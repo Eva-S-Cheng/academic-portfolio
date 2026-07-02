@@ -374,3 +374,61 @@ section {
     gap: 0.8rem;
   }
 }
+
+/* ---------- CV ---------- */
+
+.cv {
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.cv li {
+  display: grid;
+  grid-template-columns: 7rem 1fr auto;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+
+.cv .years {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.cv .role {
+  font-weight: 600;
+}
+
+.cv .org {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.languages {
+  margin-top: 1.4rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.languages .lbl {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-right: 0.6rem;
+}
+
+@media (max-width: 640px) {
+  .cv li {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+  .cv .org {
+    text-align: left;
+  }
+}

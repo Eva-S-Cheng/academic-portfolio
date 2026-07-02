@@ -2,39 +2,36 @@ import { useState } from 'react'
 import { profile } from './data/profile.js'
 import { publications } from './data/publications.js'
 
-// ÉTAPE 2 (plus tard) — remplacer les données locales par l'API :
+// STEP 2 (later) — replace local data with the API:
 // import { fetchWorksByOrcid } from './lib/openalex.js'
-// puis charger dans un useEffect + useState. L'UI est déjà compatible.
+// load in a useEffect + useState. The UI is already compatible.
 
 const TYPE_LABELS = {
   article: 'Article',
   'working-paper': 'Working paper',
-  conference: 'Conférence',
-  chapter: 'Chapitre',
-  these: 'Thèse',
+  conference: 'Conference',
+  chapter: 'Chapter',
+  thesis: 'Thesis',
 }
 
-function DrawdownFigure() {
-  // Courbe de valeur cumulée stylisée, avec annotation du max drawdown —
-  // un clin d'œil au sujet de recherche, dessiné comme une figure d'article.
+function CapitalizationFigure() {
+  // Stylized price line with a "policy" step — nods to the energy-standards
+  // capitalization paper, drawn like a figure in an article.
   const path =
-    'M0,58 L28,50 L52,54 L80,40 L108,44 L136,30 L164,36 L192,22 L214,26 ' +
-    'L238,48 L262,66 L286,60 L310,74 L334,68 L360,52 L388,56 L416,42 ' +
-    'L444,46 L472,34 L500,38 L528,26 L560,30 L600,18'
+    'M0,64 L36,60 L72,62 L108,56 L144,58 L180,52 L216,54 L252,50 ' +
+    'L288,52 L300,52 L300,40 L336,42 L372,36 L408,38 L444,30 L480,32 ' +
+    'L516,26 L552,28 L588,20 L600,20'
   return (
-    <figure className="figure" aria-label="Figure stylisée : courbe de valeur avec max drawdown annoté">
+    <figure className="figure" aria-label="Stylized figure: house price line with a policy step change">
       <svg viewBox="0 0 600 90" role="img">
         <path d={path} fill="none" stroke="var(--ink)" strokeWidth="1.6" />
-        {/* pic avant drawdown */}
-        <line x1="192" y1="22" x2="192" y2="74" stroke="var(--accent)" strokeWidth="1" strokeDasharray="3 3" />
-        {/* creux */}
-        <line x1="310" y1="22" x2="310" y2="74" stroke="var(--accent)" strokeWidth="1" strokeDasharray="3 3" />
-        <line x1="192" y1="80" x2="310" y2="80" stroke="var(--accent)" strokeWidth="1.2" />
-        <circle cx="192" cy="22" r="2.4" fill="var(--accent)" />
-        <circle cx="310" cy="74" r="2.4" fill="var(--accent)" />
+        {/* policy date */}
+        <line x1="300" y1="14" x2="300" y2="80" stroke="var(--accent)" strokeWidth="1" strokeDasharray="3 3" />
+        <circle cx="300" cy="52" r="2.4" fill="var(--accent)" />
+        <circle cx="300" cy="40" r="2.4" fill="var(--accent)" />
       </svg>
       <figcaption className="caption">
-        Fig. 1 — Valeur cumulée d'un portefeuille (stylisée). Segment rouge : <em>maximum drawdown</em>.
+        Fig. 1 &mdash; House prices around a regulatory threshold (stylized). Red line: <em>policy date</em>.
       </figcaption>
     </figure>
   )
@@ -59,11 +56,11 @@ function Publication({ pub, index }) {
           {pub.authors.join(', ')}
           {pub.venue && (
             <>
-              {' · '}
+              {' \u00b7 '}
               <span className="venue">{pub.venue}</span>
             </>
           )}
-          {' · '}
+          {' \u00b7 '}
           {pub.year}
         </p>
         <div className="badges">
@@ -78,7 +75,7 @@ function Publication({ pub, index }) {
         {pub.abstract && (
           <>
             <button className="toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
-              {open ? '− Masquer le résumé' : '+ Résumé'}
+              {open ? '\u2212 Hide abstract' : '+ Abstract'}
             </button>
             {open && <p className="abstract">{pub.abstract}</p>}
           </>
@@ -90,6 +87,7 @@ function Publication({ pub, index }) {
 
 export default function App() {
   const pubs = [...publications].sort((a, b) => b.year - a.year)
+  const { teaching, cv, languages } = profile
 
   return (
     <>
@@ -98,10 +96,11 @@ export default function App() {
           <a className="brand" href="#top">
             {profile.name}
           </a>
-          <nav className="site-nav" aria-label="Navigation principale">
-            <a href="#recherche">Recherche</a>
+          <nav className="site-nav" aria-label="Main navigation">
+            <a href="#research">Research</a>
             <a href="#publications">Publications</a>
-            {profile.teaching.length > 0 && <a href="#enseignement">Enseignement</a>}
+            {teaching.length > 0 && <a href="#teaching">Teaching</a>}
+            {cv.length > 0 && <a href="#cv">CV</a>}
             <a href="#contact">Contact</a>
           </nav>
         </div>
@@ -113,20 +112,20 @@ export default function App() {
             <h1>{profile.name}</h1>
             <p className="role">{profile.title}</p>
             <p className="affiliation">
-              {profile.affiliation} · {profile.location}
+              {profile.affiliation} &middot; {profile.location}
             </p>
             <div className="hero-links">
               {profile.links.map((l) => (
                 <a key={l.label} href={l.url} target="_blank" rel="noreferrer">
-                  {l.label} ↗
+                  {l.label} &#8599;
                 </a>
               ))}
             </div>
-            <DrawdownFigure />
+            <CapitalizationFigure />
           </div>
 
-          <section id="recherche">
-            <h2 className="section-title">Recherche</h2>
+          <section id="research">
+            <h2 className="section-title">Research</h2>
             <p className="bio">{profile.bio}</p>
             <ul className="interests">
               {profile.researchInterests.map((r) => (
@@ -147,11 +146,11 @@ export default function App() {
             </ul>
           </section>
 
-          {profile.teaching.length > 0 && (
-            <section id="enseignement">
-              <h2 className="section-title">Enseignement</h2>
+          {teaching.length > 0 && (
+            <section id="teaching">
+              <h2 className="section-title">Teaching</h2>
               <ul className="teach">
-                {profile.teaching.map((t) => (
+                {teaching.map((t) => (
                   <li key={t.course + t.years}>
                     <span>{t.course}</span>
                     <span className="level">{t.level}</span>
@@ -161,13 +160,33 @@ export default function App() {
               </ul>
             </section>
           )}
+
+          {cv.length > 0 && (
+            <section id="cv">
+              <h2 className="section-title">Curriculum vitae</h2>
+              <ul className="cv">
+                {cv.map((c) => (
+                  <li key={c.role + c.years}>
+                    <span className="years">{c.years}</span>
+                    <span className="role">{c.role}</span>
+                    <span className="org">{c.org}</span>
+                  </li>
+                ))}
+              </ul>
+              {languages.length > 0 && (
+                <p className="languages">
+                  <span className="lbl">Languages</span> {languages.join(' \u00b7 ')}
+                </p>
+              )}
+            </section>
+          )}
         </div>
       </main>
 
       <footer className="site-footer" id="contact">
         <div className="wrap">
           <p>
-            Contact : <a href={`mailto:${profile.email}`}>{profile.email}</a>
+            Contact: <a href={`mailto:${profile.email}`}>{profile.email}</a>
           </p>
           <div className="links">
             {profile.links.map((l) => (

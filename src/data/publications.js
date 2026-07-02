@@ -1,51 +1,25 @@
 // ============================================================
-// PUBLICATIONS — données locales (étape 1).
+// PUBLICATIONS — local data.
 //
-// Le format est volontairement identique à celui que produira
-// src/lib/openalex.js (étape 2) : le jour où tu branches l'API,
-// l'UI ne change pas d'une ligne.
+// The shape matches what src/lib/openalex.js would return, so the
+// day you switch to automatic fetching by ORCID, the UI is unchanged.
 //
-// types possibles : 'article' | 'working-paper' | 'conference' | 'chapter' | 'these'
+// types: 'article' | 'working-paper' | 'conference' | 'chapter' | 'thesis'
 // ============================================================
 
 export const publications = [
   {
-    id: 'wp-2026-evt-hft',
-    title: 'Extreme Value Theory for Intraday Drawdowns: Evidence from High-Frequency Data',
-    authors: ['Eva Dupont', 'Co-Auteur A'],
-    venue: 'Working paper',
-    year: 2026,
+    id: 'wp-meps-house-prices',
+    title:
+      'Minimum Energy Performance Standards and House Price Capitalization: Evidence from France\u2019s Rental Ban on \u201cEnergy Sieves\u201d',
+    authors: ['Alexandre Garel', 'Eva Cheng'],
+    venue: 'Working paper (SSRN)',
+    year: 2025,
     type: 'working-paper',
     doi: null,
-    url: 'https://www.ssrn.com/',
+    url: 'https://ssrn.com/abstract=6109023',
     abstract:
-      "Nous adaptons le cadre GARCH-EVT à la mesure des drawdowns intrajournaliers et montrons que les mesures de risque classiques sous-estiment systématiquement les pertes extrêmes aux horizons haute fréquence.",
-    tags: ['EVT', 'HFT', 'Drawdown'],
-  },
-  {
-    id: 'art-2025-drawdown',
-    title: 'On the Distribution of Maximum Drawdown Duration under Regime Switching',
-    authors: ['Eva Dupont'],
-    venue: 'Journal of Empirical Finance',
-    year: 2025,
-    type: 'article',
-    doi: '10.0000/exemple.2025',
-    url: 'https://doi.org/10.0000/exemple.2025',
-    abstract:
-      "Cet article caractérise la distribution de la durée du maximum drawdown lorsque les rendements suivent un processus à changements de régime, avec une application à l'allocation dynamique.",
-    tags: ['Drawdown', 'Regime switching'],
-  },
-  {
-    id: 'conf-2024-sbti',
-    title: 'Do Science-Based Targets Move Bond Spreads? Evidence from SBTi Commitments',
-    authors: ['Eva Dupont', 'Co-Auteur B', 'Co-Auteur C'],
-    venue: 'Conférence AFFI, Paris',
-    year: 2024,
-    type: 'conference',
-    doi: null,
-    url: null,
-    abstract:
-      "À partir des engagements SBTi appariés aux identifiants obligataires (ISIN/RIC), nous mesurons la réaction des spreads de crédit aux annonces de cibles climatiques validées.",
-    tags: ['Finance durable', 'Obligations', 'Event study'],
+      'We study how France\u2019s ban on renting out the worst energy-rated dwellings (\u201cpassoires \u00e9nerg\u00e9tiques\u201d) is capitalized into house prices, using energy-performance (DPE) ratings to identify affected properties.',
+    tags: ['Climate policy', 'Real estate', 'Energy performance'],
   },
 ]
