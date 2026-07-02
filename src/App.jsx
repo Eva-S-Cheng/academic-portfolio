@@ -1,19 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, Route, Routes, useLocation, useParams } from "react-router-dom";
 import {
-  ORCID_ID, LINKS, PROFILE_LINKS, BIO, SKILLS, LANGUAGES, RESEARCH_STATEMENT,
-  INTERESTS, WORKING_PAPERS, REPORTS, PROJECTS, EDUCATION,
+  ORCID_ID, LINKS, PROFILE_LINKS, AFFILIATION, HERO_LEDE, BIO, SKILLS, LANGUAGES,
+  RESEARCH_STATEMENT, INTERESTS, WORKING_PAPERS, REPORTS, PROJECTS, EDUCATION,
   TEACHING_EXPERIENCE, WORK_EXPERIENCE, COURSE, COPYRIGHT_NOTICE,
 } from "./content.js";
 
 /* ============================================================
-   Eva Cheng — Academic Portfolio · v4
-   Dense, precise, app-grade. Content lives in src/content.js.
+   Eva Cheng — Academic Portfolio · v5
+   Single typeface (EB Garamond), classic academic register.
+   ORCID is the primary source for publications; curated entries
+   in content.js supplement it with abstracts, citations, links.
    ============================================================ */
 
 const PHOTO_URL = import.meta.env.BASE_URL + "photo.jpg";
 
-/* ---------- ORCID (live publications, with coauthors) ---------- */
+/* ---------- ORCID ---------- */
 
 const TYPE_LABELS = {
   "journal-article": "Journal article",
@@ -24,7 +26,7 @@ const TYPE_LABELS = {
   report: "Report",
   dissertation: "Thesis",
   "dissertation-thesis": "Thesis",
-  other: "Other",
+  other: "Work",
 };
 
 function pickLink(work) {
@@ -34,22 +36,18 @@ function pickLink(work) {
   const anyUrl = ids.find((i) => i["external-id-url"]?.value);
   if (anyUrl) return anyUrl["external-id-url"].value;
   if (work?.url?.value) return work.url.value;
-  return LINKS.orcid;
+  return null;
 }
 
 function contributorsOf(work) {
   const list = work?.contributors?.contributor ?? [];
-  return list
-    .map((c) => c["credit-name"]?.value)
-    .filter(Boolean);
+  return list.map((c) => c["credit-name"]?.value).filter(Boolean);
 }
 
 function titleKey(t) {
   return (t || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
-/* Fuzzy match so the same paper never shows twice (ORCID vs curated),
-   even when titles differ in punctuation, casing or truncation. */
 function sameWork(a, b) {
   const A = titleKey(a), B = titleKey(b);
   if (!A || !B) return false;
@@ -72,20 +70,18 @@ function useOrcidWorks() {
         const data = await res.json();
         const summaries = (data.group ?? []).map((g) => g["work-summary"]?.[0]).filter(Boolean);
 
-        /* Bulk-fetch full records (max 50 put-codes per call) to get contributors,
-           which the /works summary endpoint does not include. */
-        let details = new Map();
+        /* The summary endpoint omits contributors; a bulk call on the
+           put-codes returns the full records, including coauthors. */
+        const details = new Map();
         if (summaries.length > 0) {
           const codes = summaries.map((s) => s["put-code"]).slice(0, 50).join(",");
           try {
             const resFull = await fetch(`https://pub.orcid.org/v3.0/${ORCID_ID}/works/${codes}`, { headers });
             if (resFull.ok) {
               const bulk = await resFull.json();
-              (bulk.bulk ?? []).forEach((b) => {
-                if (b.work) details.set(b.work["put-code"], b.work);
-              });
+              (bulk.bulk ?? []).forEach((b) => { if (b.work) details.set(b.work["put-code"], b.work); });
             }
-          } catch { /* summaries still usable without coauthors */ }
+          } catch { /* summaries remain usable */ }
         }
 
         const works = summaries
@@ -97,11 +93,11 @@ function useOrcidWorks() {
               year: s["publication-date"]?.year?.value ?? full["publication-date"]?.year?.value ?? null,
               journal: full["journal-title"]?.value ?? s["journal-title"]?.value ?? null,
               type: TYPE_LABELS[s.type] ?? s.type ?? "Work",
-              authors: contributorsOf(full),
+              contributors: contributorsOf(full),
               url: pickLink(full),
             };
           })
-          .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+          .sort((a, b) => (b.year ?? 9999) - (a.year ?? 9999));
 
         if (!cancelled) setState({ status: "ready", works });
       } catch (err) {
@@ -114,13 +110,30 @@ function useOrcidWorks() {
   return state;
 }
 
-/* ---------- Primitives ---------- */
-
-function Eyebrow({ children }) {
-  return <p className="eyebrow">{children}</p>;
+/* Merge an ORCID work with a matching curated entry: ORCID provides the
+   record (title, year, contributors); the curated entry provides the
+   abstract, the citation and the canonical link. */
+function mergeWithCurated(work, curated) {
+  const match = curated.find((p) => sameWork(work.title, p.title));
+  if (!match) return { ...work, matched: false };
+  return {
+    ...work,
+    matched: true,
+    authors: work.contributors.length > 0 ? work.contributors.join(", ") : match.authors,
+    venue: work.journal || match.venue,
+    link: match.link || (work.url ? { label: "View", url: work.url } : null),
+    abstract: match.abstract,
+    citation: match.citation,
+  };
 }
 
-function Reveal({ children, as: Tag = "div", className = "", delay = 0, ...rest }) {
+/* ---------- Primitives ---------- */
+
+function Label({ children, className = "" }) {
+  return <p className={`label ${className}`}>{children}</p>;
+}
+
+function Fade({ children, as: Tag = "div", className = "", ...rest }) {
   const ref = useRef(null);
   useEffect(() => {
     const el = ref.current;
@@ -130,22 +143,15 @@ function Reveal({ children, as: Tag = "div", className = "", delay = 0, ...rest 
       return;
     }
     const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-        });
-      },
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      }),
       { threshold: 0.05 }
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
-  return (
-    <Tag ref={ref} className={`reveal ${className}`}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined} {...rest}>
-      {children}
-    </Tag>
-  );
+  return <Tag ref={ref} className={`fade ${className}`} {...rest}>{children}</Tag>;
 }
 
 function useClipboard() {
@@ -160,10 +166,10 @@ function useClipboard() {
   return { copied, copy };
 }
 
-function CiteModal({ paper, onClose }) {
+function CiteModal({ citation, onClose }) {
   const [tab, setTab] = useState("bibtex");
   const { copied, copy } = useClipboard();
-  const text = tab === "bibtex" ? paper.citation.bibtex : paper.citation.apa;
+  const text = tab === "bibtex" ? citation.bibtex : citation.apa;
 
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -188,7 +194,7 @@ function CiteModal({ paper, onClose }) {
         <pre className="cite-block">{text}</pre>
         <div className="modal-foot">
           <button className="btn btn-solid" onClick={() => copy(text)}>
-            {copied ? "Copied ✓" : "Copy to clipboard"}
+            {copied ? "Copied" : "Copy to clipboard"}
           </button>
         </div>
       </div>
@@ -196,67 +202,76 @@ function CiteModal({ paper, onClose }) {
   );
 }
 
-/* Dense publication row — year rail, title, authors, inline actions */
-function PubRow({ title, authors, venue, year, link, citation, abstract, delay = 0 }) {
+/* Publication entry, vita style */
+function PubItem({ title, authors, venue, year, link, citation, abstract }) {
   const [open, setOpen] = useState(false);
   const [citing, setCiting] = useState(false);
   return (
-    <Reveal as="article" className="pub" delay={delay}>
-      <div className="pub-year">{year || "—"}</div>
-      <div className="pub-main">
+    <Fade as="article" className="pub">
+      <div className="pub-head">
         <h3 className="pub-title">{title}</h3>
-        <p className="pub-authors">
-          {authors}
-          {venue && <span className="pub-venue"> · {venue}</span>}
-        </p>
-        <div className="pub-actions">
-          {link && (
-            <a href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>
-          )}
-          {citation && (
-            <button onClick={() => setCiting(true)}>Cite</button>
-          )}
-          {abstract && (
-            <button onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-              {open ? "Hide abstract" : "Abstract"}
-            </button>
-          )}
-        </div>
-        <div className={`collapse ${open ? "open" : ""}`}>
-          <p className="pub-abstract">{abstract}</p>
-        </div>
+        {year && <span className="pub-year">{year}</span>}
       </div>
-      {citing && <CiteModal paper={{ citation }} onClose={() => setCiting(false)} />}
-    </Reveal>
+      {authors && <p className="pub-authors">{authors}</p>}
+      {venue && <p className="pub-venue">{venue}</p>}
+      <div className="pub-actions">
+        {link && <a href={link.url} target="_blank" rel="noreferrer">{link.label}</a>}
+        {citation && <button onClick={() => setCiting(true)}>Cite</button>}
+        {abstract && (
+          <button onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+            {open ? "Hide abstract" : "Abstract"}
+          </button>
+        )}
+      </div>
+      {open && <p className="pub-abstract">{abstract}</p>}
+      {citing && <CiteModal citation={citation} onClose={() => setCiting(false)} />}
+    </Fade>
   );
 }
 
-function TimelineEntry({ heading, org, period, honors, details, delay = 0 }) {
+/* Institution logo, from the organization's favicon, with fallback */
+function OrgMark({ domain, name }) {
+  const [failed, setFailed] = useState(false);
+  if (!domain || failed) {
+    return <span className="org-mark org-mark-fallback" aria-hidden="true">{(name || "?")[0]}</span>;
+  }
+  return (
+    <img
+      className="org-mark"
+      src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
+      alt=""
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+function CvRow({ heading, org, orgUrl, orgDomain, period, honors, details }) {
   const [open, setOpen] = useState(false);
   return (
-    <Reveal as="article" className="tl-entry" delay={delay}>
-      <div className="tl-rail" aria-hidden="true"><span className="tl-dot" /></div>
-      <div className="tl-body">
-        <div className="tl-top">
-          <h3 className="tl-heading">{heading}</h3>
-          <span className="tl-period">{period}</span>
+    <Fade as="article" className="cv-row">
+      <OrgMark domain={orgDomain} name={org} />
+      <div className="cv-body">
+        <div className="cv-top">
+          <h3 className="cv-heading">{heading}</h3>
+          <span className="cv-period">{period}</span>
         </div>
-        <p className="tl-org">
-          {org}
-          {honors && <span className="tl-honors"> · {honors}</span>}
+        <p className="cv-org">
+          {orgUrl ? (
+            <a href={orgUrl} target="_blank" rel="noreferrer">{org}</a>
+          ) : org}
+          {honors && <span className="cv-honors"> · {honors}</span>}
         </p>
         {details && (
           <>
-            <button className="tl-toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-              {open ? "Less −" : "Details +"}
+            <button className="text-btn" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+              {open ? "Hide details" : "Details"}
             </button>
-            <div className={`collapse ${open ? "open" : ""}`}>
-              <p className="tl-details">{details}</p>
-            </div>
+            {open && <p className="cv-details">{details}</p>}
           </>
         )}
       </div>
-    </Reveal>
+    </Fade>
   );
 }
 
@@ -266,128 +281,61 @@ const NAV = [
   { to: "/", label: "Home", end: true },
   { to: "/research", label: "Research" },
   { to: "/teaching", label: "Teaching" },
-  { to: "/cv", label: "CV" },
+  { to: "/cv", label: "Curriculum Vitae" },
 ];
 
-function ScrollProgress() {
-  const [p, setP] = useState(0);
-  useEffect(() => {
-    const onScroll = () => {
-      const h = document.documentElement;
-      const max = h.scrollHeight - h.clientHeight;
-      setP(max > 0 ? (h.scrollTop / max) * 100 : 0);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return <div className="scroll-progress" style={{ width: `${p}%` }} aria-hidden="true" />;
-}
-
 function Header({ theme, onToggleTheme }) {
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    setMenuOpen(false);
-    document.body.style.overflow = "";
-  }, [location.pathname]);
-
-  const toggleMenu = () => {
-    setMenuOpen((o) => {
-      document.body.style.overflow = o ? "" : "hidden";
-      return !o;
-    });
-  };
+  useEffect(() => setMenuOpen(false), [location.pathname]);
 
   return (
-    <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
+    <header className="site-header">
       <div className="header-inner">
-        <Link className="wordmark" to="/">
-          <span className="wordmark-mono">ε</span> Eva Cheng
-        </Link>
+        <Link className="wordmark" to="/">Eva Cheng</Link>
         <nav className="nav" aria-label="Main">
           {NAV.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end}><span>{item.label}</span></NavLink>
+            <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
           ))}
         </nav>
         <button className="theme-toggle" onClick={onToggleTheme}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
           {theme === "dark" ? "☀" : "☾"}
         </button>
-        <button className="menu-toggle" onClick={toggleMenu} aria-expanded={menuOpen} aria-label="Menu">
-          {menuOpen ? "✕" : "☰"}
+        <button className="menu-toggle" onClick={() => setMenuOpen((o) => !o)}
+          aria-expanded={menuOpen} aria-label="Menu">
+          {menuOpen ? "✕" : "Menu"}
         </button>
       </div>
-      <div className={`mobile-overlay ${menuOpen ? "open" : ""}`}>
+      {menuOpen && (
         <nav className="mobile-nav" aria-label="Main mobile">
-          {NAV.map((item, i) => (
-            <NavLink key={item.to} to={item.to} end={item.end} style={{ transitionDelay: `${50 + i * 45}ms` }}>
-              <span className="mobile-idx">0{i + 1}</span> {item.label}
-            </NavLink>
+          {NAV.map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
           ))}
         </nav>
-      </div>
+      )}
     </header>
-  );
-}
-
-function BackToTop() {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > 600);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return (
-    <button className={`back-to-top ${show ? "show" : ""}`}
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      aria-label="Back to top" tabIndex={show ? 0 : -1}>↑</button>
   );
 }
 
 function Footer() {
   return (
     <footer className="site-footer">
-      <div className="footer-inner">
-        <div className="footer-brand">
-          <p className="footer-wordmark">Eva <em>Cheng</em></p>
-          <p className="footer-tag">Sustainable &amp; quantitative finance research.</p>
-        </div>
-        <div className="footer-cols">
-          <div>
-            <p className="eyebrow">contact</p>
-            <p className="footer-emails">
-              <a href={`mailto:${LINKS.emailAcademic}`}>{LINKS.emailAcademic}</a><br />
-              <a href={`mailto:${LINKS.emailPro}`}>{LINKS.emailPro}</a>
-            </p>
-          </div>
-          <div>
-            <p className="eyebrow">profiles</p>
-            <ul className="footer-links">
-              {PROFILE_LINKS.map((l) => (
-                <li key={l.label}><a href={l.url} target="_blank" rel="noreferrer">{l.label}</a></li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="eyebrow">navigate</p>
-            <ul className="footer-links">
-              {NAV.map((item) => (<li key={item.to}><Link to={item.to}>{item.label}</Link></li>))}
-            </ul>
-          </div>
-        </div>
-      </div>
+      <p className="footer-name">Eva Cheng</p>
+      <p className="footer-aff">{AFFILIATION}</p>
+      <p className="footer-emails">
+        <a href={`mailto:${LINKS.emailAcademic}`}>{LINKS.emailAcademic}</a>
+        <span className="sep">·</span>
+        <a href={`mailto:${LINKS.emailPro}`}>{LINKS.emailPro}</a>
+      </p>
+      <ul className="footer-profiles">
+        {PROFILE_LINKS.map((l) => (
+          <li key={l.label}><a href={l.url} target="_blank" rel="noreferrer">{l.label}</a></li>
+        ))}
+      </ul>
       <p className="colophon">
-        © {new Date().getFullYear()} Eva Cheng — {COPYRIGHT_NOTICE} Publications
-        sync automatically from <a href={LINKS.orcid} target="_blank" rel="noreferrer">ORCID</a>.
+        © {new Date().getFullYear()} Eva Cheng. {COPYRIGHT_NOTICE} Publications are
+        synchronized from <a href={LINKS.orcid} target="_blank" rel="noreferrer">ORCID</a>.
       </p>
     </footer>
   );
@@ -406,18 +354,14 @@ function PageHead({ title }) {
   return null;
 }
 
-function Portrait({ size = "hero" }) {
+function Portrait() {
   const [failed, setFailed] = useState(false);
   if (failed) {
-    return <div className={`portrait portrait-${size} portrait-fallback`} aria-hidden="true">EC</div>;
+    return <div className="portrait portrait-fallback" aria-hidden="true">EC</div>;
   }
   return (
-    <img
-      className={`portrait portrait-${size}`}
-      src={PHOTO_URL}
-      alt="Portrait of Eva Cheng"
-      onError={() => setFailed(true)}
-    />
+    <img className="portrait" src={PHOTO_URL} alt="Portrait of Eva Cheng"
+      onError={() => setFailed(true)} />
   );
 }
 
@@ -429,78 +373,59 @@ function HomePage() {
       <PageHead title="" />
       <section className="hero">
         <div className="hero-grid">
-          <div className="hero-content">
-            <Reveal delay={0}>
-              <Eyebrow>visiting researcher · audencia&nbsp;&nbsp;→&nbsp;&nbsp;future phd · escp</Eyebrow>
-            </Reveal>
-            <Reveal delay={60}>
-              <h1 className="hero-name">Eva <em>Cheng</em></h1>
-            </Reveal>
-            <Reveal delay={130}>
-              <p className="hero-lede">
-                I study how <strong>climate, nature and social risks</strong> shape
-                corporate decisions and financial markets, how investors influence
-                corporate sustainability practices, and how AI can analyze
-                disclosures to support sustainability reporting.
-              </p>
-            </Reveal>
-            <Reveal delay={200} className="hero-links">
-              <Link className="btn btn-solid" to="/research">Explore my research</Link>
-              <a className="btn btn-outline" href={LINKS.cvEN} target="_blank" rel="noreferrer">
-                Download CV ↗
-              </a>
-            </Reveal>
-            <Reveal delay={270}>
-              <ul className="profile-links" aria-label="Profiles">
-                {PROFILE_LINKS.map((l) => (
-                  <li key={l.label}><a href={l.url} target="_blank" rel="noreferrer">{l.label}</a></li>
-                ))}
-              </ul>
-            </Reveal>
+          <div>
+            <Label>{AFFILIATION}</Label>
+            <h1 className="hero-name">Eva Cheng</h1>
+            <p className="hero-lede">{HERO_LEDE}</p>
+            <div className="btn-row">
+              <Link className="btn btn-solid" to="/research">Research</Link>
+              <a className="btn" href={LINKS.cvEN} target="_blank" rel="noreferrer">Curriculum Vitae (PDF)</a>
+            </div>
+            <ul className="inline-links" aria-label="Profiles">
+              {PROFILE_LINKS.map((l, i) => (
+                <li key={l.label}>
+                  {i > 0 && <span className="sep">·</span>}
+                  <a href={l.url} target="_blank" rel="noreferrer">{l.label}</a>
+                </li>
+              ))}
+            </ul>
           </div>
-          <Reveal delay={120} className="hero-photo">
-            <Portrait size="hero" />
-          </Reveal>
+          <Portrait />
         </div>
       </section>
 
       <section className="section">
+        <Label>About</Label>
         <div className="two-col">
-          <Reveal className="prose">
-            <Eyebrow>about</Eyebrow>
-            <h2 className="section-title">Toward an <em>academic career</em></h2>
+          <Fade className="prose">
             {BIO.map((p, i) => (<p key={i}>{p}</p>))}
-          </Reveal>
-          <Reveal delay={100} className="side-panel">
-            <p className="side-label">Finance, computing &amp; analytics</p>
-            <ul className="tag-cloud" aria-label="Technical skills">
-              {SKILLS.map((s) => (<li key={s} className="tag">{s}</li>))}
+          </Fade>
+          <Fade className="aside">
+            <p className="aside-label">Technical skills</p>
+            <p className="aside-line">{SKILLS.join(" · ")}</p>
+            <p className="aside-label">Languages</p>
+            <p className="aside-line">{LANGUAGES.join(" · ")}</p>
+            <p className="aside-label">Research interests</p>
+            <ul className="aside-list">
+              {INTERESTS.map((t) => (<li key={t}>{t}</li>))}
             </ul>
-            <p className="side-label mt">Languages</p>
-            <ul className="tag-cloud" aria-label="Languages">
-              {LANGUAGES.map((l) => (<li key={l} className="tag tag-quiet">{l}</li>))}
-            </ul>
-            <p className="side-label mt">Research interests</p>
-            <ul className="tag-cloud" aria-label="Research interests">
-              {INTERESTS.slice(0, 5).map((t) => (<li key={t} className="tag">{t}</li>))}
-            </ul>
-          </Reveal>
+          </Fade>
         </div>
       </section>
 
       <section className="section">
-        <div className="card-grid">
+        <Label>Contents</Label>
+        <div className="toc">
           {[
-            { to: "/research", n: "01", h: "Research", p: "Working papers, publications synced from ORCID, theses, reports and side-projects." },
-            { to: "/teaching", n: "02", h: "Teaching", p: "Python for Finance at Audencia — eight sessions, a final project and references." },
-            { to: "/cv", n: "03", h: "Curriculum Vitae", p: "Education and professional experience, with the full CV in English and French." },
-          ].map((c, i) => (
-            <Reveal as={Link} to={c.to} className="nav-card" key={c.to} delay={i * 70}>
-              <span className="nav-card-n">{c.n}</span>
+            { to: "/research", h: "Research", p: "Publications synchronized from ORCID, working papers, theses and side projects." },
+            { to: "/teaching", h: "Teaching", p: "Python for Finance at Audencia: eight sessions, a final project and references." },
+            { to: "/cv", h: "Curriculum Vitae", p: "Education and professional experience, with the full CV in English and French." },
+          ].map((c) => (
+            <Fade as={Link} to={c.to} className="toc-item" key={c.to}>
               <h3>{c.h}</h3>
               <p>{c.p}</p>
-              <span className="nav-card-cta">Browse →</span>
-            </Reveal>
+              <span className="toc-more">Read more</span>
+            </Fade>
           ))}
         </div>
       </section>
@@ -510,54 +435,42 @@ function HomePage() {
 
 function ResearchPage() {
   const { status, works } = useOrcidWorks();
-  const [filter, setFilter] = useState("All");
+  const curated = useMemo(() => [...WORKING_PAPERS, ...REPORTS], []);
 
-  const curated = [...WORKING_PAPERS, ...REPORTS];
-  const orcidWorks = works.filter((w) => !curated.some((p) => sameWork(w.title, p.title)));
-  const types = useMemo(
-    () => ["All", ...Array.from(new Set(orcidWorks.map((w) => w.type)))],
-    [orcidWorks]
+  const merged = works.map((w) => mergeWithCurated(w, curated));
+  const curatedNotInOrcid = curated.filter(
+    (p) => !works.some((w) => sameWork(w.title, p.title))
   );
-  const shown = filter === "All" ? orcidWorks : orcidWorks.filter((w) => w.type === filter);
+  const wpNotInOrcid = curatedNotInOrcid.filter((p) => WORKING_PAPERS.includes(p));
+  const reportsNotInOrcid = curatedNotInOrcid.filter((p) => REPORTS.includes(p));
 
   return (
     <>
       <PageHead title="Research" />
       <section className="page-hero">
-        <Reveal><Eyebrow>research.interests</Eyebrow></Reveal>
-        <Reveal delay={60}><h1 className="page-title">Research &amp; <em>projects</em></h1></Reveal>
+        <Label>Research</Label>
+        <h1 className="page-title">Research and projects</h1>
       </section>
 
       <section className="section">
         <div className="two-col">
-          <Reveal className="prose">
+          <Fade className="prose">
             {RESEARCH_STATEMENT.map((p, i) => (<p key={i}>{p}</p>))}
-          </Reveal>
-          <Reveal delay={100}>
-            <ul className="tag-cloud" aria-label="Research interests">
-              {INTERESTS.map((t) => (<li key={t} className="tag">{t}</li>))}
+          </Fade>
+          <Fade className="aside">
+            <p className="aside-label">Research interests</p>
+            <ul className="aside-list">
+              {INTERESTS.map((t) => (<li key={t}>{t}</li>))}
             </ul>
-          </Reveal>
+          </Fade>
         </div>
       </section>
 
       <section className="section">
-        <Reveal>
-          <h2 className="section-title">Working <em>papers</em></h2>
-        </Reveal>
-        <div className="pub-list">
-          {WORKING_PAPERS.map((p, i) => (
-            <PubRow key={p.title} title={p.title} authors={p.authors} venue={p.venue}
-              year={p.year} link={p.link} citation={p.citation} abstract={p.abstract} delay={i * 60} />
-          ))}
-        </div>
-      </section>
-
-      <section className="section">
-        <Reveal>
-          <h2 className="section-title">Publications &amp; <em>works</em></h2>
-          <p className="section-sub">Synced live from <a href={LINKS.orcid} target="_blank" rel="noreferrer">ORCID {ORCID_ID}</a>.</p>
-        </Reveal>
+        <Label>Publications and working papers</Label>
+        <p className="section-note">
+          Synchronized from <a href={LINKS.orcid} target="_blank" rel="noreferrer">ORCID {ORCID_ID}</a>.
+        </p>
 
         {status === "loading" && (
           <div className="skeleton-list" aria-hidden="true">
@@ -565,75 +478,62 @@ function ResearchPage() {
           </div>
         )}
         {status === "error" && (
-          <Reveal className="notice">
-            <p>
-              The ORCID record could not be loaded right now. Browse it on{" "}
-              <a href={LINKS.orcid} target="_blank" rel="noreferrer">orcid.org</a> or{" "}
-              <a href={LINKS.scholar} target="_blank" rel="noreferrer">Google Scholar</a>.
-            </p>
-          </Reveal>
-        )}
-        {status === "ready" && orcidWorks.length === 0 && (
-          <Reveal className="notice">
-            <p>
-              New entries on the <a href={LINKS.orcid} target="_blank" rel="noreferrer">ORCID record</a>{" "}
-              appear here automatically.
-            </p>
-          </Reveal>
+          <p className="notice">
+            The ORCID record could not be loaded. It remains available on{" "}
+            <a href={LINKS.orcid} target="_blank" rel="noreferrer">orcid.org</a> and{" "}
+            <a href={LINKS.scholar} target="_blank" rel="noreferrer">Google Scholar</a>.
+            The entries below are listed from this site's records.
+          </p>
         )}
 
-        {orcidWorks.length > 0 && types.length > 2 && (
-          <Reveal className="filter-row" role="group" aria-label="Filter by type">
-            {types.map((t) => (
-              <button key={t} className={`filter-chip ${filter === t ? "on" : ""}`} onClick={() => setFilter(t)}>
-                {t}
-              </button>
+        <div className="pub-list">
+          {merged.map((w) => (
+            <PubItem key={w.putCode} title={w.title}
+              authors={w.matched ? w.authors : (w.contributors.length > 0 ? w.contributors.join(", ") : null)}
+              venue={w.matched ? w.venue : (w.journal || w.type)}
+              year={w.year}
+              link={w.matched ? w.link : (w.url ? { label: "View", url: w.url } : null)}
+              citation={w.citation} abstract={w.abstract} />
+          ))}
+          {(status !== "loading" ? wpNotInOrcid : []).map((p) => (
+            <PubItem key={p.title} title={p.title} authors={p.authors} venue={p.venue}
+              year={p.year} link={p.link} citation={p.citation} abstract={p.abstract} />
+          ))}
+        </div>
+      </section>
+
+      {(status === "loading" || reportsNotInOrcid.length > 0) && (
+        <section className="section">
+          <Label>Theses and research reports</Label>
+          <div className="pub-list">
+            {(status !== "loading" ? reportsNotInOrcid : REPORTS).map((p) => (
+              <PubItem key={p.title} title={p.title} authors={p.authors} venue={p.venue}
+                year={p.year} link={p.link} citation={p.citation} abstract={p.abstract} />
             ))}
-          </Reveal>
-        )}
-
-        <div className="pub-list">
-          {shown.map((w, i) => (
-            <PubRow key={w.putCode} title={w.title}
-              authors={w.authors.length > 0 ? w.authors.join(", ") : w.type}
-              venue={w.journal || (w.authors.length > 0 ? w.type : null)}
-              year={w.year} link={{ label: "View", url: w.url }} delay={i * 50} />
-          ))}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       <section className="section">
-        <Reveal>
-          <h2 className="section-title">Theses &amp; <em>research reports</em></h2>
-        </Reveal>
+        <Label>Side projects</Label>
         <div className="pub-list">
-          {REPORTS.map((p, i) => (
-            <PubRow key={p.title} title={p.title} authors={p.authors} venue={p.venue}
-              year={p.year} link={p.link} citation={p.citation} abstract={p.abstract} delay={i * 60} />
+          {PROJECTS.map((p) => (
+            <Fade as="article" className="pub" key={p.name}>
+              <div className="pub-head">
+                <h3 className="pub-title">
+                  {p.link ? (
+                    <a className="quiet-link" href={p.link.url} target="_blank" rel="noreferrer">{p.name}</a>
+                  ) : p.name}
+                </h3>
+              </div>
+              <p className="pub-authors">{p.description}</p>
+              <p className="pub-venue">{p.tags.join(" · ")}</p>
+            </Fade>
           ))}
         </div>
-      </section>
-
-      <section className="section">
-        <Reveal>
-          <h2 className="section-title">Side-<em>projects</em></h2>
-        </Reveal>
-        <div className="card-grid">
-          {PROJECTS.map((p, i) => (
-            <Reveal as="article" className="project" key={p.name} delay={i * 70}>
-              <h3 className="project-name">{p.name}</h3>
-              <p className="project-desc">{p.description}</p>
-              <ul className="project-tags">
-                {p.tags.map((t) => (<li key={t}>{t}</li>))}
-              </ul>
-            </Reveal>
-          ))}
-        </div>
-        <Reveal className="cta-line">
-          <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[RESEARCH]`}>
-            Collaborate / discuss research
-          </a>
-        </Reveal>
+        <p className="cta-line">
+          <a className="btn" href={`mailto:${LINKS.emailPro}?subject=[RESEARCH]`}>Discuss research</a>
+        </p>
       </section>
     </>
   );
@@ -644,35 +544,32 @@ function TeachingPage() {
     <>
       <PageHead title="Teaching" />
       <section className="page-hero">
-        <Reveal><Eyebrow>teaching</Eyebrow></Reveal>
-        <Reveal delay={60}><h1 className="page-title">Teaching <em>quantitative finance</em></h1></Reveal>
+        <Label>Teaching</Label>
+        <h1 className="page-title">Teaching</h1>
       </section>
 
       <section className="section">
         <div className="two-col">
-          <Reveal className="prose">
+          <Fade className="prose">
             {TEACHING_EXPERIENCE.map((t) => (
               <div key={t.role}>
-                <h2 className="inline-heading">{t.role}</h2>
-                <p className="tl-org">{t.org} · {t.period}</p>
+                <h2 className="sub-heading">{t.role}</h2>
+                <p className="pub-venue">
+                  <a href={t.orgUrl} target="_blank" rel="noreferrer">{t.org}</a> · {t.period}
+                </p>
                 <p className="mt-sm">{t.details}</p>
               </div>
             ))}
-          </Reveal>
-          <Reveal delay={100}>
-            <Link to="/teaching/python-for-finance" className="nav-card nav-card-tall">
-              <span className="nav-card-n">→</span>
-              <h3>Python for Finance</h3>
-              <p>Full course material — eight sessions, a final project and additional references.</p>
-              <span className="nav-card-cta">Open the course →</span>
-            </Link>
-          </Reveal>
+          </Fade>
+          <Fade as={Link} to="/teaching/python-for-finance" className="toc-item">
+            <h3>Python for Finance</h3>
+            <p>Complete course material: eight sessions, a final project and additional references.</p>
+            <span className="toc-more">Open the course</span>
+          </Fade>
         </div>
-        <Reveal className="cta-line">
-          <a className="btn btn-outline" href={`mailto:${LINKS.emailPro}?subject=[TEACHING]`}>
-            Interested in my teaching?
-          </a>
-        </Reveal>
+        <p className="cta-line">
+          <a className="btn" href={`mailto:${LINKS.emailPro}?subject=[TEACHING]`}>Contact about teaching</a>
+        </p>
       </section>
     </>
   );
@@ -683,45 +580,36 @@ function CoursePage() {
     <>
       <PageHead title={COURSE.title} />
       <section className="page-hero">
-        <Reveal>
-          <Eyebrow><Link to="/teaching" className="crumb">teaching</Link> / python-for-finance</Eyebrow>
-        </Reveal>
-        <Reveal delay={60}>
-          <h1 className="page-title">{COURSE.title} <em>— {COURSE.org}</em></h1>
-        </Reveal>
+        <Label>
+          <Link to="/teaching" className="crumb">Teaching</Link> / Python for Finance
+        </Label>
+        <h1 className="page-title">{COURSE.title}</h1>
+        <p className="section-note">{COURSE.org}</p>
       </section>
 
       <section className="section">
-        <Reveal className="prose narrow">
+        <Fade className="prose narrow">
           <p>{COURSE.description}</p>
-        </Reveal>
-        <Reveal delay={80}>
-          <p className="side-label mt">At the end of the class, you will be capable of</p>
-        </Reveal>
+        </Fade>
+        <Label className="mt">Learning outcomes</Label>
         <ul className="outcome-list">
-          {COURSE.outcomes.map((o, i) => (
-            <Reveal as="li" key={o} delay={i * 40}>{o}</Reveal>
-          ))}
+          {COURSE.outcomes.map((o) => (<Fade as="li" key={o}>{o}</Fade>))}
         </ul>
       </section>
 
       <section className="section">
-        <Reveal>
-          <h2 className="section-title">Course <em>content</em></h2>
-        </Reveal>
+        <Label>Course content</Label>
         <div className="session-list">
-          {COURSE.sessions.map((s, i) => (
-            <Reveal as={Link} to={`/teaching/python-for-finance/${s.slug}`}
-              className="session-row" key={s.slug} delay={i * 30}>
+          {COURSE.sessions.map((s) => (
+            <Fade as={Link} to={`/teaching/python-for-finance/${s.slug}`}
+              className="session-row" key={s.slug}>
               <span className="session-label">{s.label}</span>
               <span className="session-title">{s.title}</span>
               <span className="session-arrow" aria-hidden="true">→</span>
-            </Reveal>
+            </Fade>
           ))}
         </div>
-        <Reveal className="notice mt">
-          <p>{COURSE.ipNotice}</p>
-        </Reveal>
+        <p className="notice mt">{COURSE.ipNotice}</p>
       </section>
     </>
   );
@@ -739,43 +627,36 @@ function SessionPage() {
     <>
       <PageHead title={`${session.label} · ${COURSE.title}`} />
       <section className="page-hero">
-        <Reveal>
-          <Eyebrow>
-            <Link to="/teaching" className="crumb">teaching</Link> /{" "}
-            <Link to="/teaching/python-for-finance" className="crumb">python-for-finance</Link> /{" "}
-            {session.slug}
-          </Eyebrow>
-        </Reveal>
-        <Reveal delay={60}>
-          <h1 className="page-title">{session.label}<em> — {session.title}</em></h1>
-        </Reveal>
+        <Label>
+          <Link to="/teaching" className="crumb">Teaching</Link> /{" "}
+          <Link to="/teaching/python-for-finance" className="crumb">Python for Finance</Link> /{" "}
+          {session.label}
+        </Label>
+        <h1 className="page-title">{session.title}</h1>
       </section>
 
       <section className="section">
         {session.embedUrl ? (
-          <Reveal className="embed-frame">
+          <div className="embed-frame">
             <iframe src={session.embedUrl} title={`${session.label} — ${session.title}`}
               allowFullScreen loading="lazy" />
-          </Reveal>
+          </div>
         ) : (
-          <Reveal className="notice">
-            <p>
-              The material for this session is shared on request.{" "}
-              <a href={`mailto:${LINKS.emailPro}?subject=[QUESTION_PYTHON] ${session.label}`}>
-                Contact me by email
-              </a>{" "}
-              to receive it.
-            </p>
-            <p className="notice-sub">{COURSE.ipNotice}</p>
-          </Reveal>
+          <p className="notice">
+            The material for this session is available on request.{" "}
+            <a href={`mailto:${LINKS.emailPro}?subject=[QUESTION_PYTHON] ${session.label}`}>
+              Contact me by email
+            </a>{" "}
+            to receive it. {COURSE.ipNotice}
+          </p>
         )}
 
         <nav className="pager" aria-label="Sessions">
           {prev ? (
-            <Link className="btn btn-outline" to={`/teaching/python-for-finance/${prev.slug}`}>← {prev.label}</Link>
+            <Link className="btn" to={`/teaching/python-for-finance/${prev.slug}`}>← {prev.label}</Link>
           ) : <span />}
           {next ? (
-            <Link className="btn btn-outline" to={`/teaching/python-for-finance/${next.slug}`}>{next.label} →</Link>
+            <Link className="btn" to={`/teaching/python-for-finance/${next.slug}`}>{next.label} →</Link>
           ) : <span />}
         </nav>
       </section>
@@ -788,44 +669,45 @@ function CVPage() {
     <>
       <PageHead title="Curriculum Vitae" />
       <section className="page-hero">
-        <Reveal><Eyebrow>curriculum.vitae</Eyebrow></Reveal>
-        <Reveal delay={60}><h1 className="page-title">Curriculum <em>Vitae</em></h1></Reveal>
-        <Reveal delay={120} className="hero-links">
-          <a className="btn btn-solid" href={LINKS.cvEN} target="_blank" rel="noreferrer">Download (EN) ↗</a>
-          <a className="btn btn-outline" href={LINKS.cvFR} target="_blank" rel="noreferrer">Télécharger (FR) ↗</a>
-        </Reveal>
+        <Label>Curriculum Vitae</Label>
+        <h1 className="page-title">Curriculum Vitae</h1>
+        <div className="btn-row">
+          <a className="btn btn-solid" href={LINKS.cvEN} target="_blank" rel="noreferrer">Download (English)</a>
+          <a className="btn" href={LINKS.cvFR} target="_blank" rel="noreferrer">Télécharger (français)</a>
+        </div>
       </section>
 
       <section className="section">
-        <Reveal><h2 className="section-title">Education</h2></Reveal>
-        <div className="timeline">
-          {EDUCATION.map((e, i) => (
-            <TimelineEntry key={e.degree} heading={e.degree} org={e.school}
-              period={e.year} honors={e.honors} details={e.details} delay={i * 50} />
+        <Label>Education</Label>
+        <div className="cv-list">
+          {EDUCATION.map((e) => (
+            <CvRow key={e.degree} heading={e.degree} org={e.school} orgUrl={e.orgUrl}
+              orgDomain={e.orgDomain} period={e.year} honors={e.honors} details={e.details} />
           ))}
         </div>
       </section>
 
       <section className="section">
-        <Reveal><h2 className="section-title">Teaching experience</h2></Reveal>
-        <div className="timeline">
+        <Label>Teaching experience</Label>
+        <div className="cv-list">
           {TEACHING_EXPERIENCE.map((t) => (
-            <TimelineEntry key={t.role} heading={t.role} org={t.org} period={t.period} details={t.details} />
+            <CvRow key={t.role} heading={t.role} org={t.org} orgUrl={t.orgUrl}
+              orgDomain={t.orgDomain} period={t.period} details={t.details} />
           ))}
         </div>
       </section>
 
       <section className="section">
-        <Reveal><h2 className="section-title">Work experience</h2></Reveal>
-        <div className="timeline">
-          {WORK_EXPERIENCE.map((w, i) => (
-            <TimelineEntry key={w.role + w.period} heading={w.role} org={w.org}
-              period={w.period} details={w.details} delay={i * 50} />
+        <Label>Professional experience</Label>
+        <div className="cv-list">
+          {WORK_EXPERIENCE.map((w) => (
+            <CvRow key={w.role + w.period} heading={w.role} org={w.org} orgUrl={w.orgUrl}
+              orgDomain={w.orgDomain} period={w.period} details={w.details} />
           ))}
         </div>
-        <Reveal className="cta-line">
-          <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[WORK]`}>Let's work together</a>
-        </Reveal>
+        <p className="cta-line">
+          <a className="btn" href={`mailto:${LINKS.emailPro}?subject=[WORK]`}>Get in touch</a>
+        </p>
       </section>
     </>
   );
@@ -836,9 +718,9 @@ function NotFoundPage() {
     <>
       <PageHead title="Page not found" />
       <section className="page-hero">
-        <Eyebrow>error.404</Eyebrow>
-        <h1 className="page-title">This page <em>does not exist</em></h1>
-        <div className="hero-links">
+        <Label>Error 404</Label>
+        <h1 className="page-title">This page does not exist</h1>
+        <div className="btn-row">
           <Link className="btn btn-solid" to="/">Back to home</Link>
         </div>
       </section>
@@ -866,7 +748,6 @@ export default function App() {
     <>
       <style>{STYLES}</style>
       <ScrollToTop />
-      <ScrollProgress />
       <Header theme={theme} onToggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))} />
       <main>
         <Routes>
@@ -879,7 +760,6 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
-      <BackToTop />
       <Footer />
     </>
   );
@@ -889,36 +769,28 @@ export default function App() {
 
 const STYLES = `
 :root {
-  --paper: #f6f8f3;
-  --paper-raised: #ffffff;
-  --ink: #142019;
-  --ink-soft: #55685c;
-  --line: #dde5da;
-  --line-soft: #e8eee5;
-  --accent: #1f7a54;
-  --accent-strong: #135c3d;
-  --accent-bright: #2a9a6c;
-  --accent-wash: #e5f0e8;
-  --card-shadow: 0 1px 2px rgba(20, 32, 25, 0.05), 0 6px 18px -10px rgba(20, 32, 25, 0.10);
-  --card-shadow-hover: 0 2px 4px rgba(20, 32, 25, 0.06), 0 12px 28px -12px rgba(20, 32, 25, 0.16);
-  --font-display: "Fraunces", Georgia, serif;
-  --font-body: "Instrument Sans", -apple-system, sans-serif;
-  --font-mono: "Spline Sans Mono", ui-monospace, monospace;
+  --paper: #f7f6f0;
+  --paper-raised: #fdfcf8;
+  --ink: #1e2a22;
+  --ink-soft: #5a675e;
+  --line: #d9ddd2;
+  --line-soft: #e6e8df;
+  --accent: #1c5f42;
+  --accent-soft: #3d7a5c;
+  --wash: #ebefe6;
+  --font: "EB Garamond", Garamond, "Times New Roman", serif;
 }
 
 [data-theme="dark"] {
-  --paper: #0c110e;
-  --paper-raised: #131a15;
-  --ink: #eaf2ea;
-  --ink-soft: #94a89a;
-  --line: #223028;
-  --line-soft: #1a251f;
-  --accent: #52c18b;
-  --accent-strong: #7fdcae;
-  --accent-bright: #3fae79;
-  --accent-wash: #152319;
-  --card-shadow: 0 0 0 1px rgba(82, 193, 139, 0.04), 0 8px 22px -12px rgba(0, 0, 0, 0.55);
-  --card-shadow-hover: 0 0 0 1px rgba(82, 193, 139, 0.12), 0 12px 28px -12px rgba(0, 0, 0, 0.65);
+  --paper: #121713;
+  --paper-raised: #191f1a;
+  --ink: #e9ede5;
+  --ink-soft: #9aa79c;
+  --line: #2b342c;
+  --line-soft: #212922;
+  --accent: #7cc39d;
+  --accent-soft: #5da881;
+  --wash: #1a221b;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -929,438 +801,326 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.6;
+  font-family: var(--font);
+  font-size: 18px;
+  line-height: 1.62;
   -webkit-font-smoothing: antialiased;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
 ::selection { background: var(--accent); color: var(--paper); }
-::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: var(--paper); }
-::-webkit-scrollbar-thumb { background: var(--line); border-radius: 8px; border: 3px solid var(--paper); }
-::-webkit-scrollbar-thumb:hover { background: var(--ink-soft); }
 
-a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
-a:hover { color: var(--accent-strong); }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+a:hover { text-decoration-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-main { max-width: 920px; margin: 0 auto; padding: 0 24px; min-height: 60vh; }
+main { max-width: 860px; margin: 0 auto; padding: 0 24px; min-height: 62vh; }
 
-.mt { margin-top: 22px; }
+.mt { margin-top: 30px; }
 .mt-sm { margin-top: 12px; }
+.sep { margin: 0 9px; color: var(--line); }
 
-/* --- scroll progress --- */
-.scroll-progress {
-  position: fixed; top: 0; left: 0; height: 2px; z-index: 30;
-  background: var(--accent);
+/* --- small caps labels: the structural voice of the site --- */
+.label {
+  font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 14px; font-weight: 500;
 }
 
 /* --- header --- */
-.site-header { position: sticky; top: 0; z-index: 20; }
-.site-header.scrolled {
-  background: color-mix(in srgb, var(--paper) 84%, transparent);
-  backdrop-filter: blur(12px) saturate(1.3);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3);
-  border-bottom: 1px solid var(--line-soft);
-}
+.site-header { border-bottom: 1px solid var(--line); background: var(--paper); position: sticky; top: 0; z-index: 20; }
 .header-inner {
-  display: flex; align-items: center; gap: 24px;
-  max-width: 920px; margin: 0 auto; padding: 12px 24px;
+  display: flex; align-items: baseline; gap: 28px;
+  max-width: 860px; margin: 0 auto; padding: 18px 24px 14px;
 }
 .wordmark {
-  font-family: var(--font-display); font-weight: 560; font-size: 1.05rem;
-  color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px;
+  font-style: italic; font-weight: 500; font-size: 1.22rem;
+  color: var(--ink); text-decoration: none;
 }
-.wordmark-mono {
-  font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent);
-  width: 26px; height: 26px; display: grid; place-items: center;
-  border: 1px solid var(--line); border-radius: 7px; background: var(--paper-raised);
-  transition: border-color 0.2s ease, transform 0.25s ease;
-}
-.wordmark:hover .wordmark-mono { border-color: var(--accent); transform: rotate(-8deg); }
-
-.nav { display: flex; gap: 2px; margin-left: auto; }
+.nav { display: flex; gap: 26px; margin-left: auto; }
 .nav a {
-  font-size: 0.86rem; color: var(--ink-soft); text-decoration: none;
-  padding: 6px 12px; border-radius: 999px;
-  transition: color 0.18s ease, background 0.18s ease;
+  font-size: 0.74rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-soft); text-decoration: none; padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
-.nav a:hover { color: var(--ink); background: var(--accent-wash); }
-.nav a.active { color: var(--accent-strong); background: var(--accent-wash); font-weight: 500; }
-
+.nav a:hover { color: var(--ink); }
+.nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
 .theme-toggle {
-  border: 1px solid var(--line); background: var(--paper-raised); color: var(--ink);
-  width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
-  display: grid; place-items: center; flex-shrink: 0; font-size: 0.88rem;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  border: none; background: none; color: var(--ink-soft); cursor: pointer;
+  font-size: 0.95rem; padding: 0 2px; align-self: center;
 }
-.theme-toggle:hover { border-color: var(--accent); transform: rotate(15deg); }
-
+.theme-toggle:hover { color: var(--accent); }
 .menu-toggle {
-  display: none; border: 1px solid var(--line); background: var(--paper-raised);
-  color: var(--ink); width: 32px; height: 32px; border-radius: 9px;
-  cursor: pointer; font-size: 0.95rem; z-index: 25;
+  display: none; border: none; background: none; color: var(--ink);
+  font-family: var(--font); font-size: 0.74rem; letter-spacing: 0.18em;
+  text-transform: uppercase; cursor: pointer; margin-left: auto;
 }
-
-.mobile-overlay {
-  display: none; position: fixed; inset: 0; z-index: 15;
-  background: color-mix(in srgb, var(--paper) 96%, transparent);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  opacity: 0; pointer-events: none; transition: opacity 0.28s ease;
+.mobile-nav {
+  display: flex; flex-direction: column; border-top: 1px solid var(--line-soft);
+  max-width: 860px; margin: 0 auto; padding: 6px 24px 14px;
 }
-.mobile-overlay.open { opacity: 1; pointer-events: auto; }
-.mobile-nav { display: flex; flex-direction: column; gap: 2px; padding: 96px 28px 0; }
 .mobile-nav a {
-  font-family: var(--font-display); font-size: 1.7rem; font-weight: 440;
-  color: var(--ink); text-decoration: none; padding: 12px 0;
+  font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink); text-decoration: none; padding: 11px 0;
   border-bottom: 1px solid var(--line-soft);
-  opacity: 0; transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease, color 0.18s ease;
 }
-.mobile-overlay.open .mobile-nav a { opacity: 1; transform: none; }
-.mobile-nav a.active { color: var(--accent-strong); }
-.mobile-idx { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); margin-right: 12px; }
-
-/* --- eyebrow --- */
-.eyebrow {
-  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em;
-  color: var(--accent); margin-bottom: 10px;
-}
-.eyebrow::before { content: "▸ "; opacity: 0.55; }
-.crumb { color: var(--accent); text-decoration: none; }
-.crumb:hover { text-decoration: underline; }
+.mobile-nav a.active { color: var(--accent); }
+.mobile-nav a:last-child { border-bottom: none; }
 
 /* --- hero --- */
-.hero { padding: 52px 0 44px; border-bottom: 1px solid var(--line-soft); }
-.hero-grid { display: grid; grid-template-columns: 1fr auto; gap: 44px; align-items: center; }
+.hero { padding: 56px 0 46px; border-bottom: 1px solid var(--line); }
+.hero-grid { display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; }
 .hero-name {
-  font-family: var(--font-display); font-weight: 360;
-  font-size: clamp(2.7rem, 6.5vw, 4.3rem); line-height: 1;
-  letter-spacing: -0.02em; margin: 4px 0 18px;
-  font-variation-settings: "opsz" 120;
+  font-weight: 500; font-size: clamp(2.6rem, 6vw, 3.9rem);
+  line-height: 1.04; letter-spacing: -0.01em; margin: 2px 0 18px;
 }
-.hero-name em, .page-title em, .section-title em {
-  font-style: italic; font-weight: 470; color: var(--accent-strong);
+.hero-lede { max-width: 560px; font-size: 1.12rem; line-height: 1.6; color: var(--ink-soft); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.inline-links { list-style: none; display: flex; flex-wrap: wrap; margin-top: 22px; }
+.inline-links li { display: flex; align-items: baseline; }
+.inline-links a {
+  font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-soft); text-decoration: none;
 }
-.hero-lede { max-width: 560px; font-size: 1.05rem; line-height: 1.62; color: var(--ink-soft); }
-.hero-lede strong { color: var(--ink); font-weight: 600; }
-.hero-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
-.profile-links { display: flex; flex-wrap: wrap; gap: 8px 20px; list-style: none; margin-top: 24px; }
-.profile-links a {
-  font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-soft);
-  text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 2px;
-  transition: color 0.18s ease, border-color 0.18s ease;
-}
-.profile-links a:hover { color: var(--accent-strong); border-color: var(--accent); }
+.inline-links a:hover { color: var(--accent); }
 
-.portrait-hero {
-  width: 208px; height: 208px; border-radius: 22px; object-fit: cover;
-  border: 1px solid var(--line); box-shadow: var(--card-shadow);
+.portrait {
+  width: 196px; height: 196px; object-fit: cover; border-radius: 4px;
+  border: 1px solid var(--line);
+  box-shadow: 6px 6px 0 var(--wash);
 }
 .portrait-fallback {
-  display: grid; place-items: center;
-  font-family: var(--font-display); font-size: 3rem; font-weight: 400;
-  color: var(--accent-strong); background: var(--accent-wash);
+  display: grid; place-items: center; font-style: italic;
+  font-size: 2.8rem; color: var(--accent); background: var(--wash);
 }
 
-.page-hero { padding: 40px 0 30px; border-bottom: 1px solid var(--line-soft); }
-.page-title {
-  font-family: var(--font-display); font-weight: 390;
-  font-size: clamp(1.9rem, 5vw, 2.9rem); line-height: 1.08; letter-spacing: -0.015em;
-}
+.page-hero { padding: 44px 0 34px; border-bottom: 1px solid var(--line); }
+.page-title { font-weight: 500; font-size: clamp(1.9rem, 5vw, 2.7rem); line-height: 1.08; letter-spacing: -0.008em; }
+.section-note { font-size: 0.95rem; color: var(--ink-soft); margin-top: 8px; }
 
 /* --- buttons --- */
 .btn {
-  display: inline-block; font-family: var(--font-body); font-size: 0.87rem;
-  font-weight: 500; padding: 9px 18px; border-radius: 999px;
-  text-decoration: none; cursor: pointer; border: 1px solid transparent;
-  transition: transform 0.16s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  display: inline-block; font-family: var(--font);
+  font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 10px 20px; border: 1px solid var(--ink); border-radius: 2px;
+  color: var(--ink); background: none; text-decoration: none; cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.btn:hover { transform: translateY(-1px); }
-.btn:active { transform: scale(0.98); }
-.btn-solid {
-  background: var(--accent-strong); color: #f6f8f3; border-color: var(--accent-strong);
-  box-shadow: 0 4px 14px -7px var(--accent-strong);
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn-solid { background: var(--ink); color: var(--paper); }
+.btn-solid:hover { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.text-btn {
+  font-family: var(--font); font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent); background: none; border: none;
+  padding: 0; margin-top: 8px; cursor: pointer;
 }
-[data-theme="dark"] .btn-solid { color: #0b110d; }
-.btn-solid:hover { background: var(--accent-bright); border-color: var(--accent-bright); color: #f6f8f3; }
-[data-theme="dark"] .btn-solid:hover { color: #0b110d; }
-.btn-outline { border-color: var(--line); color: var(--ink); background: var(--paper-raised); }
-.btn-outline:hover { border-color: var(--accent); color: var(--accent-strong); }
+.text-btn:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- sections --- */
-.section { padding: 40px 0; border-bottom: 1px solid var(--line-soft); }
+.section { padding: 42px 0; border-bottom: 1px solid var(--line); }
 .section:last-of-type { border-bottom: none; }
-.section-title {
-  font-family: var(--font-display); font-weight: 420;
-  font-size: clamp(1.4rem, 3vw, 1.8rem); line-height: 1.15; margin-bottom: 20px;
-  letter-spacing: -0.008em;
-}
-.section-sub { font-size: 0.88rem; color: var(--ink-soft); margin: -12px 0 18px; }
-.inline-heading { font-family: var(--font-display); font-weight: 480; font-size: 1.3rem; }
-.two-col { display: grid; grid-template-columns: 3fr 2fr; gap: 36px; align-items: start; }
-.prose p + p, .prose div + div { margin-top: 13px; }
-.prose { font-size: 0.97rem; }
-.narrow { max-width: 660px; }
-.side-panel {
-  background: var(--paper-raised); border: 1px solid var(--line-soft);
-  border-radius: 14px; padding: 20px 22px; box-shadow: var(--card-shadow);
-}
-.side-label {
-  font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.09em;
-  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px;
-}
-.cta-line { margin-top: 26px; }
+.sub-heading { font-weight: 600; font-size: 1.25rem; }
+.two-col { display: grid; grid-template-columns: 5fr 3fr; gap: 44px; align-items: start; }
+.prose { text-align: justify; hyphens: auto; }
+.prose p + p, .prose div + div { margin-top: 14px; }
+.narrow { max-width: 640px; }
+.cta-line { margin-top: 28px; }
 
-.tag-cloud { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
-.tag {
-  font-size: 0.79rem; padding: 4px 12px; border-radius: 999px;
-  background: var(--accent-wash); color: var(--accent-strong);
+.aside { border-left: 1px solid var(--line); padding-left: 26px; }
+.aside-label {
+  font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-soft); margin: 18px 0 6px;
 }
-.tag-quiet { background: transparent; border: 1px solid var(--line); color: var(--ink-soft); }
+.aside-label:first-child { margin-top: 0; }
+.aside-line { font-size: 0.98rem; }
+.aside-list { list-style: none; font-size: 0.98rem; }
+.aside-list li { padding: 2px 0; }
 
-/* --- cards --- */
-.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.nav-card, .project {
-  display: block; background: var(--paper-raised);
-  border: 1px solid var(--line-soft); border-radius: 14px; padding: 18px 20px;
-  text-decoration: none; color: var(--ink); box-shadow: var(--card-shadow);
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+/* --- table of contents cards --- */
+.toc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.toc-item {
+  padding: 22px 22px 24px; text-decoration: none; color: var(--ink);
+  border-right: 1px solid var(--line); transition: background 0.15s ease;
 }
-.nav-card:hover, .project:hover {
-  border-color: var(--accent); transform: translateY(-2px);
-  box-shadow: var(--card-shadow-hover); color: var(--ink);
+.toc-item:last-child { border-right: none; }
+.toc-item:hover { background: var(--paper-raised); }
+.toc-item h3 { font-weight: 600; font-size: 1.15rem; font-style: italic; }
+.toc-item p { color: var(--ink-soft); font-size: 0.95rem; margin-top: 8px; line-height: 1.55; }
+.toc-more {
+  display: inline-block; margin-top: 14px;
+  font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);
 }
-.nav-card-n { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); display: block; margin-bottom: 10px; }
-.nav-card h3, .project-name { font-family: var(--font-display); font-weight: 490; font-size: 1.05rem; }
-.nav-card p, .project-desc { color: var(--ink-soft); font-size: 0.87rem; margin-top: 7px; line-height: 1.55; }
-.nav-card-cta { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-strong); }
-.nav-card-tall { height: 100%; }
-.project-tags { list-style: none; display: flex; flex-wrap: wrap; gap: 5px; margin-top: 11px; }
-.project-tags li {
-  font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.04em;
-  padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-soft);
-}
+.two-col .toc-item { border: 1px solid var(--line); }
 
-/* --- publications (dense rows) --- */
+/* --- publications, vita style --- */
 .pub-list { border-top: 1px solid var(--line); }
-.pub {
-  display: grid; grid-template-columns: 62px 1fr; gap: 18px;
-  padding: 15px 4px; border-bottom: 1px solid var(--line);
-  transition: background 0.15s ease;
-}
-.pub:hover { background: color-mix(in srgb, var(--paper-raised) 65%, transparent); }
-.pub-year {
-  font-family: var(--font-mono); font-size: 0.76rem; color: var(--accent-strong);
-  padding-top: 3px;
-}
-.pub-main { min-width: 0; }
-.pub-title { font-family: var(--font-display); font-weight: 490; font-size: 1.06rem; line-height: 1.35; letter-spacing: -0.004em; }
-.pub-authors { color: var(--ink-soft); font-size: 0.86rem; margin-top: 4px; }
-.pub-venue { font-style: italic; }
-.pub-actions { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+.pub { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.pub-head { display: flex; align-items: baseline; gap: 20px; }
+.pub-title { font-weight: 600; font-size: 1.14rem; line-height: 1.4; flex: 1; }
+.pub-year { font-size: 0.85rem; color: var(--ink-soft); white-space: nowrap; }
+.pub-authors { font-size: 0.98rem; margin-top: 5px; }
+.pub-venue { font-style: italic; font-size: 0.95rem; color: var(--ink-soft); margin-top: 2px; }
+.pub-actions { display: flex; gap: 22px; margin-top: 9px; }
 .pub-actions a, .pub-actions button {
-  font-family: var(--font-mono); font-size: 0.73rem; color: var(--accent);
-  background: none; border: none; padding: 0; cursor: pointer;
-  text-decoration: none; border-bottom: 1px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  font-family: var(--font); font-size: 0.7rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--accent); background: none; border: none;
+  padding: 0; cursor: pointer; text-decoration: none;
 }
-.pub-actions a:hover, .pub-actions button:hover { color: var(--accent-strong); border-bottom-color: var(--accent); }
+.pub-actions a:hover, .pub-actions button:hover { text-decoration: underline; text-underline-offset: 3px; }
 .pub-abstract {
-  color: var(--ink-soft); font-size: 0.9rem; line-height: 1.65;
-  padding: 12px 16px; margin-top: 10px;
-  background: var(--paper-raised); border-left: 2px solid var(--accent);
-  border-radius: 0 10px 10px 0;
+  margin-top: 12px; padding: 2px 0 2px 18px; border-left: 2px solid var(--line);
+  color: var(--ink-soft); font-size: 0.97rem; line-height: 1.65;
+  text-align: justify; hyphens: auto;
 }
-.collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease; }
-.collapse.open { grid-template-rows: 1fr; }
-.collapse > * { overflow: hidden; }
+.quiet-link { color: var(--ink); text-decoration: none; }
+.quiet-link:hover { color: var(--accent); }
 
-.filter-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
-.filter-chip {
-  font-family: var(--font-body); font-size: 0.79rem; padding: 5px 13px;
-  border-radius: 999px; border: 1px solid var(--line); background: var(--paper-raised);
-  color: var(--ink-soft); cursor: pointer; transition: all 0.16s ease;
-}
-.filter-chip:hover { border-color: var(--accent); color: var(--accent-strong); }
-.filter-chip.on { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--paper); }
-[data-theme="dark"] .filter-chip.on { color: #0b110d; }
-
-.skeleton-list { display: flex; flex-direction: column; gap: 2px; border-top: 1px solid var(--line); }
+.skeleton-list { border-top: 1px solid var(--line); }
 .skeleton {
-  height: 72px; border-bottom: 1px solid var(--line);
-  background: linear-gradient(100deg, transparent 40%, var(--accent-wash) 50%, transparent 60%);
+  height: 84px; border-bottom: 1px solid var(--line);
+  background: linear-gradient(100deg, transparent 40%, var(--wash) 50%, transparent 60%);
   background-size: 200% 100%; animation: shimmer 1.4s infinite linear;
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
 
 .notice {
-  background: var(--accent-wash); border-radius: 12px;
-  padding: 15px 19px; font-size: 0.92rem;
+  background: var(--wash); padding: 15px 19px; font-size: 0.97rem;
+  border-left: 2px solid var(--accent);
 }
-.notice-sub { margin-top: 8px; font-size: 0.82rem; color: var(--ink-soft); }
 
 /* --- cite modal --- */
 .modal-backdrop {
   position: fixed; inset: 0; z-index: 40;
-  background: color-mix(in srgb, var(--ink) 32%, transparent);
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  background: color-mix(in srgb, var(--ink) 34%, transparent);
   display: grid; place-items: center; padding: 20px;
-  animation: fade 0.18s ease;
 }
 .modal {
-  width: min(620px, 100%); background: var(--paper-raised);
-  border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px;
-  box-shadow: var(--card-shadow-hover);
-  animation: pop 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+  width: min(620px, 100%); background: var(--paper);
+  border: 1px solid var(--ink); padding: 20px 22px;
 }
-@keyframes fade { from { opacity: 0; } }
-@keyframes pop { from { opacity: 0; transform: scale(0.96) translateY(6px); } }
-.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
-.seg { display: inline-flex; background: var(--accent-wash); border-radius: 999px; padding: 3px; }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.seg { display: inline-flex; gap: 18px; }
 .seg button {
-  font-family: var(--font-body); font-size: 0.82rem; font-weight: 500;
-  padding: 5px 14px; border-radius: 999px; border: none; background: none;
-  color: var(--ink-soft); cursor: pointer; transition: all 0.16s ease;
+  font-family: var(--font); font-size: 0.74rem; letter-spacing: 0.16em;
+  text-transform: uppercase; padding: 0 0 3px; border: none; background: none;
+  color: var(--ink-soft); cursor: pointer; border-bottom: 1px solid transparent;
 }
-.seg button.on { background: var(--paper-raised); color: var(--accent-strong); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.modal-close {
-  border: none; background: none; color: var(--ink-soft); cursor: pointer;
-  font-size: 0.9rem; width: 30px; height: 30px; border-radius: 50%;
-}
-.modal-close:hover { background: var(--accent-wash); color: var(--ink); }
+.seg button.on { color: var(--accent); border-bottom-color: var(--accent); }
+.modal-close { border: none; background: none; color: var(--ink-soft); cursor: pointer; font-size: 0.95rem; }
+.modal-close:hover { color: var(--ink); }
 .cite-block {
-  font-family: var(--font-mono); font-size: 0.77rem; line-height: 1.6;
-  background: var(--paper); border: 1px solid var(--line-soft); border-radius: 10px;
-  padding: 13px 15px; white-space: pre-wrap; word-break: break-word; color: var(--ink);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.76rem; line-height: 1.6;
+  background: var(--paper-raised); border: 1px solid var(--line);
+  padding: 14px 16px; white-space: pre-wrap; word-break: break-word; color: var(--ink);
 }
-.modal-foot { display: flex; justify-content: flex-end; margin-top: 13px; }
+.modal-foot { display: flex; justify-content: flex-end; margin-top: 14px; }
 
-/* --- timeline (CV) --- */
-.timeline { display: flex; flex-direction: column; }
-.tl-entry { display: grid; grid-template-columns: 22px 1fr; gap: 16px; padding: 13px 0; }
-.tl-rail { position: relative; display: flex; justify-content: center; }
-.tl-rail::before { content: ""; position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
-.tl-entry:first-child .tl-rail::before { top: 12px; }
-.tl-entry:last-child .tl-rail::before { bottom: calc(100% - 12px); }
-.tl-dot {
-  position: relative; z-index: 1; width: 10px; height: 10px; border-radius: 50%;
-  background: var(--paper); border: 2px solid var(--accent); margin-top: 7px;
-  transition: transform 0.18s ease, background 0.18s ease;
+/* --- CV --- */
+.cv-list { border-top: 1px solid var(--line); }
+.cv-row { display: grid; grid-template-columns: 44px 1fr; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.org-mark {
+  width: 36px; height: 36px; border-radius: 3px; object-fit: contain;
+  border: 1px solid var(--line); background: #fff; padding: 5px; margin-top: 3px;
 }
-.tl-entry:hover .tl-dot { transform: scale(1.25); background: var(--accent); }
-.tl-top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
-.tl-period { font-family: var(--font-mono); font-size: 0.73rem; color: var(--accent-strong); white-space: nowrap; }
-.tl-heading { font-family: var(--font-display); font-weight: 490; font-size: 1.07rem; letter-spacing: -0.003em; }
-.tl-org { color: var(--ink-soft); font-size: 0.87rem; margin-top: 2px; }
-.tl-honors { color: var(--accent-strong); }
-.tl-toggle {
-  font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent);
-  background: none; border: none; padding: 0; margin-top: 6px; cursor: pointer;
+[data-theme="dark"] .org-mark { background: #f2f2ee; }
+.org-mark-fallback {
+  display: grid; place-items: center; font-style: italic; font-size: 1.15rem;
+  color: var(--accent); background: var(--wash); padding: 0;
 }
-.tl-toggle:hover { color: var(--accent-strong); }
-.tl-details { color: var(--ink-soft); font-size: 0.9rem; line-height: 1.65; padding-top: 8px; max-width: 700px; }
+.cv-top { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
+.cv-heading { font-weight: 600; font-size: 1.1rem; line-height: 1.35; }
+.cv-period { font-size: 0.85rem; color: var(--ink-soft); white-space: nowrap; }
+.cv-org { font-size: 0.97rem; margin-top: 3px; }
+.cv-org a { color: var(--ink-soft); }
+.cv-org a:hover { color: var(--accent); }
+.cv-honors { font-style: italic; color: var(--accent); }
+.cv-details {
+  margin-top: 10px; padding-left: 18px; border-left: 2px solid var(--line);
+  color: var(--ink-soft); font-size: 0.96rem; line-height: 1.62;
+  text-align: justify; hyphens: auto; max-width: 700px;
+}
 
 /* --- course --- */
-.outcome-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 26px; max-width: 800px; margin-top: 4px; }
-.outcome-list li { padding-left: 22px; position: relative; font-size: 0.92rem; }
-.outcome-list li::before {
-  content: "✓"; position: absolute; left: 0; top: 2px;
-  color: var(--accent); font-weight: 600; font-size: 0.78rem;
-  width: 15px; height: 15px; display: grid; place-items: center;
-  background: var(--accent-wash); border-radius: 50%;
+.outcome-list { list-style: none; columns: 2; column-gap: 44px; max-width: 780px; }
+.outcome-list li {
+  break-inside: avoid; padding: 4px 0 4px 20px; position: relative; font-size: 1rem;
 }
+.outcome-list li::before { content: "—"; position: absolute; left: 0; color: var(--accent); }
 
 .session-list { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
 .session-row {
-  display: grid; grid-template-columns: 130px 1fr 24px; gap: 14px; align-items: baseline;
-  padding: 12px 8px; border-bottom: 1px solid var(--line);
+  display: grid; grid-template-columns: 120px 1fr 24px; gap: 16px; align-items: baseline;
+  padding: 13px 2px; border-bottom: 1px solid var(--line);
   text-decoration: none; color: var(--ink);
-  transition: background 0.15s ease, padding-left 0.15s ease;
+  transition: background 0.15s ease;
 }
-.session-row:hover { background: color-mix(in srgb, var(--paper-raised) 65%, transparent); padding-left: 14px; }
-.session-row:hover .session-arrow { color: var(--accent-strong); transform: translateX(3px); }
-.session-label { font-family: var(--font-mono); font-size: 0.73rem; color: var(--accent-strong); }
-.session-title { font-size: 0.93rem; }
-.session-arrow { color: var(--ink-soft); transition: transform 0.15s ease, color 0.15s ease; }
+.session-row:hover { background: var(--paper-raised); }
+.session-row:hover .session-arrow { color: var(--accent); }
+.session-label {
+  font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);
+}
+.session-title { font-size: 1.02rem; }
+.session-arrow { color: var(--line); transition: color 0.15s ease; text-align: right; }
 
-.embed-frame {
-  border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
-  background: var(--paper-raised); box-shadow: var(--card-shadow);
-}
+.embed-frame { border: 1px solid var(--line); background: var(--paper-raised); }
 .embed-frame iframe { display: block; width: 100%; height: 76vh; border: 0; }
-.pager { display: flex; justify-content: space-between; margin-top: 24px; }
-
-/* --- back to top --- */
-.back-to-top {
-  position: fixed; right: 22px; bottom: 22px; z-index: 18;
-  width: 40px; height: 40px; border-radius: 50%;
-  border: 1px solid var(--line); background: var(--paper-raised); color: var(--ink);
-  cursor: pointer; font-size: 0.95rem; box-shadow: var(--card-shadow);
-  opacity: 0; transform: translateY(10px); pointer-events: none;
-  transition: opacity 0.22s ease, transform 0.22s ease, border-color 0.18s ease;
-}
-.back-to-top.show { opacity: 1; transform: none; pointer-events: auto; }
-.back-to-top:hover { border-color: var(--accent); color: var(--accent-strong); }
+.pager { display: flex; justify-content: space-between; margin-top: 26px; }
 
 /* --- footer --- */
-.site-footer { border-top: 1px solid var(--line-soft); margin-top: 36px; background: var(--paper-raised); }
-.footer-inner {
-  max-width: 920px; margin: 0 auto; padding: 36px 24px 8px;
-  display: grid; grid-template-columns: 1.3fr 2fr; gap: 30px;
+.site-footer {
+  border-top: 1px solid var(--line); margin-top: 48px;
+  padding: 42px 24px 30px; text-align: center;
 }
-.footer-wordmark { font-family: var(--font-display); font-weight: 380; font-size: 1.7rem; line-height: 1; letter-spacing: -0.012em; }
-.footer-wordmark em { font-style: italic; color: var(--accent-strong); }
-.footer-tag { color: var(--ink-soft); font-size: 0.85rem; margin-top: 9px; }
-.footer-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.footer-links { list-style: none; }
-.footer-links a { font-size: 0.85rem; color: var(--ink-soft); text-decoration: none; line-height: 1.9; }
-.footer-links a:hover { color: var(--accent-strong); }
-.footer-emails a { font-family: var(--font-mono); font-size: 0.78rem; line-height: 2; }
+.footer-name { font-style: italic; font-weight: 500; font-size: 1.5rem; }
+.footer-aff { color: var(--ink-soft); font-size: 0.95rem; margin-top: 6px; }
+.footer-emails { margin-top: 14px; font-size: 0.95rem; }
+.footer-profiles {
+  list-style: none; display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 8px 26px; margin-top: 16px;
+}
+.footer-profiles a {
+  font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-soft); text-decoration: none;
+}
+.footer-profiles a:hover { color: var(--accent); }
 .colophon {
-  max-width: 920px; margin: 0 auto; padding: 18px 24px;
-  font-size: 0.73rem; color: var(--ink-soft); line-height: 1.6;
+  max-width: 720px; margin: 26px auto 0; padding-top: 18px;
   border-top: 1px solid var(--line-soft);
+  font-size: 0.78rem; color: var(--ink-soft); line-height: 1.6;
 }
 
-/* --- reveal --- */
-.reveal { opacity: 0; transform: translateY(8px); transition: opacity 0.4s ease, transform 0.4s ease; }
-.reveal.in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+/* --- fade --- */
+.fade { opacity: 0; transition: opacity 0.4s ease; }
+.fade.in { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .fade { opacity: 1; transition: none; } }
 
 /* --- print --- */
 @media print {
-  .site-header, .site-footer, .back-to-top, .scroll-progress, .hero-links, .cta-line { display: none !important; }
-  .reveal { opacity: 1 !important; transform: none !important; }
+  .site-header, .site-footer, .btn-row, .cta-line { display: none !important; }
+  .fade { opacity: 1 !important; }
   body { background: #fff; color: #000; }
 }
 
 /* --- responsive --- */
-@media (max-width: 780px) {
-  .nav { display: none; }
+@media (max-width: 720px) {
+  body { font-size: 17px; }
+  .nav, .site-header .theme-toggle { display: none; }
   .menu-toggle { display: block; }
-  .theme-toggle { margin-left: auto; }
-  .header-inner { gap: 10px; }
-  .mobile-overlay { display: block; }
-  .hero { padding: 34px 0 32px; }
+  .hero { padding: 36px 0 32px; }
   .hero-grid { grid-template-columns: 1fr; gap: 26px; }
-  .hero-photo { order: -1; }
-  .portrait-hero { width: 128px; height: 128px; border-radius: 16px; }
-  .page-hero { padding: 28px 0 24px; }
-  .two-col, .card-grid { grid-template-columns: 1fr; gap: 22px; }
-  .outcome-list { grid-template-columns: 1fr; }
-  .section { padding: 30px 0; }
-  .pub { grid-template-columns: 1fr; gap: 2px; }
-  .pub-year { padding-top: 0; }
-  .tl-top { flex-direction: column; gap: 2px; }
-  .session-row { grid-template-columns: 1fr 24px; gap: 4px 12px; }
+  .hero-grid .portrait, .hero-grid .portrait-fallback { order: -1; width: 128px; height: 128px; }
+  .page-hero { padding: 30px 0 26px; }
+  .two-col { grid-template-columns: 1fr; gap: 26px; }
+  .aside { border-left: none; padding-left: 0; border-top: 1px solid var(--line); padding-top: 20px; }
+  .toc { grid-template-columns: 1fr; }
+  .toc-item { border-right: none; border-bottom: 1px solid var(--line); }
+  .toc-item:last-child { border-bottom: none; }
+  .section { padding: 32px 0; }
+  .outcome-list { columns: 1; }
+  .pub-head, .cv-top { flex-direction: column; gap: 2px; }
+  .session-row { grid-template-columns: 1fr 24px; gap: 3px 12px; }
   .session-label { grid-column: 1 / -1; }
-  .footer-inner { grid-template-columns: 1fr; }
-  .footer-cols { grid-template-columns: 1fr 1fr; }
-  .embed-frame iframe { height: 60vh; }
-  .back-to-top { right: 16px; bottom: 16px; }
+  .prose, .pub-abstract, .cv-details { text-align: left; hyphens: none; }
 }
 `;
