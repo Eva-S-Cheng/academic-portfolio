@@ -29,13 +29,20 @@
    ];
    
    export const BIO = [
-     "Dynamic and goal-oriented, with a strong focus on responsible and quantitative finance, I am committed to advancing an academic career that integrates rigorous research with high-quality education. My research interests examine how nature / climate, environmental and social risks affect corporate decisions and financial markets, how investors influence corporate sustainability practices, and how AI can be used to analyze disclosures and support sustainability reporting.",
-     "I have developed proficiency in financial data analysis, programming, quantitative techniques, and dashboard design, drawing on earlier experience as a Data Analyst. Following an MSc in Data Management for Finance with distinction, I gained industry exposure as a Financial Analyst in real estate and later as an Asset & Liability Manager in the banking sector.",
-     "In parallel with these prior roles, I previously served as an adjunct lecturer in Quantitative Finance and Python, where I introduced postgraduate students to analytical and computational approaches in market finance. I am currently a visiting researcher in a predoctoral position, dedicated to strengthening my empirical and methodological capabilities in preparation for doctoral research. This stage enables me to refine my research agenda and contribute to ongoing projects in sustainable and quantitative finance.",
-     "I am fluent in French, English, and Cantonese and have professional proficiency in Chinese. I welcome communication in these languages and have basic knowledge of German.",
+     "My work examines how climate, nature and social risks affect corporate decisions and financial markets, how investors influence corporate sustainability practices, and how AI can be used to analyze disclosures and support sustainability reporting. I approach these questions with a quantitative toolkit \u2014 econometrics, asset and property pricing, and machine learning applied to finance.",
+     "I came to research through industry. After an MSc in Data Management for Finance (graduated valedictorian), I worked as a Data Analyst, then as a Financial Analyst in real estate development and as an Asset & Liability Manager in banking \u2014 experience that grounds my research in how financial decisions are actually made.",
+     "I am currently a Visiting Researcher at Audencia Business School in a predoctoral position, refining my research agenda and contributing to ongoing projects in sustainable and quantitative finance ahead of my PhD at ESCP. In parallel, I have taught Python and Quantitative Finance to postgraduate students as an adjunct lecturer.",
    ];
    
    export const SKILLS = ["Python", "R", "SQL", "Excel", "C++", "Power BI"];
+   
+   export const LANGUAGES = [
+     "French (fluent)",
+     "English (fluent)",
+     "Cantonese (fluent)",
+     "Chinese (professional)",
+     "German (basic)",
+   ];
    
    export const RESEARCH_STATEMENT = [
      "My research interests focus on areas at the intersection of finance, sustainability, and mathematics. This includes quantitative finance, econometrics, financial asset and property pricing, and the application of machine learning to finance.",
@@ -112,20 +119,20 @@
      {
        name: "Research Paper Digest Agent",
        description:
-         "An automated agent designed to systematically retrieve and compile research articles or working papers related to a specified subject from selected academic journals or websites, within a defined time frame. The agent delivers a curated daily digest of relevant publications via email to support literature monitoring.",
-       tags: ["Automation", "Literature monitoring", "Email digest"],
+         "Automated agent that monitors selected academic journals, retrieves new articles and working papers on a given subject, and delivers a curated daily digest by email.",
+       tags: ["Automation", "Literature monitoring"],
      },
      {
        name: "Kajin",
        description:
-         "A web scraping-based tool that automatically collects and compiles the latest property sale advertisements from selected online platforms. Kajin enables real-time market monitoring by providing up-to-date listings for efficient property analysis.",
-       tags: ["Web scraping", "Real estate", "Market monitoring"],
+         "Web-scraping tool that collects and compiles the latest property sale listings from selected platforms, enabling real-time housing market monitoring.",
+       tags: ["Web scraping", "Real estate"],
      },
      {
        name: "News Digest",
        description:
-         "An automated AI-based model that uses web scraping to collect daily news from a selected provider. The system generates a general summary of the day\u2019s news, category-specific summaries, and individual article summaries. For each article, it extracts key information such as keywords, main subjects, and the original source link. The results are automatically retrieved by a scheduled Python task, which compiles and sends them via email without manual intervention.",
-       tags: ["NLP", "Summarization", "Scheduled tasks"],
+         "AI pipeline that scrapes daily news, produces global, category-level and per-article summaries with keywords and sources, and ships the result by scheduled email \u2014 fully hands-free.",
+       tags: ["NLP", "Summarization", "Scheduling"],
      },
    ];
    
