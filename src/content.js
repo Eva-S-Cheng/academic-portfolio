@@ -216,7 +216,7 @@
      },
    ];
    
-   export const WORK_EXPERIENCE = [
+   export const ACADEMIC_POSITIONS = [
      {
        role: "Visiting Assistant in Research",
        org: "Audencia Business School",
@@ -225,6 +225,18 @@
        period: "2025 \u2013 Present",
        details: null,
      },
+     {
+       role: "Adjunct Lecturer in Python and Quantitative Finance",
+       org: "Audencia Business School",
+       orgUrl: "https://www.audencia.com",
+       orgDomain: "audencia.com",
+       period: "2024 \u2013 Present",
+       details:
+         "As a Lecturer at Audencia, I teach courses on Python, Quantitative Finance, and Data Analysis, focusing on practical applications of financial theory. The curriculum covers financial modeling, risk assessment, and data analysis using Python. Students learn Python programming methods for finance, enabling them to process, explore, visualize, and analyze data. The course includes topics such as data analysis, portfolio construction, risk measurement, and the use of Python libraries for financial simulations and predictions.",
+     },
+   ];
+   
+   export const PROFESSIONAL_EXPERIENCE = [
      {
        role: "Asset and Liability Manager",
        org: "Caisse d'Epargne Bretagne Pays de Loire",
