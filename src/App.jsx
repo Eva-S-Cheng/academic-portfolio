@@ -471,22 +471,28 @@ function HomePage() {
         <div className="wrap">
           <Eyebrow>About</Eyebrow>
           <h2 className="section-title">Finance, sustainability &amp; <em>quantitative methods</em></h2>
-          <div className="cols">
-            <div className="prose">
-              {BIO.map((p, i) => (<p key={i}>{p}</p>))}
-            </div>
-            <div className="side-card">
+          <div className="prose about-prose">
+            {BIO.map((p, i) => (<p key={i}>{p}</p>))}
+          </div>
+          <div className="about-meta">
+            <div>
               <p className="side-label">Research interests</p>
               <div className="tag-row">
                 {INTERESTS.map((t) => (<span className="tag" key={t}>{t}</span>))}
               </div>
-              <p className="side-label mt">Technical skills</p>
-              <div className="tag-row">
-                {SKILLS.map((s) => (<span className="tag tag-quiet" key={s}>{s}</span>))}
+            </div>
+            <div className="about-meta-row">
+              <div>
+                <p className="side-label">Technical skills</p>
+                <div className="tag-row">
+                  {SKILLS.map((s) => (<span className="tag tag-quiet" key={s}>{s}</span>))}
+                </div>
               </div>
-              <p className="side-label mt">Languages</p>
-              <div className="tag-row">
-                {LANGUAGES.map((l) => (<span className="tag tag-quiet" key={l}>{l}</span>))}
+              <div>
+                <p className="side-label">Languages</p>
+                <div className="tag-row">
+                  {LANGUAGES.map((l) => (<span className="tag tag-quiet" key={l}>{l}</span>))}
+                </div>
               </div>
             </div>
           </div>
@@ -499,7 +505,7 @@ function HomePage() {
           <div className="card-grid">
             {[
               { to: "/research", h: "Research", p: "Publications synchronized from ORCID, working papers, theses and side projects." },
-              { to: "/teaching", h: "Teaching", p: "Python for Finance at Audencia: eight sessions, a final project and references." },
+              { to: "/teaching", h: "Teaching", p: "Postgraduate teaching in Python, quantitative finance and data analysis, with course material available to enrolled students." },
               { to: "/cv", h: "Curriculum Vitae", p: "Education, academic positions and professional experience. Full CV in English and French." },
             ].map((c) => (
               <Link to={c.to} className="nav-card" key={c.to}>
@@ -1154,41 +1160,46 @@ a:hover { color: var(--green-deep); }
 .quiet-link:hover { color: var(--green-deep); }
 
 /* --- publications --- */
-.pub-list { display: flex; flex-direction: column; gap: 14px; }
+.pub-list { display: flex; flex-direction: column; gap: 10px; }
 .pub {
   position: relative; background: var(--surface); border: 1px solid var(--line);
-  border-radius: 16px; padding: 22px 26px 22px 30px;
+  border-radius: 12px; padding: 13px 18px 13px 21px;
   box-shadow: var(--shadow); overflow: hidden;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .pub::before {
-  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
   background: var(--green); opacity: 0.85;
 }
 .pub:hover { border-color: var(--green); box-shadow: var(--shadow-hover); }
-.pub-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.pub-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
 .chip {
-  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
-  padding: 4px 12px; border-radius: 999px; background: var(--wash); color: var(--green-deep);
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.03em;
+  padding: 2px 10px; border-radius: 999px; background: var(--wash); color: var(--green-deep);
 }
-.pub-year { font-size: 0.84rem; font-weight: 600; color: var(--soft); }
-.pub-title { font-weight: 520; font-size: 1.2rem; line-height: 1.34; letter-spacing: -0.008em; }
-.pub-authors { font-size: 0.96rem; margin-top: 6px; }
-.pub-venue { font-style: italic; font-size: 0.92rem; color: var(--soft); margin-top: 2px; }
-.pub-actions { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 12px; }
+.pub-year { font-size: 0.78rem; font-weight: 600; color: var(--soft); }
+.pub-title { font-weight: 520; font-size: 1.04rem; line-height: 1.32; letter-spacing: -0.006em; }
+.pub-authors { font-size: 0.88rem; margin-top: 3px; }
+.pub-venue { font-style: italic; font-size: 0.84rem; color: var(--soft); margin-top: 1px; }
+.pub-actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 7px; }
 .pub-actions a, .pub-actions button {
-  font-family: var(--font); font-size: 0.8rem; font-weight: 600;
+  font-family: var(--font); font-size: 0.76rem; font-weight: 600;
   color: var(--green); background: none; border: none; padding: 0; cursor: pointer;
 }
 .pub-actions a:hover, .pub-actions button:hover { color: var(--green-deep); text-decoration: underline; text-underline-offset: 3px; }
 .pub-abstract {
-  margin-top: 14px; padding: 14px 18px; border-radius: 12px;
-  background: var(--wash); color: var(--soft); font-size: 0.94rem; line-height: 1.64;
+  margin-top: 10px; padding: 11px 14px; border-radius: 10px;
+  background: var(--wash); color: var(--soft); font-size: 0.88rem; line-height: 1.6;
 }
+
+/* --- about meta (home) --- */
+.about-prose { margin-bottom: 22px; }
+.about-meta { display: flex; flex-direction: column; gap: 18px; }
+.about-meta-row { display: flex; gap: clamp(28px, 4vw, 64px); flex-wrap: wrap; }
 
 .skeleton-list { display: flex; flex-direction: column; gap: 14px; }
 .skeleton {
-  height: 120px; border-radius: 16px; border: 1px solid var(--line);
+  height: 86px; border-radius: 12px; border: 1px solid var(--line);
   background: linear-gradient(100deg, var(--surface) 40%, var(--wash) 50%, var(--surface) 60%);
   background-size: 200% 100%; animation: shimmer 1.4s infinite linear;
 }
@@ -1236,11 +1247,11 @@ a:hover { color: var(--green-deep); }
 .modal-foot { display: flex; justify-content: flex-end; margin-top: 14px; }
 
 /* --- CV --- */
-.cv-list { display: flex; flex-direction: column; gap: 14px; }
+.cv-list { display: flex; flex-direction: column; gap: 10px; }
 .cv-entry {
-  display: grid; grid-template-columns: 52px 1fr; gap: 18px;
-  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
-  padding: 20px 24px; box-shadow: var(--shadow);
+  display: grid; grid-template-columns: 48px 1fr; gap: 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 15px 20px; box-shadow: var(--shadow);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .cv-entry:hover { border-color: var(--green); box-shadow: var(--shadow-hover); }
