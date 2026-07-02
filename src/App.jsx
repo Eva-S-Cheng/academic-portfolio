@@ -7,10 +7,10 @@ import {
 } from "./content.js";
 
 /* ============================================================
-   Eva Cheng — Academic Portfolio · v7
-   Strict contemporary academic design. One typeface (EB Garamond),
-   full-width rigorous grid, heavy structural rules, square motif,
-   a single deep green accent. Light and dark themes.
+   Eva Cheng — Academic Portfolio · v8
+   The green identity, balanced between academic and modern.
+   One typeface (Fraunces), full-width layout, soft cards,
+   assertive green, light and dark themes.
    ============================================================ */
 
 const PHOTO_URL = import.meta.env.BASE_URL + "photo.jpg";
@@ -124,13 +124,8 @@ function mergeWithCurated(work, curated) {
 
 /* ---------- Primitives ---------- */
 
-function SectionHead({ title, meta }) {
-  return (
-    <div className="sec-head">
-      <h2 className="sec-title"><span className="sq" aria-hidden="true" />{title}</h2>
-      {meta && <span className="sec-meta">{meta}</span>}
-    </div>
-  );
+function Eyebrow({ children }) {
+  return <p className="eyebrow">{children}</p>;
 }
 
 function useClipboard() {
@@ -173,7 +168,7 @@ function CiteModal({ citation, onClose }) {
         <pre className="cite-block">{text}</pre>
         <div className="modal-foot">
           <button className="btn btn-solid" onClick={() => copy(text)}>
-            {copied ? "Copied" : "Copy to clipboard"}
+            {copied ? "Copied ✓" : "Copy to clipboard"}
           </button>
         </div>
       </div>
@@ -181,27 +176,28 @@ function CiteModal({ citation, onClose }) {
   );
 }
 
-function PubItem({ title, authors, venue, year, link, citation, abstract }) {
+function PubItem({ title, authors, venue, year, type, link, citation, abstract }) {
   const [open, setOpen] = useState(false);
   const [citing, setCiting] = useState(false);
   return (
     <article className="pub">
-      <div className="pub-year">{year || ""}</div>
-      <div className="pub-main">
-        <h3 className="pub-title">{title}</h3>
-        {authors && <p className="pub-authors">{authors}</p>}
-        {venue && <p className="pub-venue">{venue}</p>}
-        <div className="pub-actions">
-          {link && <a href={link.url} target="_blank" rel="noreferrer">{link.label}</a>}
-          {citation && <button onClick={() => setCiting(true)}>Cite</button>}
-          {abstract && (
-            <button onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-              {open ? "Hide abstract" : "Abstract"}
-            </button>
-          )}
-        </div>
-        {open && <p className="pub-abstract">{abstract}</p>}
+      <div className="pub-meta">
+        {type && <span className="chip">{type}</span>}
+        {year && <span className="pub-year">{year}</span>}
       </div>
+      <h3 className="pub-title">{title}</h3>
+      {authors && <p className="pub-authors">{authors}</p>}
+      {venue && <p className="pub-venue">{venue}</p>}
+      <div className="pub-actions">
+        {link && <a href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>}
+        {citation && <button onClick={() => setCiting(true)}>Cite</button>}
+        {abstract && (
+          <button onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+            {open ? "Hide abstract" : "Abstract"}
+          </button>
+        )}
+      </div>
+      {open && <p className="pub-abstract">{abstract}</p>}
       {citing && <CiteModal citation={citation} onClose={() => setCiting(false)} />}
     </article>
   );
@@ -227,7 +223,10 @@ function CvEntry({ heading, org, orgUrl, orgDomain, period, honors, details }) {
     <article className="cv-entry">
       <OrgMark domain={orgDomain} name={org} />
       <div className="cv-main">
-        <h3 className="cv-heading">{heading}</h3>
+        <div className="cv-top">
+          <h3 className="cv-heading">{heading}</h3>
+          <span className="cv-period">{period}</span>
+        </div>
         <p className="cv-org">
           {orgUrl ? <a href={orgUrl} target="_blank" rel="noreferrer">{org}</a> : org}
           {honors && <span className="cv-honors"> · {honors}</span>}
@@ -241,7 +240,6 @@ function CvEntry({ heading, org, orgUrl, orgDomain, period, honors, details }) {
           </>
         )}
       </div>
-      <span className="cv-period">{period}</span>
     </article>
   );
 }
@@ -256,16 +254,21 @@ const NAV = [
 ];
 
 function Header({ theme, onToggleTheme }) {
+  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   useEffect(() => setMenuOpen(false), [location.pathname]);
 
   return (
-    <header className="site-header">
+    <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
       <div className="wrap header-inner">
-        <Link className="wordmark" to="/">
-          <span className="sq" aria-hidden="true" />Eva Cheng
-        </Link>
+        <Link className="wordmark" to="/">Eva <em>Cheng</em></Link>
         <nav className="nav" aria-label="Main">
           {NAV.map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
@@ -273,11 +276,11 @@ function Header({ theme, onToggleTheme }) {
         </nav>
         <button className="theme-toggle" onClick={onToggleTheme}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
-          {theme === "dark" ? "Light" : "Dark"}
+          {theme === "dark" ? "☀" : "☾"}
         </button>
         <button className="menu-toggle" onClick={() => setMenuOpen((o) => !o)}
           aria-expanded={menuOpen} aria-label="Menu">
-          {menuOpen ? "Close" : "Menu"}
+          {menuOpen ? "✕" : "☰"}
         </button>
       </div>
       {menuOpen && (
@@ -285,9 +288,6 @@ function Header({ theme, onToggleTheme }) {
           {NAV.map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
           ))}
-          <button className="theme-toggle mobile-theme" onClick={onToggleTheme}>
-            {theme === "dark" ? "Light theme" : "Dark theme"}
-          </button>
         </nav>
       )}
     </header>
@@ -299,7 +299,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="wrap footer-grid">
         <div>
-          <p className="footer-name"><span className="sq" aria-hidden="true" />Eva Cheng</p>
+          <p className="footer-name">Eva <em>Cheng</em></p>
           <p className="footer-aff">{AFFILIATION}</p>
         </div>
         <div>
@@ -364,12 +364,12 @@ function HomePage() {
       <section className="hero">
         <div className="wrap hero-grid">
           <div>
-            <p className="hero-aff">{AFFILIATION}</p>
-            <h1 className="hero-name">Eva Cheng</h1>
+            <Eyebrow>{AFFILIATION}</Eyebrow>
+            <h1 className="hero-name">Eva <em>Cheng</em></h1>
             <p className="hero-lede">{HERO_LEDE}</p>
             <div className="btn-row">
-              <Link className="btn btn-solid" to="/research">Research</Link>
-              <a className="btn" href={LINKS.cvEN} target="_blank" rel="noreferrer">Curriculum Vitae (PDF)</a>
+              <Link className="btn btn-solid" to="/research">Explore my research</Link>
+              <a className="btn" href={LINKS.cvEN} target="_blank" rel="noreferrer">Download CV ↗</a>
             </div>
             <ul className="hero-profiles" aria-label="Profiles">
               {PROFILE_LINKS.map((l) => (
@@ -379,38 +379,31 @@ function HomePage() {
           </div>
           <div className="hero-side">
             <Portrait />
-            <dl className="fact-list">
-              <div className="fact">
-                <dt>Fields</dt>
-                <dd>Sustainable finance, quantitative finance, AI applied to finance</dd>
-              </div>
-              <div className="fact">
-                <dt>Methods</dt>
-                <dd>Econometrics, asset and property pricing, machine learning</dd>
-              </div>
-              <div className="fact">
-                <dt>Languages</dt>
-                <dd>{LANGUAGES.join(", ")}</dd>
-              </div>
-            </dl>
           </div>
         </div>
       </section>
 
       <section className="section">
         <div className="wrap">
-          <SectionHead title="About" />
+          <Eyebrow>About</Eyebrow>
+          <h2 className="section-title">Finance, sustainability &amp; <em>quantitative methods</em></h2>
           <div className="cols">
             <div className="prose">
               {BIO.map((p, i) => (<p key={i}>{p}</p>))}
             </div>
-            <div>
+            <div className="side-card">
               <p className="side-label">Research interests</p>
-              <ul className="plain-list">
-                {INTERESTS.map((t) => (<li key={t}>{t}</li>))}
-              </ul>
+              <div className="tag-row">
+                {INTERESTS.map((t) => (<span className="tag" key={t}>{t}</span>))}
+              </div>
               <p className="side-label mt">Technical skills</p>
-              <p className="side-text">{SKILLS.join(", ")}</p>
+              <div className="tag-row">
+                {SKILLS.map((s) => (<span className="tag tag-quiet" key={s}>{s}</span>))}
+              </div>
+              <p className="side-label mt">Languages</p>
+              <div className="tag-row">
+                {LANGUAGES.map((l) => (<span className="tag tag-quiet" key={l}>{l}</span>))}
+              </div>
             </div>
           </div>
         </div>
@@ -418,20 +411,17 @@ function HomePage() {
 
       <section className="section">
         <div className="wrap">
-          <SectionHead title="Contents" />
-          <div className="index-grid">
+          <Eyebrow>Explore</Eyebrow>
+          <div className="card-grid">
             {[
               { to: "/research", h: "Research", p: "Publications synchronized from ORCID, working papers, theses and side projects." },
               { to: "/teaching", h: "Teaching", p: "Python for Finance at Audencia: eight sessions, a final project and references." },
               { to: "/cv", h: "Curriculum Vitae", p: "Education, academic positions and professional experience. Full CV in English and French." },
-            ].map((c, i) => (
-              <Link to={c.to} className="index-item" key={c.to}>
-                <span className="index-n">{String(i + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3>{c.h}</h3>
-                  <p>{c.p}</p>
-                </div>
-                <span className="index-arrow" aria-hidden="true">→</span>
+            ].map((c) => (
+              <Link to={c.to} className="nav-card" key={c.to}>
+                <h3>{c.h}</h3>
+                <p>{c.p}</p>
+                <span className="nav-card-cta">Browse →</span>
               </Link>
             ))}
           </div>
@@ -451,24 +441,37 @@ function ResearchPage() {
   );
   const wpNotInOrcid = curatedNotInOrcid.filter((p) => WORKING_PAPERS.includes(p));
   const reportsNotInOrcid = curatedNotInOrcid.filter((p) => REPORTS.includes(p));
-  const pubCount = status === "ready" ? merged.length + wpNotInOrcid.length : null;
 
   return (
     <>
       <PageHead title="Research" />
       <section className="page-hero">
         <div className="wrap">
-          <h1 className="page-title">Research</h1>
-          <p className="page-sub">{RESEARCH_STATEMENT[0]}</p>
+          <Eyebrow>Research</Eyebrow>
+          <h1 className="page-title">Research &amp; <em>projects</em></h1>
         </div>
       </section>
 
       <section className="section">
         <div className="wrap">
-          <SectionHead
-            title="Publications and working papers"
-            meta={pubCount ? `${pubCount} ${pubCount > 1 ? "entries" : "entry"} · ORCID ${ORCID_ID}` : `ORCID ${ORCID_ID}`}
-          />
+          <div className="cols">
+            <div className="prose">
+              {RESEARCH_STATEMENT.map((p, i) => (<p key={i}>{p}</p>))}
+            </div>
+            <div className="side-card">
+              <p className="side-label">Research interests</p>
+              <div className="tag-row">
+                {INTERESTS.map((t) => (<span className="tag" key={t}>{t}</span>))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="wrap">
+          <Eyebrow>Synchronized from ORCID {ORCID_ID}</Eyebrow>
+          <h2 className="section-title">Publications &amp; <em>working papers</em></h2>
 
           {status === "loading" && (
             <div className="skeleton-list" aria-hidden="true">
@@ -488,14 +491,14 @@ function ResearchPage() {
             {merged.map((w) => (
               <PubItem key={w.putCode} title={w.title}
                 authors={w.matched ? w.authors : (w.contributors.length > 0 ? w.contributors.join(", ") : null)}
-                venue={w.matched ? w.venue : (w.journal || w.type)}
-                year={w.year}
+                venue={w.matched ? w.venue : w.journal}
+                type={w.type} year={w.year}
                 link={w.matched ? w.link : (w.url ? { label: "View", url: w.url } : null)}
                 citation={w.citation} abstract={w.abstract} />
             ))}
             {(status !== "loading" ? wpNotInOrcid : []).map((p) => (
-              <PubItem key={p.title} title={p.title} authors={p.authors} venue={p.venue}
-                year={p.year} link={p.link} citation={p.citation} abstract={p.abstract} />
+              <PubItem key={p.title} title={p.title} authors={p.authors}
+                type={p.venue} year={p.year} link={p.link} citation={p.citation} abstract={p.abstract} />
             ))}
           </div>
         </div>
@@ -504,11 +507,12 @@ function ResearchPage() {
       {(status === "loading" || reportsNotInOrcid.length > 0) && (
         <section className="section">
           <div className="wrap">
-            <SectionHead title="Theses and research reports" />
+            <Eyebrow>Not for publication</Eyebrow>
+            <h2 className="section-title">Theses &amp; <em>research reports</em></h2>
             <div className="pub-list">
               {(status !== "loading" ? reportsNotInOrcid : REPORTS).map((p) => (
-                <PubItem key={p.title} title={p.title} authors={p.authors} venue={p.venue}
-                  year={p.year} link={p.link} citation={p.citation} abstract={p.abstract} />
+                <PubItem key={p.title} title={p.title} authors={p.authors}
+                  type={p.venue} year={p.year} link={p.link} citation={p.citation} abstract={p.abstract} />
               ))}
             </div>
           </div>
@@ -517,39 +521,25 @@ function ResearchPage() {
 
       <section className="section">
         <div className="wrap">
-          <SectionHead title="Research interests" />
-          <div className="cols">
-            <div className="prose">
-              {RESEARCH_STATEMENT.map((p, i) => (<p key={i}>{p}</p>))}
-            </div>
-            <ul className="plain-list">
-              {INTERESTS.map((t) => (<li key={t}>{t}</li>))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="wrap">
-          <SectionHead title="Side projects" />
-          <div className="pub-list">
+          <Eyebrow>Lab</Eyebrow>
+          <h2 className="section-title">Side <em>projects</em></h2>
+          <div className="card-grid">
             {PROJECTS.map((p) => (
-              <article className="pub" key={p.name}>
-                <div className="pub-year" />
-                <div className="pub-main">
-                  <h3 className="pub-title">
-                    {p.link ? (
-                      <a className="quiet-link" href={p.link.url} target="_blank" rel="noreferrer">{p.name}</a>
-                    ) : p.name}
-                  </h3>
-                  <p className="pub-authors">{p.description}</p>
-                  <p className="pub-venue">{p.tags.join(" · ")}</p>
+              <article className="nav-card nav-card-static" key={p.name}>
+                <h3>
+                  {p.link ? (
+                    <a className="quiet-link" href={p.link.url} target="_blank" rel="noreferrer">{p.name} ↗</a>
+                  ) : p.name}
+                </h3>
+                <p>{p.description}</p>
+                <div className="tag-row mt-sm">
+                  {p.tags.map((t) => (<span className="tag tag-quiet" key={t}>{t}</span>))}
                 </div>
               </article>
             ))}
           </div>
           <p className="cta-line">
-            <a className="btn" href={`mailto:${LINKS.emailPro}?subject=[RESEARCH]`}>Discuss research</a>
+            <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[RESEARCH]`}>Discuss research</a>
           </p>
         </div>
       </section>
@@ -563,16 +553,13 @@ function TeachingPage() {
       <PageHead title="Teaching" />
       <section className="page-hero">
         <div className="wrap">
-          <h1 className="page-title">Teaching</h1>
-          <p className="page-sub">
-            Postgraduate teaching in Python, quantitative finance and data analysis at Audencia Business School.
-          </p>
+          <Eyebrow>Teaching</Eyebrow>
+          <h1 className="page-title">Teaching <em>quantitative finance</em></h1>
         </div>
       </section>
 
       <section className="section">
         <div className="wrap">
-          <SectionHead title="Current teaching" />
           <div className="cols">
             <div className="prose">
               {TEACHING_EXPERIENCE.map((t) => (
@@ -585,13 +572,10 @@ function TeachingPage() {
                 </div>
               ))}
             </div>
-            <Link to="/teaching/python-for-finance" className="index-item index-solo">
-              <span className="index-n">→</span>
-              <div>
-                <h3>Python for Finance</h3>
-                <p>Complete course material: eight sessions, a final project and additional references.</p>
-              </div>
-              <span className="index-arrow" aria-hidden="true">→</span>
+            <Link to="/teaching/python-for-finance" className="nav-card">
+              <h3>Python for Finance</h3>
+              <p>Complete course material: eight sessions, a final project and additional references.</p>
+              <span className="nav-card-cta">Open the course →</span>
             </Link>
           </div>
           <p className="cta-line">
@@ -609,9 +593,9 @@ function CoursePage() {
       <PageHead title={COURSE.title} />
       <section className="page-hero">
         <div className="wrap">
-          <p className="crumbs">
-            <Link to="/teaching">Teaching</Link> / Python for Finance
-          </p>
+          <Eyebrow>
+            <Link to="/teaching" className="crumb">Teaching</Link> / Python for Finance
+          </Eyebrow>
           <h1 className="page-title">{COURSE.title}</h1>
           <p className="page-sub">{COURSE.org}</p>
         </div>
@@ -619,12 +603,11 @@ function CoursePage() {
 
       <section className="section">
         <div className="wrap">
-          <SectionHead title="Course description" />
           <div className="cols">
             <p className="prose">{COURSE.description}</p>
-            <div>
+            <div className="side-card">
               <p className="side-label">Learning outcomes</p>
-              <ul className="plain-list">
+              <ul className="check-list">
                 {COURSE.outcomes.map((o) => (<li key={o}>{o}</li>))}
               </ul>
             </div>
@@ -634,13 +617,14 @@ function CoursePage() {
 
       <section className="section">
         <div className="wrap">
-          <SectionHead title="Course content" meta={`${COURSE.sessions.length} pages`} />
+          <Eyebrow>Course content</Eyebrow>
+          <h2 className="section-title">Direct access to the <em>material</em></h2>
           <div className="session-list">
             {COURSE.sessions.map((s) => (
               <Link to={`/teaching/python-for-finance/${s.slug}`} className="session-row" key={s.slug}>
                 <span className="session-label">{s.label}</span>
                 <span className="session-title">{s.title}</span>
-                <span className="index-arrow" aria-hidden="true">→</span>
+                <span className="session-arrow" aria-hidden="true">→</span>
               </Link>
             ))}
           </div>
@@ -664,11 +648,11 @@ function SessionPage() {
       <PageHead title={`${session.label} · ${COURSE.title}`} />
       <section className="page-hero">
         <div className="wrap">
-          <p className="crumbs">
-            <Link to="/teaching">Teaching</Link> /{" "}
-            <Link to="/teaching/python-for-finance">Python for Finance</Link> /{" "}
+          <Eyebrow>
+            <Link to="/teaching" className="crumb">Teaching</Link> /{" "}
+            <Link to="/teaching/python-for-finance" className="crumb">Python for Finance</Link> /{" "}
             {session.label}
-          </p>
+          </Eyebrow>
           <h1 className="page-title">{session.title}</h1>
         </div>
       </section>
@@ -709,17 +693,18 @@ function CVPage() {
       <PageHead title="Curriculum Vitae" />
       <section className="page-hero">
         <div className="wrap">
-          <h1 className="page-title">Curriculum Vitae</h1>
+          <Eyebrow>Curriculum Vitae</Eyebrow>
+          <h1 className="page-title">Curriculum <em>Vitae</em></h1>
           <div className="btn-row">
-            <a className="btn btn-solid" href={LINKS.cvEN} target="_blank" rel="noreferrer">Download (English)</a>
-            <a className="btn" href={LINKS.cvFR} target="_blank" rel="noreferrer">Télécharger (français)</a>
+            <a className="btn btn-solid" href={LINKS.cvEN} target="_blank" rel="noreferrer">Download (English) ↗</a>
+            <a className="btn" href={LINKS.cvFR} target="_blank" rel="noreferrer">Télécharger (français) ↗</a>
           </div>
         </div>
       </section>
 
       <section className="section">
         <div className="wrap">
-          <SectionHead title="Academic positions" />
+          <Eyebrow>Academic positions</Eyebrow>
           <div className="cv-list">
             {ACADEMIC_POSITIONS.map((p) => (
               <CvEntry key={p.role + p.period} heading={p.role} org={p.org} orgUrl={p.orgUrl}
@@ -731,7 +716,7 @@ function CVPage() {
 
       <section className="section">
         <div className="wrap">
-          <SectionHead title="Education" />
+          <Eyebrow>Education</Eyebrow>
           <div className="cv-list">
             {EDUCATION.map((e) => (
               <CvEntry key={e.degree} heading={e.degree} org={e.school} orgUrl={e.orgUrl}
@@ -743,7 +728,7 @@ function CVPage() {
 
       <section className="section">
         <div className="wrap">
-          <SectionHead title="Professional experience" />
+          <Eyebrow>Professional experience</Eyebrow>
           <div className="cv-list">
             {PROFESSIONAL_EXPERIENCE.map((w) => (
               <CvEntry key={w.role + w.period} heading={w.role} org={w.org} orgUrl={w.orgUrl}
@@ -751,7 +736,7 @@ function CVPage() {
             ))}
           </div>
           <p className="cta-line">
-            <a className="btn" href={`mailto:${LINKS.emailPro}?subject=[WORK]`}>Get in touch</a>
+            <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[WORK]`}>Get in touch</a>
           </p>
         </div>
       </section>
@@ -765,6 +750,7 @@ function NotFoundPage() {
       <PageHead title="Page not found" />
       <section className="page-hero">
         <div className="wrap">
+          <Eyebrow>Error 404</Eyebrow>
           <h1 className="page-title">This page does not exist</h1>
           <div className="btn-row">
             <Link className="btn btn-solid" to="/">Back to home</Link>
@@ -816,26 +802,30 @@ export default function App() {
 
 const STYLES = `
 :root {
-  --bg: #faf9f5;
-  --bg-raised: #ffffff;
-  --ink: #171916;
-  --soft: #5a5f58;
-  --line: #dcdbd2;
-  --rule: #171916;
-  --green: #175338;
-  --green-soft: #2e6e4e;
-  --font: "EB Garamond", Garamond, "Times New Roman", serif;
+  --bg: #f5f7f2;
+  --surface: #ffffff;
+  --ink: #172219;
+  --soft: #58695e;
+  --line: #dde4d9;
+  --green: #1c7550;
+  --green-deep: #135c3d;
+  --wash: #e6f0e8;
+  --shadow: 0 1px 2px rgba(23, 34, 25, 0.04), 0 8px 24px -12px rgba(23, 34, 25, 0.12);
+  --shadow-hover: 0 2px 4px rgba(23, 34, 25, 0.05), 0 14px 32px -14px rgba(23, 34, 25, 0.18);
+  --font: "Fraunces", Georgia, serif;
 }
 
 [data-theme="dark"] {
-  --bg: #131512;
-  --bg-raised: #1a1d19;
-  --ink: #e9e8e0;
-  --soft: #a1a69c;
-  --line: #2e322c;
-  --rule: #e9e8e0;
-  --green: #8ecbaa;
-  --green-soft: #6bb18d;
+  --bg: #0e130f;
+  --surface: #161d17;
+  --ink: #eaf1ea;
+  --soft: #98aa9d;
+  --line: #263129;
+  --green: #5fc292;
+  --green-deep: #83d6ae;
+  --wash: #182a1e;
+  --shadow: 0 0 0 1px rgba(95, 194, 146, 0.04), 0 10px 28px -14px rgba(0, 0, 0, 0.55);
+  --shadow-hover: 0 0 0 1px rgba(95, 194, 146, 0.12), 0 16px 36px -14px rgba(0, 0, 0, 0.65);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -847,292 +837,351 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font);
-  font-size: 18px;
-  line-height: 1.58;
+  font-size: 17px;
+  line-height: 1.6;
+  font-variation-settings: "opsz" 24;
   -webkit-font-smoothing: antialiased;
   transition: background 0.25s ease, color 0.25s ease;
 }
 
 ::selection { background: var(--green); color: var(--bg); }
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 8px; border: 3px solid var(--bg); }
 
-a { color: var(--green); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-a:hover { color: var(--green-soft); }
-:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+a { color: var(--green); text-decoration: none; }
+a:hover { color: var(--green-deep); }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 4px; }
 
-.wrap { max-width: 1240px; margin: 0 auto; padding-left: clamp(20px, 4vw, 56px); padding-right: clamp(20px, 4vw, 56px); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: clamp(20px, 4vw, 48px); padding-right: clamp(20px, 4vw, 48px); }
 
-.sq { display: inline-block; width: 10px; height: 10px; background: var(--green); margin-right: 14px; flex-shrink: 0; }
-
-.mt { margin-top: 24px; }
+.mt { margin-top: 22px; }
 .mt-sm { margin-top: 12px; }
 
+.eyebrow {
+  font-size: 0.74rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--green); margin-bottom: 14px;
+}
+.crumb { color: var(--green); }
+.crumb:hover { text-decoration: underline; text-underline-offset: 3px; }
+
 /* --- header --- */
-.site-header { border-bottom: 2px solid var(--rule); background: var(--bg); position: sticky; top: 0; z-index: 30; }
-.header-inner { display: flex; align-items: center; gap: 34px; padding-top: 18px; padding-bottom: 16px; }
-.wordmark {
-  display: flex; align-items: center;
-  font-weight: 600; font-size: 1.25rem; color: var(--ink); text-decoration: none;
-  letter-spacing: 0.01em;
+.site-header { position: sticky; top: 0; z-index: 30; transition: background 0.25s ease, border-color 0.25s ease; border-bottom: 1px solid transparent; }
+.site-header.scrolled {
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  backdrop-filter: blur(12px) saturate(1.3);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  border-bottom-color: var(--line);
 }
-.nav { display: flex; gap: 30px; margin-left: auto; }
+.header-inner { display: flex; align-items: center; gap: 28px; padding-top: 16px; padding-bottom: 14px; }
+.wordmark { font-weight: 560; font-size: 1.18rem; color: var(--ink); letter-spacing: -0.01em; }
+.wordmark em { font-style: italic; color: var(--green-deep); }
+.wordmark:hover { color: var(--ink); }
+.nav { display: flex; gap: 4px; margin-left: auto; }
 .nav a {
-  font-size: 0.78rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--soft); text-decoration: none; padding-bottom: 3px;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  font-size: 0.87rem; font-weight: 500; color: var(--soft);
+  padding: 7px 14px; border-radius: 999px;
+  transition: color 0.15s ease, background 0.15s ease;
 }
-.nav a:hover { color: var(--ink); }
-.nav a.active { color: var(--ink); border-bottom-color: var(--green); }
-.theme-toggle, .menu-toggle {
-  border: none; background: none; color: var(--soft); cursor: pointer;
-  font-family: var(--font); font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase;
-  padding: 0;
+.nav a:hover { color: var(--ink); background: var(--wash); }
+.nav a.active { color: var(--green-deep); background: var(--wash); }
+.theme-toggle {
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 0.9rem;
+  transition: border-color 0.15s ease, transform 0.2s ease;
 }
-.theme-toggle:hover, .menu-toggle:hover { color: var(--green); }
-.menu-toggle { display: none; }
-.mobile-nav { display: flex; flex-direction: column; border-top: 1px solid var(--line); padding-top: 8px; padding-bottom: 16px; }
+.theme-toggle:hover { border-color: var(--green); transform: rotate(12deg); }
+.menu-toggle {
+  display: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 0.95rem;
+}
+.mobile-nav { display: flex; flex-direction: column; border-top: 1px solid var(--line); padding-top: 6px; padding-bottom: 14px; background: var(--bg); }
 .mobile-nav a {
-  font-size: 0.85rem; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--ink); text-decoration: none; padding: 12px 0;
-  border-bottom: 1px solid var(--line);
+  font-size: 1.05rem; font-weight: 500; color: var(--ink);
+  padding: 12px 4px; border-bottom: 1px solid var(--line);
 }
-.mobile-nav a.active { color: var(--green); }
-.mobile-theme { text-align: left; padding: 14px 0 4px; }
+.mobile-nav a.active { color: var(--green-deep); }
+.mobile-nav a:last-child { border-bottom: none; }
 
 /* --- hero --- */
-.hero { border-bottom: 2px solid var(--rule); padding: clamp(40px, 6vh, 68px) 0 clamp(36px, 5vh, 56px); }
-.hero-grid { display: grid; grid-template-columns: 1fr minmax(280px, 380px); gap: clamp(36px, 6vw, 96px); align-items: start; }
-.hero-aff {
-  font-size: 0.78rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--green);
+.hero {
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(48% 62% at 88% 0%, var(--wash), transparent 72%),
+    radial-gradient(36% 52% at 0% 100%, var(--wash), transparent 70%);
+  padding: clamp(44px, 7vh, 76px) 0 clamp(38px, 6vh, 60px);
 }
+.hero-grid { display: grid; grid-template-columns: 1fr auto; gap: clamp(36px, 6vw, 88px); align-items: center; }
 .hero-name {
-  font-weight: 600; font-size: clamp(2.7rem, 5.5vw, 4.1rem);
-  line-height: 1.02; letter-spacing: -0.01em; margin: 14px 0 20px;
+  font-weight: 420; font-size: clamp(2.9rem, 6.5vw, 4.8rem);
+  line-height: 1; letter-spacing: -0.018em; margin: 8px 0 22px;
+  font-variation-settings: "opsz" 144;
 }
-.hero-lede { max-width: 640px; font-size: 1.16rem; line-height: 1.6; color: var(--soft); }
+.hero-name em, .page-title em, .section-title em, .footer-name em {
+  font-style: italic; font-weight: 480; color: var(--green-deep);
+}
+.hero-lede { max-width: 620px; font-size: 1.14rem; line-height: 1.6; color: var(--soft); }
 .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
-.hero-profiles { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 26px; margin-top: 26px; }
+.hero-profiles { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 26px; }
 .hero-profiles a {
-  font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--soft); text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 3px;
+  font-size: 0.76rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--soft); border-bottom: 1px solid var(--line); padding-bottom: 3px;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
-.hero-profiles a:hover { color: var(--green); border-color: var(--green); }
+.hero-profiles a:hover { color: var(--green-deep); border-color: var(--green); }
 
-.hero-side { display: flex; flex-direction: column; gap: 22px; }
+.hero-side { display: flex; }
 .portrait {
-  width: 100%; max-width: 300px; aspect-ratio: 4 / 4.6; object-fit: cover;
-  border: 1px solid var(--rule); display: block;
+  width: clamp(200px, 21vw, 264px); height: clamp(230px, 24vw, 304px);
+  object-fit: cover; border-radius: 18px;
+  border: 1px solid var(--line); box-shadow: var(--shadow);
+  background: var(--surface);
 }
 .portrait-fallback {
-  display: grid; place-items: center; font-weight: 600; font-size: 3rem;
-  color: var(--green); background: var(--bg-raised);
+  display: grid; place-items: center; font-weight: 500; font-size: 3rem;
+  font-style: italic; color: var(--green-deep); background: var(--wash);
 }
-.fact-list { border-top: 1px solid var(--line); }
-.fact { display: grid; grid-template-columns: 92px 1fr; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); }
-.fact dt { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); padding-top: 4px; }
-.fact dd { font-size: 0.95rem; }
 
 /* --- page hero --- */
-.page-hero { border-bottom: 2px solid var(--rule); padding: clamp(32px, 5vh, 52px) 0 clamp(26px, 4vh, 40px); }
-.page-title { font-weight: 600; font-size: clamp(2.1rem, 4.5vw, 3.1rem); line-height: 1.05; letter-spacing: -0.008em; }
-.page-sub { max-width: 700px; font-size: 1.08rem; color: var(--soft); margin-top: 14px; }
-.crumbs { font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); margin-bottom: 12px; }
-.crumbs a { color: var(--green); text-decoration: none; }
-.crumbs a:hover { text-decoration: underline; }
+.page-hero {
+  border-bottom: 1px solid var(--line);
+  background: radial-gradient(42% 70% at 92% 0%, var(--wash), transparent 72%);
+  padding: clamp(36px, 5vh, 56px) 0 clamp(28px, 4vh, 42px);
+}
+.page-title {
+  font-weight: 420; font-size: clamp(2.1rem, 5vw, 3.3rem);
+  line-height: 1.05; letter-spacing: -0.015em;
+  font-variation-settings: "opsz" 144;
+}
+.page-sub { font-size: 1.02rem; color: var(--soft); margin-top: 10px; }
 
 /* --- buttons --- */
 .btn {
   display: inline-block; font-family: var(--font);
-  font-size: 0.76rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
-  padding: 11px 22px; border: 1px solid var(--rule); color: var(--ink);
-  background: none; text-decoration: none; cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  font-size: 0.88rem; font-weight: 560; letter-spacing: 0.01em;
+  padding: 11px 24px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  cursor: pointer; text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
-.btn:hover { border-color: var(--green); color: var(--green); }
-.btn-solid { background: var(--rule); color: var(--bg); }
+.btn:hover { transform: translateY(-1px); border-color: var(--green); color: var(--green-deep); }
+.btn:active { transform: scale(0.98); }
+.btn-solid {
+  background: var(--green-deep); border-color: var(--green-deep); color: var(--bg);
+  box-shadow: 0 6px 18px -9px var(--green-deep);
+}
+[data-theme="dark"] .btn-solid { color: #0b120d; }
 .btn-solid:hover { background: var(--green); border-color: var(--green); color: var(--bg); }
+[data-theme="dark"] .btn-solid:hover { color: #0b120d; }
 .text-link {
-  font-family: var(--font); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+  font-family: var(--font); font-size: 0.8rem; font-weight: 600;
   color: var(--green); background: none; border: none; padding: 0; margin-top: 8px; cursor: pointer;
 }
-.text-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.text-link:hover { color: var(--green-deep); text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- sections --- */
-.section { padding: clamp(34px, 5vh, 52px) 0; }
-.section + .section { padding-top: 0; }
-.sec-head {
-  display: flex; align-items: baseline; justify-content: space-between; gap: 24px;
-  border-top: 2px solid var(--rule); padding-top: 16px; margin-bottom: 28px;
+.section { padding: clamp(34px, 5vh, 54px) 0; border-bottom: 1px solid var(--line); }
+main > section:last-child { border-bottom: none; }
+.section-title {
+  font-weight: 440; font-size: clamp(1.55rem, 3.4vw, 2.15rem);
+  letter-spacing: -0.012em; line-height: 1.12; margin-bottom: 26px;
+  font-variation-settings: "opsz" 100;
 }
-.sec-title { display: flex; align-items: center; font-weight: 600; font-size: 1.5rem; letter-spacing: -0.005em; }
-.sec-meta { font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); white-space: nowrap; }
-.sub-heading { font-weight: 600; font-size: 1.28rem; }
-
-.cols { display: grid; grid-template-columns: 3fr 2fr; gap: clamp(32px, 5vw, 80px); align-items: start; }
-.prose { max-width: 72ch; }
+.sub-heading { font-weight: 520; font-size: 1.3rem; }
+.cols { display: grid; grid-template-columns: 3fr 2fr; gap: clamp(30px, 4.5vw, 64px); align-items: start; }
+.prose { max-width: 70ch; }
 .prose p + p, .prose div + div { margin-top: 15px; }
 .cta-line { margin-top: 30px; }
 
+.side-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 22px 24px; box-shadow: var(--shadow);
+}
 .side-label {
-  font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--soft); margin-bottom: 10px;
+  font-size: 0.71rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--soft); margin-bottom: 11px;
 }
-.side-text { font-size: 1rem; }
-.plain-list { list-style: none; }
-.plain-list li {
-  padding: 7px 0 7px 22px; position: relative; font-size: 1rem;
-  border-bottom: 1px solid var(--line);
+.tag-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.tag {
+  font-size: 0.8rem; font-weight: 500; padding: 5px 13px; border-radius: 999px;
+  background: var(--wash); color: var(--green-deep);
 }
-.plain-list li::before {
-  content: ""; position: absolute; left: 2px; top: 15px;
-  width: 7px; height: 7px; background: var(--green);
+.tag-quiet { background: transparent; border: 1px solid var(--line); color: var(--soft); }
+.check-list { list-style: none; }
+.check-list li { padding: 6px 0 6px 24px; position: relative; font-size: 0.95rem; }
+.check-list li::before {
+  content: "✓"; position: absolute; left: 0; top: 8px;
+  width: 16px; height: 16px; display: grid; place-items: center;
+  font-size: 0.62rem; font-weight: 700; border-radius: 50%;
+  background: var(--wash); color: var(--green-deep);
 }
 
-/* --- index (contents) --- */
-.index-grid { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--line); }
-.index-item {
-  display: grid; grid-template-columns: 56px 1fr 30px; gap: 20px; align-items: baseline;
-  padding: 20px 4px; border-bottom: 1px solid var(--line);
-  color: var(--ink); text-decoration: none;
-  transition: background 0.15s ease, padding-left 0.15s ease;
+/* --- nav cards --- */
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.nav-card {
+  display: block; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 16px; padding: 24px 26px; color: var(--ink);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.index-item:hover { background: var(--bg-raised); padding-left: 14px; color: var(--ink); }
-.index-item:hover .index-arrow { color: var(--green); transform: translateX(4px); }
-.index-n { font-size: 0.78rem; letter-spacing: 0.14em; color: var(--green); font-weight: 600; }
-.index-item h3 { font-weight: 600; font-size: 1.28rem; }
-.index-item p { color: var(--soft); font-size: 0.97rem; margin-top: 4px; }
-.index-arrow { color: var(--soft); transition: transform 0.15s ease, color 0.15s ease; text-align: right; }
-.index-solo { border-top: 1px solid var(--line); align-self: start; }
+.nav-card:hover { transform: translateY(-3px); border-color: var(--green); box-shadow: var(--shadow-hover); color: var(--ink); }
+.nav-card-static:hover { transform: none; }
+.nav-card h3 { font-weight: 520; font-size: 1.18rem; letter-spacing: -0.008em; }
+.nav-card p { color: var(--soft); font-size: 0.93rem; margin-top: 9px; line-height: 1.58; }
+.nav-card-cta { display: inline-block; margin-top: 16px; font-size: 0.8rem; font-weight: 600; color: var(--green-deep); }
+.quiet-link { color: var(--ink); }
+.quiet-link:hover { color: var(--green-deep); }
 
 /* --- publications --- */
-.pub-list { border-top: 1px solid var(--line); }
+.pub-list { display: flex; flex-direction: column; gap: 14px; }
 .pub {
-  display: grid; grid-template-columns: 64px 1fr; gap: 22px;
-  padding: 18px 4px; border-bottom: 1px solid var(--line);
-  transition: background 0.15s ease;
+  position: relative; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 16px; padding: 22px 26px 22px 30px;
+  box-shadow: var(--shadow); overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.pub:hover { background: var(--bg-raised); }
-.pub-year { font-size: 0.88rem; font-weight: 600; color: var(--green); padding-top: 4px; }
-.pub-title { font-weight: 600; font-size: 1.18rem; line-height: 1.38; }
-.pub-authors { font-size: 1rem; margin-top: 5px; }
-.pub-venue { font-style: italic; font-size: 0.95rem; color: var(--soft); margin-top: 2px; }
-.pub-actions { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 10px; }
+.pub::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--green); opacity: 0.85;
+}
+.pub:hover { border-color: var(--green); box-shadow: var(--shadow-hover); }
+.pub-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.chip {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
+  padding: 4px 12px; border-radius: 999px; background: var(--wash); color: var(--green-deep);
+}
+.pub-year { font-size: 0.84rem; font-weight: 600; color: var(--soft); }
+.pub-title { font-weight: 520; font-size: 1.2rem; line-height: 1.34; letter-spacing: -0.008em; }
+.pub-authors { font-size: 0.96rem; margin-top: 6px; }
+.pub-venue { font-style: italic; font-size: 0.92rem; color: var(--soft); margin-top: 2px; }
+.pub-actions { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 12px; }
 .pub-actions a, .pub-actions button {
-  font-family: var(--font); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--green); background: none; border: none; padding: 0; cursor: pointer; text-decoration: none;
+  font-family: var(--font); font-size: 0.8rem; font-weight: 600;
+  color: var(--green); background: none; border: none; padding: 0; cursor: pointer;
 }
-.pub-actions a:hover, .pub-actions button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.pub-actions a:hover, .pub-actions button:hover { color: var(--green-deep); text-decoration: underline; text-underline-offset: 3px; }
 .pub-abstract {
-  margin-top: 12px; padding-left: 18px; border-left: 3px solid var(--green);
-  color: var(--soft); font-size: 0.98rem; line-height: 1.62; max-width: 78ch;
+  margin-top: 14px; padding: 14px 18px; border-radius: 12px;
+  background: var(--wash); color: var(--soft); font-size: 0.94rem; line-height: 1.64;
 }
-.quiet-link { color: var(--ink); text-decoration: none; }
-.quiet-link:hover { color: var(--green); }
 
-.skeleton-list { border-top: 1px solid var(--line); }
+.skeleton-list { display: flex; flex-direction: column; gap: 14px; }
 .skeleton {
-  height: 96px; border-bottom: 1px solid var(--line);
-  background: linear-gradient(100deg, transparent 40%, var(--bg-raised) 50%, transparent 60%);
+  height: 120px; border-radius: 16px; border: 1px solid var(--line);
+  background: linear-gradient(100deg, var(--surface) 40%, var(--wash) 50%, var(--surface) 60%);
   background-size: 200% 100%; animation: shimmer 1.4s infinite linear;
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
 
 .notice {
-  border: 1px solid var(--line); border-left: 3px solid var(--green);
-  background: var(--bg-raised); padding: 15px 19px; font-size: 0.98rem;
+  background: var(--wash); border-radius: 14px; padding: 16px 20px; font-size: 0.94rem;
 }
 
 /* --- cite modal --- */
 .modal-backdrop {
   position: fixed; inset: 0; z-index: 50;
   background: color-mix(in srgb, #000 42%, transparent);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
   display: grid; place-items: center; padding: 20px;
+  animation: fadein 0.18s ease;
 }
 .modal {
-  width: min(640px, 100%); background: var(--bg);
-  border: 2px solid var(--rule); padding: 20px 22px;
+  width: min(640px, 100%); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px;
+  box-shadow: var(--shadow-hover);
+  animation: popin 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
+@keyframes fadein { from { opacity: 0; } }
+@keyframes popin { from { opacity: 0; transform: scale(0.97) translateY(6px); } }
 .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.seg { display: inline-flex; gap: 20px; }
+.seg { display: inline-flex; background: var(--wash); border-radius: 999px; padding: 3px; }
 .seg button {
-  font-family: var(--font); font-size: 0.76rem; letter-spacing: 0.16em; text-transform: uppercase;
-  padding: 0 0 3px; border: none; background: none; color: var(--soft); cursor: pointer;
-  border-bottom: 2px solid transparent;
+  font-family: var(--font); font-size: 0.84rem; font-weight: 560;
+  padding: 6px 16px; border-radius: 999px; border: none; background: none;
+  color: var(--soft); cursor: pointer; transition: all 0.15s ease;
 }
-.seg button.on { color: var(--ink); border-bottom-color: var(--green); }
-.modal-close { border: none; background: none; color: var(--soft); cursor: pointer; font-size: 0.95rem; }
-.modal-close:hover { color: var(--ink); }
+.seg button.on { background: var(--surface); color: var(--green-deep); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.modal-close {
+  border: none; background: none; color: var(--soft); cursor: pointer;
+  font-size: 0.95rem; width: 32px; height: 32px; border-radius: 50%;
+}
+.modal-close:hover { background: var(--wash); color: var(--ink); }
 .cite-block {
   font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.76rem; line-height: 1.6;
-  background: var(--bg-raised); border: 1px solid var(--line);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 12px;
   padding: 14px 16px; white-space: pre-wrap; word-break: break-word; color: var(--ink);
 }
 .modal-foot { display: flex; justify-content: flex-end; margin-top: 14px; }
 
 /* --- CV --- */
-.cv-list { border-top: 1px solid var(--line); }
+.cv-list { display: flex; flex-direction: column; gap: 14px; }
 .cv-entry {
-  display: grid; grid-template-columns: 48px 1fr auto; gap: 20px;
-  padding: 16px 4px; border-bottom: 1px solid var(--line);
-  transition: background 0.15s ease;
+  display: grid; grid-template-columns: 52px 1fr; gap: 18px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 20px 24px; box-shadow: var(--shadow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.cv-entry:hover { background: var(--bg-raised); }
+.cv-entry:hover { border-color: var(--green); box-shadow: var(--shadow-hover); }
 .org-mark {
-  width: 44px; height: 44px; object-fit: contain;
-  border: 1px solid var(--line); background: #fff; padding: 6px; margin-top: 3px;
+  width: 48px; height: 48px; border-radius: 12px; object-fit: contain;
+  border: 1px solid var(--line); background: #fff; padding: 7px; margin-top: 2px;
 }
 .org-mark-fallback {
-  display: grid; place-items: center; font-weight: 600; font-size: 1.25rem;
-  color: var(--green); background: var(--bg-raised); padding: 0;
+  display: grid; place-items: center; font-weight: 520; font-style: italic;
+  font-size: 1.3rem; color: var(--green-deep); background: var(--wash); padding: 0;
 }
-.cv-heading { font-weight: 600; font-size: 1.12rem; line-height: 1.35; }
-.cv-org { font-size: 0.98rem; margin-top: 3px; }
-.cv-org a { color: var(--soft); text-decoration: none; border-bottom: 1px solid var(--line); }
-.cv-org a:hover { color: var(--green); border-color: var(--green); }
-.cv-honors { font-style: italic; color: var(--green); }
-.cv-period { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.06em; color: var(--soft); white-space: nowrap; padding-top: 5px; }
+.cv-top { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
+.cv-heading { font-weight: 520; font-size: 1.1rem; line-height: 1.32; letter-spacing: -0.006em; }
+.cv-period { font-size: 0.82rem; font-weight: 600; color: var(--green-deep); white-space: nowrap; }
+.cv-org { font-size: 0.94rem; margin-top: 3px; }
+.cv-org a { color: var(--soft); border-bottom: 1px solid var(--line); }
+.cv-org a:hover { color: var(--green-deep); border-color: var(--green); }
+.cv-honors { font-style: italic; color: var(--green-deep); }
 .cv-details {
-  margin-top: 10px; padding-left: 18px; border-left: 3px solid var(--green);
-  color: var(--soft); font-size: 0.96rem; line-height: 1.6; max-width: 76ch;
+  margin-top: 10px; padding: 14px 18px; border-radius: 12px;
+  background: var(--wash); color: var(--soft); font-size: 0.93rem; line-height: 1.62;
 }
 
 /* --- course --- */
-.session-list { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.session-list { display: flex; flex-direction: column; gap: 8px; }
 .session-row {
-  display: grid; grid-template-columns: 130px 1fr 30px; gap: 20px; align-items: baseline;
-  padding: 15px 4px; border-bottom: 1px solid var(--line);
-  color: var(--ink); text-decoration: none;
-  transition: background 0.15s ease, padding-left 0.15s ease;
+  display: grid; grid-template-columns: 126px 1fr 26px; gap: 16px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 13px;
+  padding: 14px 20px; color: var(--ink); box-shadow: var(--shadow);
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
-.session-row:hover { background: var(--bg-raised); padding-left: 14px; color: var(--ink); }
-.session-row:hover .index-arrow { color: var(--green); transform: translateX(4px); }
-.session-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); }
-.session-title { font-size: 1.05rem; }
+.session-row:hover { border-color: var(--green); transform: translateX(4px); box-shadow: var(--shadow-hover); color: var(--ink); }
+.session-row:hover .session-arrow { color: var(--green-deep); transform: translateX(3px); }
+.session-label {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--green-deep);
+}
+.session-title { font-size: 0.97rem; }
+.session-arrow { color: var(--soft); transition: transform 0.18s ease, color 0.18s ease; text-align: right; }
 
-.embed-frame { border: 1px solid var(--rule); background: var(--bg-raised); }
+.embed-frame { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
 .embed-frame iframe { display: block; width: 100%; height: 76vh; border: 0; }
 .pager { display: flex; justify-content: space-between; margin-top: 28px; }
 
 /* --- footer --- */
-.site-footer { border-top: 2px solid var(--rule); margin-top: 30px; }
+.site-footer { background: var(--wash); border-top: 1px solid var(--line); margin-top: 26px; }
 .footer-grid {
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: clamp(24px, 4vw, 56px);
-  padding-top: 38px; padding-bottom: 26px;
+  padding-top: 40px; padding-bottom: 26px;
 }
-.footer-name { display: flex; align-items: center; font-weight: 600; font-size: 1.3rem; }
-.footer-aff { color: var(--soft); font-size: 0.95rem; margin-top: 10px; max-width: 34ch; }
+.footer-name { font-weight: 500; font-size: 1.5rem; letter-spacing: -0.01em; }
+.footer-aff { color: var(--soft); font-size: 0.93rem; margin-top: 10px; max-width: 36ch; }
 .foot-label {
-  font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
   color: var(--soft); margin-bottom: 10px;
 }
-.foot-line { font-size: 0.96rem; line-height: 1.9; }
-.foot-line a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
-.foot-line a:hover { color: var(--green); border-color: var(--green); }
+.foot-line { font-size: 0.94rem; line-height: 1.95; }
+.foot-line a { color: var(--ink); }
+.foot-line a:hover { color: var(--green-deep); }
 .colophon {
   border-top: 1px solid var(--line); padding-top: 16px; padding-bottom: 24px;
-  font-size: 0.8rem; color: var(--soft); line-height: 1.6;
+  font-size: 0.78rem; color: var(--soft); line-height: 1.6;
 }
 
 /* --- print --- */
@@ -1143,19 +1192,19 @@ a:hover { color: var(--green-soft); }
 
 /* --- responsive --- */
 @media (max-width: 820px) {
-  body { font-size: 17px; }
-  .nav, .header-inner .theme-toggle { display: none; }
+  .nav { display: none; }
   .menu-toggle { display: block; margin-left: auto; }
-  .hero-grid { grid-template-columns: 1fr; gap: 30px; }
-  .portrait, .portrait-fallback { max-width: 200px; }
-  .cols { grid-template-columns: 1fr; gap: 28px; }
-  .pub { grid-template-columns: 1fr; gap: 2px; }
-  .pub-year { padding-top: 0; }
-  .cv-entry { grid-template-columns: 40px 1fr; }
-  .org-mark { width: 38px; height: 38px; }
-  .cv-period { grid-column: 2; padding-top: 0; }
-  .index-item { grid-template-columns: 40px 1fr 24px; gap: 14px; }
-  .session-row { grid-template-columns: 1fr 24px; gap: 4px 12px; }
+  .theme-toggle { margin-left: auto; }
+  .header-inner { gap: 10px; }
+  .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+  .hero-side { order: -1; }
+  .portrait, .portrait-fallback { width: 148px; height: 170px; }
+  .cols, .card-grid { grid-template-columns: 1fr; gap: 24px; }
+  .pub { padding: 18px 20px 18px 24px; }
+  .cv-entry { grid-template-columns: 42px 1fr; padding: 18px 20px; }
+  .org-mark { width: 40px; height: 40px; }
+  .cv-top { flex-direction: column; gap: 2px; }
+  .session-row { grid-template-columns: 1fr 26px; gap: 4px 12px; padding: 13px 16px; }
   .session-label { grid-column: 1 / -1; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
