@@ -242,6 +242,7 @@
        org: "Caisse d'Epargne Bretagne Pays de Loire",
        orgUrl: "https://www.caisse-epargne.fr",
        orgDomain: "caisse-epargne.fr",
+       logoUrl: "https://www.google.com/s2/favicons?domain=caisse-epargne.fr&sz=128",
        period: "2025",
        details:
          "At Caisse d'Epargne Bretagne Pays de Loire, a regional bank, I worked in the Financial Management Department as part of the Asset and Liability Management (ALM) team. My role focused on liquidity and interest rate risks. I produced periodic indicators for balance-sheet management, analyzed the net interest margin, and developed pricing scales for the commercial bank to align commercial and financial interests. I also assessed balance-sheet risks and evaluated the financial impact of various scenarios.",
@@ -266,36 +267,53 @@
      },
    ];
    
-   export const COURSE = {
-     title: "Python for Finance",
-     org: "Audencia Business School",
-     description:
-       "This class provides students with materials that will help them learn programming methods in Python. The goal for the students is to be able to understand the logic behind a Python program in finance, and by extension being able to process, explore, visualize and analyze the data. The course will guide the student in the usage of advanced Python libraries in finance to model complex concepts that are used for simulations and predictions in market finance. The course will cover different subjects from basics of Python to advanced quantitative methods for market finance, including data analysis, visualization, construction of a portfolio and measuring the risk of a portfolio.",
-     outcomes: [
-       "Writing and understanding Python code for financial applications.",
-       "Performing data analysis and visualization using Python.",
-       "Applying time series analysis to financial data.",
-       "Implementing key quantitative models used in finance.",
-       "Valuing financial assets and applying pricing techniques in Python.",
-       "Utilizing Python for corporate finance applications.",
-       "Running quantitative simulations to test financial strategies.",
-       "Constructing a portfolio and developing an investment strategy.",
-     ],
-     ipNotice:
-       "For intellectual property reasons, course content is not available for copying, pasting, or text selection. If you require a version that allows text selection and copying, please contact me by email.",
-     sessions: [
-       { slug: "session-1", label: "Session 1", title: "Introduction to Python for Finance", embedUrl: "" },
-       { slug: "session-2", label: "Session 2", title: "Advanced basics of Python for Finance", embedUrl: "" },
-       { slug: "session-3", label: "Session 3", title: "Basics of Data Analysis in Python", embedUrl: "" },
-       { slug: "session-4", label: "Session 4", title: "Financial Analysis Using Python: Application with the Dupont Analysis", embedUrl: "" },
-       { slug: "session-5", label: "Session 5", title: "Introduction to time series and Linear Regression using OLS", embedUrl: "" },
-       { slug: "session-6", label: "Session 6", title: "Building a portfolio and valuing different types of assets", embedUrl: "" },
-       { slug: "session-7", label: "Session 7", title: "Quantitative methods and simulations for Finance", embedUrl: "" },
-       { slug: "session-8", label: "Session 8", title: "Financial risk assessment", embedUrl: "" },
-       { slug: "final-project", label: "Final Project", title: "Portfolio diversification, risk management, and strategy development", embedUrl: "" },
-       { slug: "additional-references", label: "References", title: "Additional resources and references", embedUrl: "" },
-     ],
-   };
+   /* ---------- Courses ----------
+      COURSES is an array: add new courses here and they appear
+      automatically on the Teaching page with their own pages.
+   
+      accessCodeHash: SHA-256 hash of the access code required to view
+      session material (leave "" to disable the gate for a course).
+      Once entered, the code is remembered in the visitor's browser.
+      To generate a hash for a new code, run in a terminal:
+        node -e "console.log(require('crypto').createHash('sha256').update('YOUR-CODE').digest('hex'))"
+      Current hash corresponds to the code: PYTHON2026
+   */
+   
+   export const COURSES = [
+     {
+       slug: "python-for-finance",
+       title: "Python for Finance",
+       org: "Audencia Business School",
+       accessCodeHash:
+         "bbe11ae2f8c5c6286c4c39b3cf17136b906ac3e6a670e3f3ecda54d1394427cd",
+       description:
+         "This class provides students with materials that will help them learn programming methods in Python. The goal for the students is to be able to understand the logic behind a Python program in finance, and by extension being able to process, explore, visualize and analyze the data. The course will guide the student in the usage of advanced Python libraries in finance to model complex concepts that are used for simulations and predictions in market finance. The course will cover different subjects from basics of Python to advanced quantitative methods for market finance, including data analysis, visualization, construction of a portfolio and measuring the risk of a portfolio.",
+       outcomes: [
+         "Writing and understanding Python code for financial applications.",
+         "Performing data analysis and visualization using Python.",
+         "Applying time series analysis to financial data.",
+         "Implementing key quantitative models used in finance.",
+         "Valuing financial assets and applying pricing techniques in Python.",
+         "Utilizing Python for corporate finance applications.",
+         "Running quantitative simulations to test financial strategies.",
+         "Constructing a portfolio and developing an investment strategy.",
+       ],
+       ipNotice:
+         "For intellectual property reasons, course content is not available for copying, pasting, or text selection. If you require a version that allows text selection and copying, please contact me by email.",
+       sessions: [
+         { slug: "session-1", label: "Session 1", title: "Introduction to Python for Finance", embedUrl: "" },
+         { slug: "session-2", label: "Session 2", title: "Advanced basics of Python for Finance", embedUrl: "" },
+         { slug: "session-3", label: "Session 3", title: "Basics of Data Analysis in Python", embedUrl: "" },
+         { slug: "session-4", label: "Session 4", title: "Financial Analysis Using Python: Application with the Dupont Analysis", embedUrl: "" },
+         { slug: "session-5", label: "Session 5", title: "Introduction to time series and Linear Regression using OLS", embedUrl: "" },
+         { slug: "session-6", label: "Session 6", title: "Building a portfolio and valuing different types of assets", embedUrl: "" },
+         { slug: "session-7", label: "Session 7", title: "Quantitative methods and simulations for Finance", embedUrl: "" },
+         { slug: "session-8", label: "Session 8", title: "Financial risk assessment", embedUrl: "" },
+         { slug: "final-project", label: "Final Project", title: "Portfolio diversification, risk management, and strategy development", embedUrl: "" },
+         { slug: "additional-references", label: "References", title: "Additional resources and references", embedUrl: "" },
+       ],
+     },
+   ];
    
    export const COPYRIGHT_NOTICE =
      "All content on this website, including courses, texts, videos, graphics, and other elements, is protected by French and international intellectual property laws. Any reproduction, distribution, modification, or reuse of the content, in whole or in part, without prior written consent from the owner is strictly prohibited.";

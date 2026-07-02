@@ -3,7 +3,7 @@ import { Link, NavLink, Route, Routes, useLocation, useParams } from "react-rout
 import {
   ORCID_ID, LINKS, PROFILE_LINKS, AFFILIATION, HERO_LEDE, BIO, SKILLS, LANGUAGES,
   RESEARCH_STATEMENT, INTERESTS, WORKING_PAPERS, REPORTS, PROJECTS, EDUCATION,
-  TEACHING_EXPERIENCE, ACADEMIC_POSITIONS, PROFESSIONAL_EXPERIENCE, COURSE, COPYRIGHT_NOTICE,
+  TEACHING_EXPERIENCE, ACADEMIC_POSITIONS, PROFESSIONAL_EXPERIENCE, COURSES, COPYRIGHT_NOTICE,
 } from "./content.js";
 
 /* ============================================================
@@ -122,6 +122,84 @@ function mergeWithCurated(work, curated) {
   };
 }
 
+/* ---------- Course access (private material) ---------- */
+
+function findCourse(slug) {
+  return COURSES.find((c) => c.slug === slug) || null;
+}
+
+async function sha256Hex(text) {
+  const data = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/* The entered code is remembered in the browser (localStorage),
+   so students only type it once per device. */
+function useCourseAccess(course) {
+  const storageKey = `course-access:${course?.slug}`;
+  const [unlocked, setUnlocked] = useState(() => {
+    if (!course?.accessCodeHash) return true;
+    try { return localStorage.getItem(storageKey) === course.accessCodeHash; }
+    catch { return false; }
+  });
+
+  const tryUnlock = useCallback(async (code) => {
+    const hash = await sha256Hex(code.trim());
+    if (hash === course.accessCodeHash) {
+      try { localStorage.setItem(storageKey, hash); } catch { /* cache unavailable */ }
+      setUnlocked(true);
+      return true;
+    }
+    return false;
+  }, [course, storageKey]);
+
+  return { unlocked, tryUnlock };
+}
+
+function AccessGate({ course, onUnlock }) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState(false);
+  const [checking, setChecking] = useState(false);
+
+  const submit = async () => {
+    if (!code.trim() || checking) return;
+    setChecking(true);
+    const ok = await onUnlock(code);
+    setChecking(false);
+    if (!ok) setError(true);
+  };
+
+  return (
+    <div className="gate">
+      <p className="gate-title">This material is reserved for enrolled students.</p>
+      <p className="gate-sub">
+        Enter the access code provided in class. It will be remembered on this device.
+      </p>
+      <div className="gate-row">
+        <input
+          className="gate-input"
+          type="password"
+          value={code}
+          placeholder="Access code"
+          aria-label="Access code"
+          onChange={(e) => { setCode(e.target.value); setError(false); }}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+        />
+        <button className="btn btn-solid" onClick={submit} disabled={checking}>
+          {checking ? "Checking…" : "Unlock"}
+        </button>
+      </div>
+      {error && <p className="gate-error">Incorrect code. Please try again.</p>}
+      <p className="gate-help">
+        No code? <a href={`mailto:${LINKS.emailPro}?subject=[QUESTION_PYTHON] Access code`}>Contact me by email</a>.
+      </p>
+    </div>
+  );
+}
+
 /* ---------- Primitives ---------- */
 
 function Eyebrow({ children }) {
@@ -203,25 +281,29 @@ function PubItem({ title, authors, venue, year, type, link, citation, abstract }
   );
 }
 
-function OrgMark({ domain, name }) {
+function OrgMark({ domain, name, logoUrl }) {
   const [stage, setStage] = useState(0);
-  if (!domain || stage >= 2) {
+  const sources = [
+    ...(logoUrl ? [logoUrl] : []),
+    ...(domain ? [
+      `https://logo.clearbit.com/${domain}`,
+      `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
+    ] : []),
+  ];
+  if (stage >= sources.length) {
     return <span className="org-mark org-mark-fallback" aria-hidden="true">{(name || "?")[0]}</span>;
   }
-  const src = stage === 0
-    ? `https://logo.clearbit.com/${domain}`
-    : `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
   return (
-    <img className="org-mark" src={src} alt="" loading="lazy"
+    <img className="org-mark" src={sources[stage]} alt="" loading="lazy"
       onError={() => setStage((s) => s + 1)} />
   );
 }
 
-function CvEntry({ heading, org, orgUrl, orgDomain, period, honors, details }) {
+function CvEntry({ heading, org, orgUrl, orgDomain, logoUrl, period, honors, details }) {
   const [open, setOpen] = useState(false);
   return (
     <article className="cv-entry">
-      <OrgMark domain={orgDomain} name={org} />
+      <OrgMark domain={orgDomain} name={org} logoUrl={logoUrl} />
       <div className="cv-main">
         <div className="cv-top">
           <h3 className="cv-heading">{heading}</h3>
@@ -320,7 +402,9 @@ function Footer() {
           {NAV.map((item) => (
             <p className="foot-line" key={item.to}><Link to={item.to}>{item.label}</Link></p>
           ))}
-          <p className="foot-line"><Link to="/teaching/python-for-finance">Python for Finance</Link></p>
+          {COURSES.map((c) => (
+            <p className="foot-line" key={c.slug}><Link to={`/teaching/${c.slug}`}>{c.title}</Link></p>
+          ))}
         </div>
       </div>
       <div className="wrap colophon">
@@ -560,23 +644,33 @@ function TeachingPage() {
 
       <section className="section">
         <div className="wrap">
-          <div className="cols">
-            <div className="prose">
-              {TEACHING_EXPERIENCE.map((t) => (
-                <div key={t.role}>
-                  <h3 className="sub-heading">{t.role}</h3>
-                  <p className="pub-venue">
-                    <a href={t.orgUrl} target="_blank" rel="noreferrer">{t.org}</a> · {t.period}
-                  </p>
-                  <p className="mt-sm">{t.details}</p>
-                </div>
-              ))}
-            </div>
-            <Link to="/teaching/python-for-finance" className="nav-card">
-              <h3>Python for Finance</h3>
-              <p>Complete course material: eight sessions, a final project and additional references.</p>
-              <span className="nav-card-cta">Open the course →</span>
-            </Link>
+          <Eyebrow>Positions</Eyebrow>
+          <div className="prose wide-prose">
+            {TEACHING_EXPERIENCE.map((t) => (
+              <div key={t.role + t.period}>
+                <h3 className="sub-heading">{t.role}</h3>
+                <p className="pub-venue">
+                  {t.orgUrl ? <a href={t.orgUrl} target="_blank" rel="noreferrer">{t.org}</a> : t.org} · {t.period}
+                </p>
+                {t.details && <p className="mt-sm">{t.details}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="wrap">
+          <Eyebrow>Courses</Eyebrow>
+          <h2 className="section-title">Course <em>material</em></h2>
+          <div className="card-grid">
+            {COURSES.map((c) => (
+              <Link to={`/teaching/${c.slug}`} className="nav-card" key={c.slug}>
+                <h3>{c.title}</h3>
+                <p>{c.org} · {c.sessions.length} pages of material{c.accessCodeHash ? " · access code required" : ""}</p>
+                <span className="nav-card-cta">Open the course →</span>
+              </Link>
+            ))}
           </div>
           <p className="cta-line">
             <a className="btn" href={`mailto:${LINKS.emailPro}?subject=[TEACHING]`}>Contact about teaching</a>
@@ -588,27 +682,31 @@ function TeachingPage() {
 }
 
 function CoursePage() {
+  const { courseSlug } = useParams();
+  const course = findCourse(courseSlug);
+  if (!course) return <NotFoundPage />;
+
   return (
     <>
-      <PageHead title={COURSE.title} />
+      <PageHead title={course.title} />
       <section className="page-hero">
         <div className="wrap">
           <Eyebrow>
-            <Link to="/teaching" className="crumb">Teaching</Link> / Python for Finance
+            <Link to="/teaching" className="crumb">Teaching</Link> / {course.title}
           </Eyebrow>
-          <h1 className="page-title">{COURSE.title}</h1>
-          <p className="page-sub">{COURSE.org}</p>
+          <h1 className="page-title">{course.title}</h1>
+          <p className="page-sub">{course.org}</p>
         </div>
       </section>
 
       <section className="section">
         <div className="wrap">
           <div className="cols">
-            <p className="prose">{COURSE.description}</p>
+            <p className="prose">{course.description}</p>
             <div className="side-card">
               <p className="side-label">Learning outcomes</p>
               <ul className="check-list">
-                {COURSE.outcomes.map((o) => (<li key={o}>{o}</li>))}
+                {course.outcomes.map((o) => (<li key={o}>{o}</li>))}
               </ul>
             </div>
           </div>
@@ -617,18 +715,18 @@ function CoursePage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>Course content</Eyebrow>
+          <Eyebrow>Course content{course.accessCodeHash ? " · access code required" : ""}</Eyebrow>
           <h2 className="section-title">Direct access to the <em>material</em></h2>
           <div className="session-list">
-            {COURSE.sessions.map((s) => (
-              <Link to={`/teaching/python-for-finance/${s.slug}`} className="session-row" key={s.slug}>
+            {course.sessions.map((s) => (
+              <Link to={`/teaching/${course.slug}/${s.slug}`} className="session-row" key={s.slug}>
                 <span className="session-label">{s.label}</span>
                 <span className="session-title">{s.title}</span>
                 <span className="session-arrow" aria-hidden="true">→</span>
               </Link>
             ))}
           </div>
-          <p className="notice mt">{COURSE.ipNotice}</p>
+          <p className="notice mt">{course.ipNotice}</p>
         </div>
       </section>
     </>
@@ -636,21 +734,23 @@ function CoursePage() {
 }
 
 function SessionPage() {
-  const { slug } = useParams();
-  const index = COURSE.sessions.findIndex((s) => s.slug === slug);
-  const session = COURSE.sessions[index];
-  if (!session) return <NotFoundPage />;
-  const prev = COURSE.sessions[index - 1];
-  const next = COURSE.sessions[index + 1];
+  const { courseSlug, slug } = useParams();
+  const course = findCourse(courseSlug);
+  const index = course ? course.sessions.findIndex((s) => s.slug === slug) : -1;
+  const session = course?.sessions[index];
+  const { unlocked, tryUnlock } = useCourseAccess(course);
+  if (!course || !session) return <NotFoundPage />;
+  const prev = course.sessions[index - 1];
+  const next = course.sessions[index + 1];
 
   return (
     <>
-      <PageHead title={`${session.label} · ${COURSE.title}`} />
+      <PageHead title={`${session.label} · ${course.title}`} />
       <section className="page-hero">
         <div className="wrap">
           <Eyebrow>
             <Link to="/teaching" className="crumb">Teaching</Link> /{" "}
-            <Link to="/teaching/python-for-finance" className="crumb">Python for Finance</Link> /{" "}
+            <Link to={`/teaching/${course.slug}`} className="crumb">{course.title}</Link> /{" "}
             {session.label}
           </Eyebrow>
           <h1 className="page-title">{session.title}</h1>
@@ -659,7 +759,9 @@ function SessionPage() {
 
       <section className="section">
         <div className="wrap">
-          {session.embedUrl ? (
+          {!unlocked ? (
+            <AccessGate course={course} onUnlock={tryUnlock} />
+          ) : session.embedUrl ? (
             <div className="embed-frame">
               <iframe src={session.embedUrl} title={`${session.label} — ${session.title}`}
                 allowFullScreen loading="lazy" />
@@ -670,15 +772,15 @@ function SessionPage() {
               <a href={`mailto:${LINKS.emailPro}?subject=[QUESTION_PYTHON] ${session.label}`}>
                 Contact me by email
               </a>{" "}
-              to receive it. {COURSE.ipNotice}
+              to receive it. {course.ipNotice}
             </p>
           )}
           <nav className="pager" aria-label="Sessions">
             {prev ? (
-              <Link className="btn" to={`/teaching/python-for-finance/${prev.slug}`}>← {prev.label}</Link>
+              <Link className="btn" to={`/teaching/${course.slug}/${prev.slug}`}>← {prev.label}</Link>
             ) : <span />}
             {next ? (
-              <Link className="btn" to={`/teaching/python-for-finance/${next.slug}`}>{next.label} →</Link>
+              <Link className="btn" to={`/teaching/${course.slug}/${next.slug}`}>{next.label} →</Link>
             ) : <span />}
           </nav>
         </div>
@@ -732,7 +834,7 @@ function CVPage() {
           <div className="cv-list">
             {PROFESSIONAL_EXPERIENCE.map((w) => (
               <CvEntry key={w.role + w.period} heading={w.role} org={w.org} orgUrl={w.orgUrl}
-                orgDomain={w.orgDomain} period={w.period} details={w.details} />
+                orgDomain={w.orgDomain} logoUrl={w.logoUrl} period={w.period} details={w.details} />
             ))}
           </div>
           <p className="cta-line">
@@ -787,8 +889,8 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/research" element={<ResearchPage />} />
           <Route path="/teaching" element={<TeachingPage />} />
-          <Route path="/teaching/python-for-finance" element={<CoursePage />} />
-          <Route path="/teaching/python-for-finance/:slug" element={<SessionPage />} />
+          <Route path="/teaching/:courseSlug" element={<CoursePage />} />
+          <Route path="/teaching/:courseSlug/:slug" element={<SessionPage />} />
           <Route path="/cv" element={<CVPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
@@ -853,7 +955,7 @@ a { color: var(--green); text-decoration: none; }
 a:hover { color: var(--green-deep); }
 :focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 4px; }
 
-.wrap { max-width: 1180px; margin: 0 auto; padding-left: clamp(20px, 4vw, 48px); padding-right: clamp(20px, 4vw, 48px); }
+.wrap { max-width: 1560px; margin: 0 auto; padding-left: clamp(20px, 3vw, 44px); padding-right: clamp(20px, 3vw, 44px); }
 
 .mt { margin-top: 22px; }
 .mt-sm { margin-top: 12px; }
@@ -909,12 +1011,12 @@ a:hover { color: var(--green-deep); }
   background:
     radial-gradient(48% 62% at 88% 0%, var(--wash), transparent 72%),
     radial-gradient(36% 52% at 0% 100%, var(--wash), transparent 70%);
-  padding: clamp(44px, 7vh, 76px) 0 clamp(38px, 6vh, 60px);
+  padding: clamp(32px, 5vh, 52px) 0 clamp(28px, 4vh, 44px);
 }
-.hero-grid { display: grid; grid-template-columns: 1fr auto; gap: clamp(36px, 6vw, 88px); align-items: center; }
+.hero-grid { display: grid; grid-template-columns: 1fr auto; gap: clamp(32px, 5vw, 72px); align-items: center; }
 .hero-name {
-  font-weight: 420; font-size: clamp(2.9rem, 6.5vw, 4.8rem);
-  line-height: 1; letter-spacing: -0.018em; margin: 8px 0 22px;
+  font-weight: 420; font-size: clamp(2.5rem, 5vw, 3.8rem);
+  line-height: 1; letter-spacing: -0.018em; margin: 8px 0 18px;
   font-variation-settings: "opsz" 144;
 }
 .hero-name em, .page-title em, .section-title em, .footer-name em {
@@ -932,7 +1034,7 @@ a:hover { color: var(--green-deep); }
 
 .hero-side { display: flex; }
 .portrait {
-  width: clamp(200px, 21vw, 264px); height: clamp(230px, 24vw, 304px);
+  width: clamp(210px, 20vw, 280px); height: clamp(210px, 20vw, 280px);
   object-fit: cover; border-radius: 18px;
   border: 1px solid var(--line); box-shadow: var(--shadow);
   background: var(--surface);
@@ -946,11 +1048,11 @@ a:hover { color: var(--green-deep); }
 .page-hero {
   border-bottom: 1px solid var(--line);
   background: radial-gradient(42% 70% at 92% 0%, var(--wash), transparent 72%);
-  padding: clamp(36px, 5vh, 56px) 0 clamp(28px, 4vh, 42px);
+  padding: clamp(26px, 4vh, 40px) 0 clamp(22px, 3vh, 32px);
 }
 .page-title {
-  font-weight: 420; font-size: clamp(2.1rem, 5vw, 3.3rem);
-  line-height: 1.05; letter-spacing: -0.015em;
+  font-weight: 430; font-size: clamp(1.8rem, 3.6vw, 2.5rem);
+  line-height: 1.06; letter-spacing: -0.012em;
   font-variation-settings: "opsz" 144;
 }
 .page-sub { font-size: 1.02rem; color: var(--soft); margin-top: 10px; }
@@ -980,18 +1082,38 @@ a:hover { color: var(--green-deep); }
 .text-link:hover { color: var(--green-deep); text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- sections --- */
-.section { padding: clamp(34px, 5vh, 54px) 0; border-bottom: 1px solid var(--line); }
+.section { padding: clamp(26px, 4vh, 42px) 0; border-bottom: 1px solid var(--line); }
 main > section:last-child { border-bottom: none; }
 .section-title {
-  font-weight: 440; font-size: clamp(1.55rem, 3.4vw, 2.15rem);
-  letter-spacing: -0.012em; line-height: 1.12; margin-bottom: 26px;
+  font-weight: 440; font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+  letter-spacing: -0.01em; line-height: 1.12; margin-bottom: 20px;
   font-variation-settings: "opsz" 100;
 }
-.sub-heading { font-weight: 520; font-size: 1.3rem; }
-.cols { display: grid; grid-template-columns: 3fr 2fr; gap: clamp(30px, 4.5vw, 64px); align-items: start; }
-.prose { max-width: 70ch; }
-.prose p + p, .prose div + div { margin-top: 15px; }
-.cta-line { margin-top: 30px; }
+.sub-heading { font-weight: 520; font-size: 1.25rem; }
+.cols { display: grid; grid-template-columns: 3fr 2fr; gap: clamp(28px, 4vw, 60px); align-items: start; }
+.prose { max-width: 82ch; }
+.prose p + p, .prose div + div { margin-top: 14px; }
+.wide-prose { max-width: none; }
+.wide-prose > div + div { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
+.cta-line { margin-top: 24px; }
+
+/* --- access gate --- */
+.gate {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 28px 30px; box-shadow: var(--shadow); max-width: 560px;
+}
+.gate-title { font-weight: 520; font-size: 1.15rem; }
+.gate-sub { color: var(--soft); font-size: 0.94rem; margin-top: 6px; }
+.gate-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.gate-input {
+  flex: 1; min-width: 200px; font-family: var(--font); font-size: 0.95rem;
+  padding: 10px 16px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+}
+.gate-input:focus { outline: 2px solid var(--green); outline-offset: 1px; border-color: var(--green); }
+.gate-error { color: #b3401f; font-size: 0.88rem; margin-top: 10px; }
+[data-theme="dark"] .gate-error { color: #e89273; }
+.gate-help { color: var(--soft); font-size: 0.86rem; margin-top: 14px; }
 
 .side-card {
   background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
