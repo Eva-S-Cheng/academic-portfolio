@@ -13,10 +13,11 @@
      researchgate: "https://www.researchgate.net/profile/Eva-Cheng-13",
      emailAcademic: "eva.cheng@audencia.com",
      emailPro: "evcheng.pro@gmail.com",
-     cvEN:
-       "https://drive.google.com/file/d/1pBss8qZHF8M2tvDXX6qIkp_bz3c3sLIG/view?usp=drive_link",
-     cvFR:
-       "https://drive.google.com/file/d/1O68dhVgzxGPekUV4ZjUXhsh5Tn5zBkUt/view?usp=sharing",
+     /* CV PDFs are served by the site itself: download them from your Drive
+        and upload the two files to the repository's public/ folder as
+        cv-en.pdf and cv-fr.pdf (same place as photo.jpg). */
+     cvEN: (import.meta.env?.BASE_URL ?? "/") + "cv-en.pdf",
+     cvFR: (import.meta.env?.BASE_URL ?? "/") + "cv-fr.pdf",
    };
    
    export const PROFILE_LINKS = [
@@ -276,7 +277,7 @@
       Once entered, the code is remembered in the visitor's browser.
       To generate a hash for a new code, run in a terminal:
         node -e "console.log(require('crypto').createHash('sha256').update('YOUR-CODE').digest('hex'))"
-      Current hash corresponds to the code: PYTHON2026
+      Current hash corresponds to the code: DMCF513
    */
    
    export const COURSES = [
@@ -285,7 +286,7 @@
        title: "Python for Finance",
        org: "Audencia Business School",
        accessCodeHash:
-         "bbe11ae2f8c5c6286c4c39b3cf17136b906ac3e6a670e3f3ecda54d1394427cd",
+         "7fdf98b53e01373c764f61cb6038465eafcb04fafc3307a7a28692fc216f14dd",
        description:
          "This class provides students with materials that will help them learn programming methods in Python. The goal for the students is to be able to understand the logic behind a Python program in finance, and by extension being able to process, explore, visualize and analyze the data. The course will guide the student in the usage of advanced Python libraries in finance to model complex concepts that are used for simulations and predictions in market finance. The course will cover different subjects from basics of Python to advanced quantitative methods for market finance, including data analysis, visualization, construction of a portfolio and measuring the risk of a portfolio.",
        outcomes: [
