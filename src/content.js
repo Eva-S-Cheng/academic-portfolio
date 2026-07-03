@@ -782,7 +782,924 @@ Value of speed of first Tesla : 80 & Value of speed of second Tesla : 80</pre></
 <span class="ansi-white-intense-fg ansi-bold">         ^</span>
 <span class="ansi-red-intense-fg ansi-bold">SyntaxError</span><span class="ansi-red-intense-fg ansi-bold">:</span> invalid syntax</pre></details>
 ` },
-         { slug: "session-3", label: "Session 3", title: "Basics of Data Analysis in Python", embedUrl: "" },
+         { slug: "session-3", label: "Session 3", title: "Basics of Data Analysis in Python", embedUrl: "", html: `
+<p>This session aims to equip you with essential skills for preparing data and creating visualizations for data analysis. We will cover the following key topics:</p>
+<ul>
+<li>Data collection and file reading</li>
+<li>Data processing and cleaning</li>
+<li>Basic operations and aggregations</li>
+<li>Graph creation</li>
+</ul>
+<h2 id="I---Data-collection">I - Data collection</h2>
+<p>In this class, we will focus on utilizing structured data for analysis in Python, excluding unstructured data from our scope. Structured data can be organized into tables and includes various types such as numbers, strings, text, dates, and booleans. A convenient method for collecting structured data is by reusing Excel tables.</p>
+<p>To illustrate this, we will download datasets available online, specifically from Kaggle, which offers a vast collection of datasets. For our next class, we will use a dataset representing seismic activity around the world, accessible via the following link: <a href="https://www.kaggle.com/datasets/stealthtechnologies/earthquakes-dataset?resource=download">https://www.kaggle.com/datasets/stealthtechnologies/earthquakes-dataset?resource=download</a></p>
+<p>To begin our analysis, we need to instruct Python to read data from an Excel file and store it in a variable for further processing.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Libraries </span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>                <span class="c1"># The library used for data manipulation</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># We first set the working directory (The pathway were the all data can be found on the computer)</span>
+<span class="n">MAIN_PATH</span> <span class="o">=</span> <span class="s1">'C:/Users/evche/Documents/Lessons - Audencia BS/Data'</span>
+<span class="c1"># Then we store the data into a dataframe (by refering to the path of the file, this file is a csv)</span>
+<span class="n">earthquake_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/Session 3/earthquake_dataset.xlsx'</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div>
+<h2 id="II---Identifying-the-data">II - Identifying the data</h2><p>Before performing any operations, it is crucial to understand the dataset by displaying key information, such as the first few rows and the data types of each column.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># We first display the first 5 rows of the dataset </span>
+<span class="n">earthquake_data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># NB : We can also display the last 5 rows by using tail instead of head</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Date</th>
+<th>Time (utc)</th>
+<th>Region</th>
+<th>Magnitude</th>
+<th>Depth (km)</th>
+<th>Latitude</th>
+<th>Longitude</th>
+<th>Mode</th>
+<th>Map</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2024-06-23</td>
+<td>04:51:49</td>
+<td>Mindanao, Philippine</td>
+<td>4.8</td>
+<td>342</td>
+<td>8.01N</td>
+<td>125.20E</td>
+<td>A</td>
+<td>-</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2024-06-23</td>
+<td>03:58:03</td>
+<td>Near Coast of Venezuela</td>
+<td>5.9</td>
+<td>105</td>
+<td>10.80N</td>
+<td>62.65W</td>
+<td>A</td>
+<td>-</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2024-06-23</td>
+<td>03:12:08</td>
+<td>Near East Coast of Honshu, japan</td>
+<td>5.0</td>
+<td>55</td>
+<td>37.16N</td>
+<td>141.09E</td>
+<td>A</td>
+<td>-</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2024-06-22</td>
+<td>20:46:51</td>
+<td>Near Coast of Peru</td>
+<td>5.3</td>
+<td>64</td>
+<td>15.79S</td>
+<td>74.47W</td>
+<td>A</td>
+<td>-</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2024-06-22</td>
+<td>18:08:44</td>
+<td>Afghanistan-Tajikistan Border Region</td>
+<td>3.8</td>
+<td>179</td>
+<td>36.36N</td>
+<td>71.45E</td>
+<td>M</td>
+<td>-</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Let us get the type of variable stored in the dataset</span>
+<span class="n">earthquake_data</span><span class="o">.</span><span class="n">dtypes</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Date          datetime64[ns]
+Time (utc)            object
+Region                object
+Magnitude            float64
+Depth (km)             int64
+Latitude              object
+Longitude             object
+Mode                  object
+Map                   object
+dtype: object</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Then we can get the structure of the data</span>
+<span class="n">earthquake_data</span><span class="o">.</span><span class="n">shape</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>(14668, 9)</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Then we can get the number of unique values of each column</span>
+<span class="n">earthquake_data</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Date           2671
+Time (utc)    13344
+Region         3206
+Magnitude        77
+Depth (km)      601
+Latitude       5504
+Longitude      6697
+Mode              2
+Map               1
+dtype: int64</pre></details>
+<p>The dataset contains 14,726 records distributed across 9 columns, representing the following attributes: date, time, region, magnitude, depth, latitude, longitude, detection mode (automatic or manual), and map. There are 2,672 unique dates on which earthquakes were recorded across 3,221 unique regions.</p>
+<p>⚠️ Note: The data has not been cleaned yet; therefore, the actual number of unique regions may be smaller. For instance, variations in casing (e.g., uppercase vs. lowercase) may lead Python to count them as distinct regions.</p>
+<h2 id="III---Data-processing-and-cleaning">III - Data processing and cleaning</h2>
+<p>To facilitate analysis, we will convert the data types of several variables, including:</p>
+<ul>
+<li>Date: Converted to a date format</li>
+<li>Time: Converted to a time format</li>
+<li>Latitude and Longitude: Converted to float types</li>
+<li>Mode: Converted to binary values (1 for automatic and 0 for manual)</li>
+<li>The last column will be excluded from our analysis.</li>
+</ul>
+<div class="nb-code"><pre><span></span><span class="c1"># Converting the column date &amp; time to a datetime value, into a new variable called "moment"</span>
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Moment'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Time (utc)'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="c1"># Then we convert the whole column to datetime with a format (it is important so the interpreter can understand the format)</span>
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Moment'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Moment'</span><span class="p">],</span> <span class="nb">format</span> <span class="o">=</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S"</span><span class="p">)</span>
+<span class="c1"># Display </span>
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Moment'</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>0   2024-06-23 04:51:49
+1   2024-06-23 03:58:03
+2   2024-06-23 03:12:08
+3   2024-06-22 20:46:51
+4   2024-06-22 18:08:44
+Name: Moment, dtype: datetime64[ns]</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Then we can process the latitude and the longitude, we have to convert the numbers that are followed by W and S to negative</span>
+<span class="c1"># Basically, to do so, we just remove the last 2 digits of the longitude and the latitude (Space + Direction)</span>
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Lat'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Latitude'</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span><span class="s2">""</span><span class="p">)</span>          
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Long'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Longitude'</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span><span class="s2">""</span><span class="p">)</span>        
+
+<span class="c1"># Remove the spaces in the strings</span>
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Lat'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Lat'</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>              <span class="c1"># 0:-1 = From beginning to 2nd last</span>
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Long'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Long'</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>            <span class="c1"># Str = The string value</span>
+
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Lat'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Lat'</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span><span class="s2">""</span><span class="p">)</span>          
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Long'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Long'</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span><span class="s2">""</span><span class="p">)</span>   
+
+<span class="c1"># Converting to float</span>
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Lat'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Lat'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Long'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Long'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="c1"># Now, if last digit of Latitude is S or Last digit of Longitude is W, make it negative, for from 0 to length - 1</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">earthquake_data</span><span class="p">)):</span> 
+    <span class="c1"># First dimension i always represent the rows and the second is the column</span>
+    <span class="k">if</span> <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Latitude'</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'S'</span><span class="p">:</span>
+        <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Lat'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Lat'</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Longitude'</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'W'</span><span class="p">:</span>
+        <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Long'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Long'</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">earthquake_data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Date</th>
+<th>Time (utc)</th>
+<th>Region</th>
+<th>Magnitude</th>
+<th>Depth (km)</th>
+<th>Latitude</th>
+<th>Longitude</th>
+<th>Mode</th>
+<th>Map</th>
+<th>Moment</th>
+<th>Lat</th>
+<th>Long</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2024-06-23</td>
+<td>04:51:49</td>
+<td>Mindanao, Philippine</td>
+<td>4.8</td>
+<td>342</td>
+<td>8.01N</td>
+<td>125.20E</td>
+<td>A</td>
+<td>-</td>
+<td>2024-06-23 04:51:49</td>
+<td>8.01</td>
+<td>125.20</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2024-06-23</td>
+<td>03:58:03</td>
+<td>Near Coast of Venezuela</td>
+<td>5.9</td>
+<td>105</td>
+<td>10.80N</td>
+<td>62.65W</td>
+<td>A</td>
+<td>-</td>
+<td>2024-06-23 03:58:03</td>
+<td>10.80</td>
+<td>-62.65</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2024-06-23</td>
+<td>03:12:08</td>
+<td>Near East Coast of Honshu, japan</td>
+<td>5.0</td>
+<td>55</td>
+<td>37.16N</td>
+<td>141.09E</td>
+<td>A</td>
+<td>-</td>
+<td>2024-06-23 03:12:08</td>
+<td>37.16</td>
+<td>141.09</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2024-06-22</td>
+<td>20:46:51</td>
+<td>Near Coast of Peru</td>
+<td>5.3</td>
+<td>64</td>
+<td>15.79S</td>
+<td>74.47W</td>
+<td>A</td>
+<td>-</td>
+<td>2024-06-22 20:46:51</td>
+<td>-15.79</td>
+<td>-74.47</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2024-06-22</td>
+<td>18:08:44</td>
+<td>Afghanistan-Tajikistan Border Region</td>
+<td>3.8</td>
+<td>179</td>
+<td>36.36N</td>
+<td>71.45E</td>
+<td>M</td>
+<td>-</td>
+<td>2024-06-22 18:08:44</td>
+<td>36.36</td>
+<td>71.45</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Converting the mode : 1 for automatic detection and 0 for manual detection (in further classes we will learn another syntax)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">earthquake_data</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Mode'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'A'</span> <span class="p">:</span>
+        <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Mode'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Mode'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'M'</span><span class="p">:</span>
+        <span class="n">earthquake_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'Mode'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">earthquake_data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Date</th>
+<th>Time (utc)</th>
+<th>Region</th>
+<th>Magnitude</th>
+<th>Depth (km)</th>
+<th>Latitude</th>
+<th>Longitude</th>
+<th>Mode</th>
+<th>Map</th>
+<th>Moment</th>
+<th>Lat</th>
+<th>Long</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2024-06-23</td>
+<td>04:51:49</td>
+<td>Mindanao, Philippine</td>
+<td>4.8</td>
+<td>342</td>
+<td>8.01N</td>
+<td>125.20E</td>
+<td>1</td>
+<td>-</td>
+<td>2024-06-23 04:51:49</td>
+<td>8.01</td>
+<td>125.20</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2024-06-23</td>
+<td>03:58:03</td>
+<td>Near Coast of Venezuela</td>
+<td>5.9</td>
+<td>105</td>
+<td>10.80N</td>
+<td>62.65W</td>
+<td>1</td>
+<td>-</td>
+<td>2024-06-23 03:58:03</td>
+<td>10.80</td>
+<td>-62.65</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2024-06-23</td>
+<td>03:12:08</td>
+<td>Near East Coast of Honshu, japan</td>
+<td>5.0</td>
+<td>55</td>
+<td>37.16N</td>
+<td>141.09E</td>
+<td>1</td>
+<td>-</td>
+<td>2024-06-23 03:12:08</td>
+<td>37.16</td>
+<td>141.09</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2024-06-22</td>
+<td>20:46:51</td>
+<td>Near Coast of Peru</td>
+<td>5.3</td>
+<td>64</td>
+<td>15.79S</td>
+<td>74.47W</td>
+<td>1</td>
+<td>-</td>
+<td>2024-06-22 20:46:51</td>
+<td>-15.79</td>
+<td>-74.47</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2024-06-22</td>
+<td>18:08:44</td>
+<td>Afghanistan-Tajikistan Border Region</td>
+<td>3.8</td>
+<td>179</td>
+<td>36.36N</td>
+<td>71.45E</td>
+<td>0</td>
+<td>-</td>
+<td>2024-06-22 18:08:44</td>
+<td>36.36</td>
+<td>71.45</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># We can reorder the colmumns and remove the columns that are not useful for further analysis</span>
+<span class="n">earthquake_data</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[[</span><span class="s1">'Date'</span><span class="p">,</span><span class="s1">'Moment'</span><span class="p">,</span> <span class="s1">'Region'</span><span class="p">,</span> <span class="s1">'Lat'</span><span class="p">,</span> <span class="s1">'Long'</span><span class="p">,</span> <span class="s1">'Magnitude'</span><span class="p">,</span> <span class="s1">'Depth (km)'</span><span class="p">,</span> <span class="s1">'Mode'</span><span class="p">]]</span>
+<span class="n">earthquake_data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Date</th>
+<th>Moment</th>
+<th>Region</th>
+<th>Lat</th>
+<th>Long</th>
+<th>Magnitude</th>
+<th>Depth (km)</th>
+<th>Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2024-06-23</td>
+<td>2024-06-23 04:51:49</td>
+<td>Mindanao, Philippine</td>
+<td>8.01</td>
+<td>125.20</td>
+<td>4.8</td>
+<td>342</td>
+<td>1</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2024-06-23</td>
+<td>2024-06-23 03:58:03</td>
+<td>Near Coast of Venezuela</td>
+<td>10.80</td>
+<td>-62.65</td>
+<td>5.9</td>
+<td>105</td>
+<td>1</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2024-06-23</td>
+<td>2024-06-23 03:12:08</td>
+<td>Near East Coast of Honshu, japan</td>
+<td>37.16</td>
+<td>141.09</td>
+<td>5.0</td>
+<td>55</td>
+<td>1</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2024-06-22</td>
+<td>2024-06-22 20:46:51</td>
+<td>Near Coast of Peru</td>
+<td>-15.79</td>
+<td>-74.47</td>
+<td>5.3</td>
+<td>64</td>
+<td>1</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2024-06-22</td>
+<td>2024-06-22 18:08:44</td>
+<td>Afghanistan-Tajikistan Border Region</td>
+<td>36.36</td>
+<td>71.45</td>
+<td>3.8</td>
+<td>179</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>Once the data is cleaned, we can proceed to data manipulation, which encompasses exploration, analysis, and visualization. Data analysis involves preparing the data, deriving insights, and visualizing the results.</p>
+<h2 id="IV---Statistics-with-pandas-dataframe">IV - Statistics with pandas dataframe</h2><p>The pandas library in Python makes it convenient to calculate statistics on a dataset, enabling a better understanding of the data's characteristics.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># We can calculate the average magnitude and the average depth</span>
+<span class="n">avg_magnitude</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">var_magnitude</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">]</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+<span class="n">avg_depth</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The Average magnitude of the earthquakes included in the dataset is"</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">avg_magnitude</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> 
+      <span class="s2">"with a variance of"</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">var_magnitude</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The Average depth is"</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">avg_depth</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"km"</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The Average magnitude of the earthquakes included in the dataset is 4.47 with a variance of 1.1
+The Average depth is 94.53 km</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># We can even go further by counting the number of earthquakes that have a magnitude that is superior to the average</span>
+<span class="c1"># Dataset containing the earthquake with a magnitude higher than 4.47</span>
+<span class="n">earthquake_above</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">avg_magnitude</span><span class="p">]</span>
+<span class="c1"># We count the rows to get the number of earthquakes </span>
+<span class="n">nb_above</span> <span class="o">=</span> <span class="n">earthquake_above</span><span class="o">.</span><span class="n">count</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"There are"</span><span class="p">,</span> <span class="n">nb_above</span><span class="p">,</span><span class="s2">"earthquakes that have a magnitude that is higher than the average"</span><span class="p">)</span>
+
+<span class="c1"># Calculate the percentage of earthquakes that this number represents </span>
+<span class="n">percentage_of_earthquake</span> <span class="o">=</span> <span class="n">nb_above</span><span class="o">/</span><span class="n">earthquake_data</span><span class="o">.</span><span class="n">count</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"It represents "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">percentage_of_earthquake</span> <span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s2">"</span><span class="si">% o</span><span class="s2">f the earthquakes in the dataset"</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>There are 8021 earthquakes that have a magnitude that is higher than the average
+It represents  54.68 % of the earthquakes in the dataset</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># We can see whether the Magnitude and the Depth are correlated</span>
+<span class="n">corr_depth_mag</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[[</span><span class="s1">'Magnitude'</span><span class="p">,</span> <span class="s1">'Depth (km)'</span><span class="p">]]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">corr_depth_mag</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Magnitude  Depth (km)
+Magnitude    1.000000   -0.006207
+Depth (km)  -0.006207    1.000000</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># We can do the same with the other variables</span>
+<span class="n">corr_all</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[[</span><span class="s1">'Magnitude'</span><span class="p">,</span> <span class="s1">'Depth (km)'</span><span class="p">,</span><span class="s1">'Lat'</span><span class="p">,</span><span class="s1">'Long'</span><span class="p">]]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">corr_all</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Magnitude  Depth (km)       Lat      Long
+Magnitude    1.000000   -0.006207 -0.038868 -0.024570
+Depth (km)  -0.006207    1.000000 -0.000292 -0.049223
+Lat         -0.038868   -0.000292  1.000000  0.004581
+Long        -0.024570   -0.049223  0.004581  1.000000</pre></details>
+<p>From the correlation table generated, we can conclude that there is no statistical evidence suggesting correlation or anti-correlation among the variables; thus, they appear to be independent.</p>
+<h2 id="V---Data-Visualization-basics">V - Data Visualization basics</h2>
+<p>There are four primary types of data analysis:</p>
+<ul>
+<li>Descriptive Analysis: Answers the question, "What happened?" using statistical methods.</li>
+<li>Prescriptive Analysis: Addresses, "Why did it happen?" by combining statistics with subject matter expertise.</li>
+<li>Predictive Analysis: Explores, "Can we make it happen, or prevent it? And how?" by utilizing statistics, subject knowledge, and external factors.</li>
+<li>Cognitive Analysis: Asks, "What can we conclude?" by providing additional insights into complex problems.</li>
+</ul>
+<p>Data visualization enhances various levels of analysis, particularly descriptive analysis, by revealing insights that may not be immediately apparent. This session will focus exclusively on descriptive analysis due to the dataset's format. Other analysis types will be explored in future sessions, especially in a financial context.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># To visualize our data, we may require the following libraries</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># We first plot the magnitude by depth of each earthquake </span>
+<span class="c1"># Clearing the plot first so the window can be further used for plots</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">],</span><span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 1" data-asset="session-3/fig-1.png" loading="lazy"/></figure></details>
+<p>To improve the readability of visual representations, it is essential to exclude outliers, label axes, and set appropriate limits. In quantitative methods, several approaches can be used to identify and exclude outliers:</p>
+<ul>
+<li>In <code>normal distribution</code>, points below <code>µ - 3σ</code> or above <code>µ + 3σ</code> are typically excluded.</li>
+<li>In <code>skewed distribution</code>, points below Q1 - 1.5IQR and above Q3 + 1.5IQR are excluded where (Q1 is the first quartile and IQR is the interquartile range)</li>
+<li>In <code>any other distribution</code>, a percentile approach can be adopted; for instance, excluding data above the 95th percentile and below the 5th percentile.</li>
+</ul>
+<p>For this analysis, we will set the interval to  [1% ; 99%]</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Let us plot the distribution of the data, using the box plots</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of the Depth of the earthquakes"</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 2" data-asset="session-3/fig-2.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Distribution of the magnitude</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of the Magnitude of the earthquakes"</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 3" data-asset="session-3/fig-3.png" loading="lazy"/></figure></details>
+<p>From the graph, we can observe that manually recorded earthquakes display a broader range of magnitudes, while their depths appear more homogeneous. Conversely, automatically recorded earthquakes show greater variability in depth but maintain a more consistent magnitude.</p>
+<p>Two hypotheses may explain this phenomenon:</p>
+<ol>
+<li>Significant-depth earthquakes may not be manually recorded, and their magnitudes could be less accurate than those recorded manually (potential errors in manual recording).</li>
+<li>While automatically recorded earthquakes may reach considerable depths, there may be limitations to the magnitudes that can be captured automatically.</li>
+</ol>
+<div class="nb-code"><pre><span></span><span class="c1"># We can get the percentile using pandas' quantile method</span>
+<span class="n">upper_bound_magnitude</span> <span class="o">=</span>  <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.99</span><span class="p">)</span>
+<span class="n">lower_bound_magnitude</span> <span class="o">=</span>  <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">upper_bound_depth</span> <span class="o">=</span>  <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.99</span><span class="p">)</span>
+<span class="n">lower_bound_depth</span> <span class="o">=</span>  <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="c1"># Display</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Upper limit of Magnitude : "</span><span class="p">,</span> <span class="n">upper_bound_magnitude</span><span class="p">,</span> <span class="s2">"&amp; Lower limit of Magnitude : "</span><span class="p">,</span> <span class="n">lower_bound_magnitude</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Upper limit of Depth : "</span><span class="p">,</span> <span class="n">upper_bound_depth</span><span class="p">,</span> <span class="s2">"&amp; Lower limit of Depth : "</span><span class="p">,</span> <span class="n">lower_bound_depth</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Upper limit of Magnitude :  6.5 &amp; Lower limit of Magnitude :  2.2670000000000017
+Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
+<p>After establishing the limits, we will exclude outliers—values falling outside the defined interval. This process will enhance the readability of our boxplot.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Excluding the earthquakes that have a magnitude higher to the upper bound and lower bound</span>
+<span class="n">earthquake_cleaned_data</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[(</span><span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">upper_bound_magnitude</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lower_bound_magnitude</span><span class="p">)]</span>
+
+<span class="c1"># Now excluding the data that have a depth that is higher or lower to the limits (Using the new data frame)</span>
+<span class="n">earthquake_cleaned_data</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[(</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">upper_bound_depth</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lower_bound_depth</span><span class="p">)]</span>
+
+<span class="c1"># Display</span>
+<span class="n">earthquake_cleaned_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Date</th>
+<th>Moment</th>
+<th>Region</th>
+<th>Lat</th>
+<th>Long</th>
+<th>Magnitude</th>
+<th>Depth (km)</th>
+<th>Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2024-06-23</td>
+<td>2024-06-23 04:51:49</td>
+<td>Mindanao, Philippine</td>
+<td>8.01</td>
+<td>125.20</td>
+<td>4.8</td>
+<td>342</td>
+<td>1</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2024-06-23</td>
+<td>2024-06-23 03:58:03</td>
+<td>Near Coast of Venezuela</td>
+<td>10.80</td>
+<td>-62.65</td>
+<td>5.9</td>
+<td>105</td>
+<td>1</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2024-06-23</td>
+<td>2024-06-23 03:12:08</td>
+<td>Near East Coast of Honshu, japan</td>
+<td>37.16</td>
+<td>141.09</td>
+<td>5.0</td>
+<td>55</td>
+<td>1</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2024-06-22</td>
+<td>2024-06-22 20:46:51</td>
+<td>Near Coast of Peru</td>
+<td>-15.79</td>
+<td>-74.47</td>
+<td>5.3</td>
+<td>64</td>
+<td>1</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2024-06-22</td>
+<td>2024-06-22 18:08:44</td>
+<td>Afghanistan-Tajikistan Border Region</td>
+<td>36.36</td>
+<td>71.45</td>
+<td>3.8</td>
+<td>179</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>Once the data is cleaned, we can display boxplots to illustrate the distribution. The distribution should theoretically appear more homogeneous compared to before outlier exclusion.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the magnitude </span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of the Magnitude of the earthquakes"</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 4" data-asset="session-3/fig-4.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the depth</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of the Magnitude of the earthquakes"</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 5" data-asset="session-3/fig-5.png" loading="lazy"/></figure></details>
+<p>Next, we will create a scatter plot reflecting the data without outliers. This visualization will enhance clarity by adding titles to the axes and a main title for the graph, along with any necessary axis limits.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Creating the visual</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="c1"># Representing the points depending the data depending on the mode</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">][</span><span class="s1">'Depth (km)'</span><span class="p">],</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">][</span><span class="s1">'Magnitude'</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="s2">"Manual"</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span><span class="s2">"1"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">][</span><span class="s1">'Depth (km)'</span><span class="p">],</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">][</span><span class="s1">'Magnitude'</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="s2">"Automatic"</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s2">"."</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="s2">"upper right"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Depth in km"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Magnitude"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Magnitude and depth of the recorded earthquakes depending on the mode of detection"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 6" data-asset="session-3/fig-6.png" loading="lazy"/></figure></details>
+<p>From the scatter plot, we can conclude that there is no evidence of a relationship between the magnitude and depth of the earthquakes. The manual detection mode identifies lower-magnitude earthquakes, while the automatic method detects those occurring at greater depths.</p>
+<p>Python's capabilities for visualizing data are crucial, highlighting the importance of cleaning latitude and longitude data prior to analysis.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Let us show a first map with all the data, then we can either separate the data by mode of detection or by year of occurence</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter_geo</span><span class="p">(</span><span class="n">earthquake_cleaned_data</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="s1">'Lat'</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="s1">'Long'</span><span class="p">,</span> 
+                     <span class="n">color</span> <span class="o">=</span><span class="s1">'Magnitude'</span><span class="p">,</span> <span class="n">hover_name</span> <span class="o">=</span><span class="s1">'Region'</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s2">"Magnitude of the earthquakes"</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre><figure 0="" 640x480="" axes="" size="" with=""></figure></pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Let us represent only the earthquakes that are detected automatically</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter_geo</span><span class="p">(</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">],</span> <span class="n">lat</span><span class="o">=</span><span class="s1">'Lat'</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="s1">'Long'</span><span class="p">,</span> 
+                     <span class="n">color</span> <span class="o">=</span><span class="s1">'Magnitude'</span><span class="p">,</span> <span class="n">hover_name</span> <span class="o">=</span><span class="s1">'Region'</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s2">"Magnitude of the automatically detected earthquakes"</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre><figure 0="" 640x480="" axes="" size="" with=""></figure></pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># And the earthquakes that are detected manually</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter_geo</span><span class="p">(</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">],</span> <span class="n">lat</span><span class="o">=</span><span class="s1">'Lat'</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="s1">'Long'</span><span class="p">,</span> 
+                     <span class="n">color</span> <span class="o">=</span><span class="s1">'Magnitude'</span><span class="p">,</span> <span class="n">hover_name</span> <span class="o">=</span><span class="s1">'Region'</span><span class="p">,</span>  <span class="n">title</span> <span class="o">=</span> <span class="s2">"Magnitude of the manually detected earthquakes"</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre><figure 0="" 640x480="" axes="" size="" with=""></figure></pre></details>
+<aside class="nb-exercise"><span class="nb-ex-tag">Exercise</span><h3>Evolution in 5 years : <em>In class Exercise (Blitz 15 min), Live coding or Assignment</em></h3><p>From our visuals, we observe that a larger number of earthquakes in the dataset were detected automatically. Manually recorded earthquakes were predominantly located in the Middle East and exhibited lower magnitudes compared to those recorded automatically. To gain further insights, we will compare data from 2018 to 2023.</p></aside><div class="nb-code"><pre><span></span><span class="c1"># Filter by date</span>
+
+<span class="c1"># Display the head</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Filter by date</span>
+
+<span class="c1"># Display the head</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Show the earthquakes that occured in 2018</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Show the earthquakes that occured in 2023</span></pre></div>
+<p>Our visuals indicate that seismic regions have remained consistent over the five-year period. However, fewer earthquakes were recorded in 2023 compared to 2018. To further investigate this trend, we can create a graph counting the number of earthquakes by date to examine temporal evolution.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># We can group the data by date and count the number of earthquakes and calculate the average magnitude.</span>
+<span class="n">earthquakes_data_grouped_date</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">'Date'</span><span class="p">],</span> <span class="n">as_index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)[</span><span class="s1">'Magnitude'</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">'count'</span><span class="p">,</span> <span class="s1">'mean'</span><span class="p">])</span>
+<span class="n">earthquakes_data_grouped_date</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">earthquakes_data_grouped_date</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>index</th>
+<th>Date</th>
+<th>count</th>
+<th>mean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>0</td>
+<td>2015-04-12</td>
+<td>1</td>
+<td>2.30</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1</td>
+<td>2015-11-19</td>
+<td>1</td>
+<td>3.80</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2</td>
+<td>2015-11-22</td>
+<td>1</td>
+<td>6.20</td>
+</tr>
+<tr>
+<th>3</th>
+<td>3</td>
+<td>2015-11-26</td>
+<td>1</td>
+<td>3.00</td>
+</tr>
+<tr>
+<th>4</th>
+<td>4</td>
+<td>2015-11-27</td>
+<td>4</td>
+<td>4.25</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the number of earthquakes that occured</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">earthquakes_data_grouped_date</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">],</span> <span class="n">earthquakes_data_grouped_date</span><span class="p">[</span><span class="s1">'count'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Number of earthquakes"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Number of earthquakes by date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 7" data-asset="session-3/fig-7.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the average magnitude of earthquakes by date</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">earthquakes_data_grouped_date</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">],</span> <span class="n">earthquakes_data_grouped_date</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Magnitude"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Average magnitude of earthquakes by date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 8" data-asset="session-3/fig-8.png" loading="lazy"/></figure></details>
+<p>The initial visuals provided lack readability and do not significantly enhance our analysis. It is crucial to maintain simplicity in reports and utilize only relevant visuals. The previous two graphs do not add value; instead, we should consider grouping the data by year for clearer insights.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># First, we add a column to the original table named Year</span>
+<span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Year'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y'</span><span class="p">)</span>
+<span class="c1"># Be careful, this function is only usable because the "Date" column here is has a datatime type</span>
+<span class="n">earthquake_cleaned_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Date</th>
+<th>Moment</th>
+<th>Region</th>
+<th>Lat</th>
+<th>Long</th>
+<th>Magnitude</th>
+<th>Depth (km)</th>
+<th>Mode</th>
+<th>Year</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2024-06-23</td>
+<td>2024-06-23 04:51:49</td>
+<td>Mindanao, Philippine</td>
+<td>8.01</td>
+<td>125.20</td>
+<td>4.8</td>
+<td>342</td>
+<td>1</td>
+<td>2024</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2024-06-23</td>
+<td>2024-06-23 03:58:03</td>
+<td>Near Coast of Venezuela</td>
+<td>10.80</td>
+<td>-62.65</td>
+<td>5.9</td>
+<td>105</td>
+<td>1</td>
+<td>2024</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2024-06-23</td>
+<td>2024-06-23 03:12:08</td>
+<td>Near East Coast of Honshu, japan</td>
+<td>37.16</td>
+<td>141.09</td>
+<td>5.0</td>
+<td>55</td>
+<td>1</td>
+<td>2024</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2024-06-22</td>
+<td>2024-06-22 20:46:51</td>
+<td>Near Coast of Peru</td>
+<td>-15.79</td>
+<td>-74.47</td>
+<td>5.3</td>
+<td>64</td>
+<td>1</td>
+<td>2024</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2024-06-22</td>
+<td>2024-06-22 18:08:44</td>
+<td>Afghanistan-Tajikistan Border Region</td>
+<td>36.36</td>
+<td>71.45</td>
+<td>3.8</td>
+<td>179</td>
+<td>0</td>
+<td>2024</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Now we can group the data by year instead of dates</span>
+<span class="n">earthquakes_data_grouped_year</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">'Year'</span><span class="p">],</span> <span class="n">as_index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)[</span><span class="s1">'Magnitude'</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">'count'</span><span class="p">,</span> <span class="s1">'mean'</span><span class="p">])</span>
+<span class="n">earthquakes_data_grouped_year</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">earthquakes_data_grouped_year</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>index</th>
+<th>Year</th>
+<th>count</th>
+<th>mean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>0</td>
+<td>2015</td>
+<td>16</td>
+<td>3.731250</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1</td>
+<td>2016</td>
+<td>1520</td>
+<td>4.361645</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2</td>
+<td>2017</td>
+<td>1546</td>
+<td>4.647801</td>
+</tr>
+<tr>
+<th>3</th>
+<td>3</td>
+<td>2018</td>
+<td>2752</td>
+<td>4.622384</td>
+</tr>
+<tr>
+<th>4</th>
+<td>4</td>
+<td>2019</td>
+<td>2717</td>
+<td>4.795694</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the number of earthquakes that occured by year</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">earthquakes_data_grouped_year</span><span class="p">[</span><span class="s1">'Year'</span><span class="p">],</span> <span class="n">earthquakes_data_grouped_year</span><span class="p">[</span><span class="s1">'count'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Year"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Number of earthquakes"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Number of earthquakes by year"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 9" data-asset="session-3/fig-9.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the number of earthquakes that occured by year</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">earthquakes_data_grouped_year</span><span class="p">[</span><span class="s1">'Year'</span><span class="p">],</span> <span class="n">earthquakes_data_grouped_year</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Year"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Magnitude"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Average magnitude of earthquakes by year"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 10" data-asset="session-3/fig-10.png" loading="lazy"/></figure></details>
+<p>From the graphs, we note fewer recorded earthquakes in 2020, 2021, and 2022, with notably lower recorded magnitudes in 2020. However, the average magnitude of earthquakes over the past ten years remains consistent at approximately 4 ± 0.8.</p>
+<h2 id="VI---Conclusion">VI - Conclusion</h2><p>From our analysis, we can draw the following conclusions:</p>
+<ul>
+<li>The variables are not correlated.</li>
+<li>No evident relationship exists between the depth and magnitude of earthquakes.</li>
+<li>Manually recorded earthquakes primarily occurred in the Middle East, displaying lower average magnitudes and depths compared to automatically recorded earthquakes.</li>
+<li>The seismic regions have remained consistent over the years.</li>
+<li>There was a decline in recorded earthquakes in 2020, 2021, and 2022.</li>
+</ul>
+<aside class="nb-exercise"><span class="nb-ex-tag">Assignment</span><h3>VII - Assignment</h3><p>For the next session:</p><ul>
+<li>Go on Kaggle and download a dataset.</li>
+<li>Clean the data using the methods covered in class.</li>
+<li>Create 2 to 3 visuals that might be relevant for the analysis.</li>
+</ul><p>Make sure to apply the data cleaning techniques and visualization methods we discussed to ensure that your graphs are clear and meaningful.</p></aside>
+` },
          { slug: "session-4", label: "Session 4", title: "Financial Analysis Using Python: Application with the Dupont Analysis", embedUrl: "" },
          { slug: "session-5", label: "Session 5", title: "Introduction to time series and Linear Regression using OLS", embedUrl: "" },
          { slug: "session-6", label: "Session 6", title: "Building a portfolio and valuing different types of assets", embedUrl: "" },

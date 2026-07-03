@@ -809,6 +809,9 @@ function SessionContent({ session }) {
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
+    root.querySelectorAll("img[data-asset]").forEach((img) => {
+      img.src = (import.meta.env?.BASE_URL ?? "/") + "course-assets/" + img.dataset.asset;
+    });
     root.querySelectorAll(".nb-code").forEach((block) => {
       if (block.querySelector(".nb-copy")) return;
       const btn = document.createElement("button");
@@ -1242,6 +1245,22 @@ details.nb-output pre {
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 0.82rem; line-height: 1.5; color: var(--soft); overflow-x: auto;
 }
+details.nb-output .nb-figure { margin: 0; padding: 4px 18px 14px; }
+details.nb-output .nb-figure img {
+  display: block; max-width: min(100%, 840px);
+  border: 1px solid var(--line); border-radius: 10px; background: #fff;
+}
+details.nb-output .nb-table-wrap { overflow-x: auto; padding: 4px 18px 14px; }
+.nb-table-wrap table {
+  border-collapse: collapse;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.76rem; line-height: 1.45;
+}
+.nb-table-wrap th, .nb-table-wrap td {
+  padding: 5px 12px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap;
+}
+.nb-table-wrap thead th { color: var(--green-deep); font-weight: 600; }
+.nb-table-wrap tbody th { color: var(--green-deep); font-weight: 600; text-align: left; }
 
 /* --- exercises & assignments: visibly not course content --- */
 :root { --ex: #9a6b1f; }
