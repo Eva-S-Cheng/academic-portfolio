@@ -160,6 +160,14 @@
       linkedin, website) for each person as you retrieve them; only
       non-empty links are displayed. */
    export const COLLABORATORS = [
+    {
+      name: "Alberta Di Giuli",
+      role: "PhD supervisor",
+      org: "Full Professor in Finance & Dean of Turin Campus, ESCP Business School",
+      scholar: "https://scholar.google.com/citations?user=wyQf0M0AAAAJ",
+      linkedin: "https://it.linkedin.com/in/alberta-di-giuli",
+      website: "https://sites.google.com/site/albertadigiuli/home",
+    },
      {
        name: "Alexandre Garel",
        role: "Co-author · Research supervisor",
