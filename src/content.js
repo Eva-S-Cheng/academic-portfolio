@@ -594,7 +594,194 @@ The number after the function :  15</pre></details>
 3) Long strategy on a stock initially priced 110  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  20
 4) Short strategy on a stock initially priced 100  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  -20</pre></details>
 <aside class="nb-exercise"><span class="nb-ex-tag">Assignment</span><h3>Assignment : Writing functions used in financial analysis</h3><p>Write a program in Jupyter that calculates the current ratio, return on assets (ROA), and internal rate of return (IRR) using a list of cash flows. Include three examples to illustrate the formulas. Please send the code to the email: eva.cheng@audencia.com</p></aside>` },
-         { slug: "session-2", label: "Session 2", title: "Advanced basics of Python for Finance", embedUrl: "" },
+         { slug: "session-2", label: "Session 2", title: "Advanced basics of Python for Finance", embedUrl: "", html: `
+<p>This session aims to make you as autonomous as possible while writing programs in Python. It will help you understand:</p>
+<ul>
+<li>The principles of object-oriented programming</li>
+<li>How to identify recurring errors and debug code</li>
+<li>How to install packages and libraries</li>
+</ul>
+<h2 id="I---Principles-of-object-oriented-programming">I - Principles of object oriented programming</h2><p>To store information, a computer can use either variables or objects. Variables can include integers, strings, floats, and complex numbers, while objects encompass data structures such as dataframes and lists. In this section, you will learn about the specifics of objects and how to create them.</p>
+<p>An object is an instance (or element) of a specific class. A class is a particular data structure that can be user-defined or pre-defined through Python packages. The class defines the nature of an object with:</p>
+<ul>
+<li>Values for state (attributes or variables)</li>
+<li>Behaviors (methods)</li>
+</ul>
+<p>As a simple example, at school :</p>
+<ul>
+<li><code>Student</code> would be a class.</li>
+<li>Each individual student would be an instance or element of that class.</li>
+<li>Attributes might include name, gender, age, major, grades, and classes.</li>
+<li>Methods could include actions like receiving a grade, enrolling in a class, walking, or interacting with other students.</li>
+</ul>
+<div class="nb-code"><pre><span></span><span class="c1"># An example of how we define a class in Python </span>
+<span class="k">class</span> <span class="nc">Vehicle</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">brand</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">passengers</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span> <span class="c1"># A vehicle is defined by brand, model, color, passengers, speed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brand</span> <span class="o">=</span> <span class="n">brand</span>                                      <span class="c1"># Brand of the object (represented as "self") = value of brand</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">passengers</span> <span class="o">=</span> <span class="n">passengers</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">speed</span>  
+        
+    <span class="k">def</span> <span class="nf">accelerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>                                       <span class="c1"># Adding a method (behavior), a vehicle can accelerate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">+</span> <span class="mi">10</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"The vehicle is going 10 km/h faster"</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_passengers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>                           <span class="c1"># Passengers can get off and get on a vehicle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">passengers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">passengers</span> <span class="o">+</span> <span class="n">number</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="s2">"new passenger(s) got on the vehicle"</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"The vehicle is a"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">"from"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">brand</span><span class="p">,</span> 
+              <span class="s2">"with"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">passengers</span><span class="p">,</span> <span class="s2">"passengers and going "</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span><span class="p">,</span> <span class="s2">"km/h"</span><span class="p">)</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Testing the class</span>
+<span class="n">bmwv_car</span> <span class="o">=</span> <span class="n">Vehicle</span><span class="p">(</span><span class="s2">"BMW"</span><span class="p">,</span> <span class="s2">"Model 4"</span><span class="p">,</span> <span class="s2">"Blue"</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+<span class="n">bmwv_car</span><span class="o">.</span><span class="n">get_info</span><span class="p">()</span>
+<span class="n">bmwv_car</span><span class="o">.</span><span class="n">accelerate</span><span class="p">()</span>
+<span class="n">bmwv_car</span><span class="o">.</span><span class="n">add_passengers</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">bmwv_car</span><span class="o">.</span><span class="n">get_info</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The vehicle is a Blue Model 4 from BMW with 4 passengers and going  120 km/h
+The vehicle is going 10 km/h faster
+1 new passenger(s) got on the vehicle
+The vehicle is a Blue Model 4 from BMW with 5 passengers and going  130 km/h</pre></details>
+<p>As you may have noticed, whenever we refer to a class method, the method is preceded by the name of the object, followed by a period, and then the parentheses that indicate we are calling a function. Each attribute of the object is preceded by the name of the object and a period only.</p>
+<p>The major difference between variables and objects is that objects are references, while variables hold values in functions. In other words:</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Example with variables</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mi">15</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Value of x :"</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="s2">"&amp; Value of y :"</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># Example with objects</span>
+<span class="n">tesla_car</span> <span class="o">=</span> <span class="n">Vehicle</span><span class="p">(</span><span class="s2">"Tesla"</span><span class="p">,</span> <span class="s2">"Model X"</span><span class="p">,</span> <span class="s2">"Black"</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Initial of the car's speed value :"</span><span class="p">,</span> <span class="n">tesla_car</span><span class="o">.</span><span class="n">speed</span><span class="p">)</span>
+<span class="n">another_tesla</span> <span class="o">=</span> <span class="n">tesla_car</span>
+<span class="n">another_tesla</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="mi">80</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Value of speed of first Tesla :"</span><span class="p">,</span> <span class="n">tesla_car</span><span class="o">.</span><span class="n">speed</span><span class="p">,</span> <span class="s2">"&amp; Value of speed of second Tesla :"</span><span class="p">,</span> <span class="n">another_tesla</span><span class="o">.</span><span class="n">speed</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Value of x : 10 & Value of y : 15
+Initial of the car's speed value : 100
+Value of speed of first Tesla : 80 & Value of speed of second Tesla : 80</pre></details>
+<p>Therefore, it is crucial to understand that when an object is mentioned, we are referring to a reference in the computer's memory. This statement applies equally to user-defined objects and to those that already exist in Python, such as lists, dataframes, series, and arrays.</p>
+<p>Different levels of encapsulation exist in object-oriented programming (which will not be covered in this class). In the example above, all elements were public. However, for advanced Python programming, developers need to understand the distinctions between the different levels of encapsulation:</p>
+<ul>
+<li><code>Private</code>: Private methods and attributes are preceded by <code>__</code>, and their access is restricted to the class level only (these attributes and methods cannot be called outside the class).</li>
+<li><code>Protected</code>: Protected methods and attributes are preceded by <code>_</code>, and their access is restricted to the class and its subclasses only (this relates to inheritance, which is not covered in this class).</li>
+<li><code>Public</code>: Public methods and attributes can be accessed from outside the class.</li>
+</ul>
+<h2 id="II---Installing-packages">II - Installing packages</h2><p>Existing objects in Python typically come from packages or libraries that often require installation before use. The main packages commonly used for finance include:</p>
+<ul>
+<li><code>pandas</code> : For data manipulation</li>
+<li><code>numpy</code> : Supports large multi-dimensional arrays and high-level mathematical operations</li>
+<li><code>matplotlib</code> and <code>seaborn</code> : For visualization</li>
+<li><code>statsmodels</code> : Provides statistical tools</li>
+<li><code>scipy</code> : Primarily used for scientific computing, including linear algebra, optimization, and integration</li>
+</ul>
+<p>These packages are usually installed via the Anaconda Prompt in the Anaconda environment or through the command line with the statement <code>pip install [name of package]</code></p>
+<div class="nb-code"><pre><span></span><span class="c1"># Before using the module / package, the package needs to be imported with the following statement</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>                 <span class="c1"># pd is the convetionnal shortname for pandas</span></pre></div>
+<p>They can also be installed manually through the IDE directly. You can view the packages that are already installed by using the <code>pip list</code> command in the prompt.</p>
+<h2 id="III---Recurrent-errors">III - Recurrent errors</h2><p>As you begin learning Python, it is important to become more independent and self-sufficient when writing programs. Errors are often indicators of whether the code is correct. If there are issues, the computer will typically either: not produce the expected result, generate an error or a bug, or cause the program to crash.</p>
+<p>There are common errors that can lead to bugs (where no result is generated):</p>
+<ul>
+<li>Syntax Error: Occurs when the interpreter encounters lines of code that do not adhere to syntax rules (e.g., unclosed strings, missing commas, misspelled keywords, missing parentheses, etc.)</li>
+<li>Indentation Error: Occurs when the spacing used for a nested block is incorrect.</li>
+<li>Name Error: Commonly occurs when referring to a variable that has not been defined previously.</li>
+<li>Value Error: Occurs when the data type passed as an argument to a function is correct, but the value is invalid.</li>
+<li>Type Error: Happens when an invalid data type is used for certain operations or when the variable passed as an argument to a function does not have the correct data type.</li>
+<li>Zero Division Error: Occurs when the program attempts to divide a number by zero.</li>
+<li>File Not Found Error: Occurs when trying to read a file that cannot be found in the directory (usually due to a missing file or a misspelled file name).</li>
+<li>Module Not Found Error: Occurs when the module being imported is not recognized by the computer (due to misspelling, the package not being installed, or the module not existing).</li>
+<li>Memory Error: Typically arises when performing large operations and the system runs out of RAM.</li>
+<li>Index Error: Occurs when trying to access an index in a sequence (such as a list, dataframe, or array) that is outside the valid range (remember that indices start from 0 up to the length of the list minus one).</li>
+<li>Permission Error: Occurs when a user attempts to execute an operation without the required privileges.</li>
+<li>Attribute Error: Occurs in object-oriented programming when trying to refer to an attribute or method of an object that is not defined.</li>
+<li>Unbound Local Error: Occurs inside functions when referring to a name that is defined outside the function but not defined within it.</li>
+</ul>
+<p>PyCharm is a helpful tool for correcting common errors. There are various ways to debug code, and some websites can assist by allowing you to copy and paste error messages online:</p>
+<ol>
+<li>Stack Overflow: <a href="https://stackoverflow.com/">https://stackoverflow.com/</a></li>
+<li>GeeksforGeeks: <a href="https://www.geeksforgeeks.org/">https://www.geeksforgeeks.org/</a></li>
+<li>Python.org: <a href="https://discuss.python.org/">https://discuss.python.org/</a></li>
+</ol>
+<aside class="nb-exercise"><span class="nb-ex-tag">Assignment</span><h3>Assignment : Correct the following code</h3><p>In order to practice and enhance your independence with Python before delving into the more challenging finance section, you will be required to correct the following code. (Be careful ⚠️ The errors can either generate explicit error messages or produce incorrect results without any feedback from the Python interpreter. These errors may include logical or calculation mistakes, and you will need knowledge in areas beyond Python to successfully complete this exercise.)</p></aside><div class="nb-code"><pre><span></span><span class="c1"># Precisions : There will be syntax errors and logical errors (wrong calculations for example)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="sd">"""" ---------------- Part 1 : Simplified Real Estate Valuation ---------------- """</span>
+
+<span class="c1"># Imagining you are investing in a real asset sold at price $250,0000 and annual revenue $10,000 and annual cost $7,500</span>
+<span class="n">real</span> <span class="n">asset</span> <span class="o">=</span> <span class="mi">45000</span>
+<span class="n">revenue</span> <span class="o">=</span> <span class="mi">10000</span>
+
+<span class="c1"># The Annual Net Operating Income is the income generated each year with the revenue and the costs implied after the acquistion </span>
+<span class="k">def</span> <span class="nf">calculate_NOI</span><span class="p">(</span><span class="n">revenue</span><span class="p">):</span>
+    <span class="n">net_operating_income</span> <span class="o">=</span> <span class="n">cost</span> <span class="o">-</span> <span class="n">revenue</span>
+<span class="k">return</span> <span class="n">revenue</span>
+
+<span class="n">Afterwards</span><span class="p">,</span> <span class="n">we</span> <span class="n">can</span> <span class="n">calculate</span> <span class="n">the</span> <span class="n">capitalization</span> <span class="n">rate</span><span class="o">.</span> <span class="n">The</span> <span class="n">capitalization</span> <span class="n">rate</span> <span class="ow">is</span> <span class="n">basically</span> <span class="n">the</span> <span class="n">expected</span> <span class="k">return</span> <span class="n">on</span> <span class="n">real</span> <span class="n">assets</span>
+<span class="k">def</span> <span class="nf">calculate_cap_rate</span><span class="p">(</span><span class="n">net_operating_income</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">net_operating_income</span> <span class="o">/</span> <span class="n">value</span>
+
+<span class="c1"># We can also calculate the investment payback period. It is by definition the time required to generate profit on investment</span>
+<span class="n">get_payback_period</span><span class="p">(</span><span class="n">net_operating_income</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_payback_period</span><span class="p">(</span><span class="n">net_operating_income</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span> <span class="o">/</span> <span class="n">net_operating</span> <span class="n">income</span>
+
+<span class="c1"># Testing the formulas</span>
+<span class="n">net_op_income</span> <span class="o">=</span> <span class="n">calculate_NOI</span><span class="p">(</span><span class="n">revenue</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+<span class="n">cap_rate</span> <span class="o">=</span> <span class="k">def</span> <span class="nf">calculate_cap_rate</span><span class="p">(</span><span class="n">net_operating_income</span><span class="p">,</span> <span class="n">real</span> <span class="n">asset</span><span class="p">)</span>
+    <span class="n">payback_period</span> <span class="o">=</span> <span class="n">get_payback_period</span><span class="p">(</span><span class="n">net_op_income</span><span class="p">,</span> <span class="n">real</span> <span class="n">asset</span><span class="p">)</span>
+
+<span class="c1"># Displaying the results </span>
+<span class="nb">print</span><span class="p">(</span><span class="n">The</span> <span class="n">real</span> <span class="n">asset</span> <span class="n">that</span> <span class="n">inital</span> <span class="n">cost</span><span class="p">,</span> <span class="s2">"real asset"</span><span class="p">,</span> <span class="s2">"has a"</span><span class="p">,</span> <span class="n">payback_period</span><span class="p">,</span> 
+      <span class="s2">"- year payback period and a cap rate of "</span><span class="p">,</span> <span class="n">cap_rate</span><span class="p">,</span> <span class="s2">"%"</span><span class="p">)</span>
+
+<span class="sd">"""" ---------------- Part 2 : Simplfied Mortgage Payment ---------------- """</span>
+<span class="c1"># A mortgage loan is defined by : a Home Price, a down payment (initial payment), a term, an interest rate. (without taxes)</span>
+<span class="c1"># We are usually interested in knowing the paid interests and the total mortgage payment</span>
+<span class="n">home_price</span> <span class="o">=</span> <span class="mi">450000</span>
+<span class="n">term</span> <span class="o">=</span> <span class="mi">30</span> <span class="n">years</span>
+<span class="n">initial_payment</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="mi">2</span>              <span class="c1"># 20% </span>
+
+<span class="c1"># We let the user choose the interest rate</span>
+<span class="nb">input</span><span class="p">(</span><span class="s2">"Please enter an interest rate : "</span><span class="p">)</span>
+
+<span class="c1"># The principal is the amount of the loan (The home price - initial payment), n the number of payment per year (assume months)</span>
+<span class="k">def</span> <span class="nf">calculate_periodic_payment</span><span class="p">(</span><span class="n">principal</span><span class="p">,</span> <span class="n">term</span><span class="p">,</span> <span class="n">interest_rate</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="n">number_of_payment</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">principal</span>
+    <span class="n">interest_rate_per_period</span> <span class="o">=</span> <span class="n">interest_rate</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="n">principal</span> <span class="o">*</span> <span class="n">interest_rate_per_period</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">interest_rate_per_period</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">number_of_payment</span><span class="p">))</span>
+<span class="c1"># The official formula is (P x (r/n))/(1 - (1 + r/n)^(-nt)) </span>
+<span class="c1"># P : the principal, r the interest, n the number of month, t the term</span>
+
+<span class="n">principal</span> <span class="o">=</span> <span class="n">home_price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">initial_payment</span><span class="p">)</span>
+<span class="n">periodic_payment</span> <span class="o">=</span> <span class="n">calculate_periodic_payment</span><span class="p">(</span><span class="n">principal</span><span class="p">,</span> <span class="n">term</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="c1"># We create the lists of the payments (the interests and the principal)</span>
+<span class="n">number_of_period</span> <span class="o">=</span> <span class="mi">12</span> <span class="o">*</span> <span class="n">term</span>
+
+<span class="n">interests</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">reimbursement_of_principal</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">remaining_capital</span> <span class="o">=</span> <span class="n">principal</span>
+<span class="n">total_reimbursement</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">interest_per_period</span> <span class="o">=</span> <span class="n">interest_rate</span> <span class="o">/</span> <span class="mi">12</span>
+
+<span class="c1"># We calculate the payments</span>
+<span class="k">while</span> <span class="n">remaining_capital</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">interest</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">remaining_capital</span> <span class="o">*</span> <span class="n">interest_per_period</span>
+    <span class="n">reimbursement_of_principal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">periodic_payment</span> <span class="o">-</span> <span class="n">interests</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">interest</span><span class="p">)])</span> <span class="c1"># Last element of the list named interests</span>
+
+<span class="c1"># Total interest</span>
+<span class="n">paid_interests</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">interests</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Total payment = "</span> <span class="n">paid_interests</span> <span class="o">+</span> <span class="n">principal</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Reimbursement : "</span><span class="p">,</span> <span class="n">reimbursement_of_principal</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Interests : "</span><span class="p">,</span> <span class="n">interests</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre><span class="ansi-cyan-intense-fg ansi-bold">  Cell </span><span class="ansi-green-intense-fg ansi-bold">In[17], line 7</span>
+<span class="ansi-yellow-intense-fg ansi-bold">    real asset = 45000</span>
+<span class="ansi-white-intense-fg ansi-bold">         ^</span>
+<span class="ansi-red-intense-fg ansi-bold">SyntaxError</span><span class="ansi-red-intense-fg ansi-bold">:</span> invalid syntax</pre></details>
+` },
          { slug: "session-3", label: "Session 3", title: "Basics of Data Analysis in Python", embedUrl: "" },
          { slug: "session-4", label: "Session 4", title: "Financial Analysis Using Python: Application with the Dupont Analysis", embedUrl: "" },
          { slug: "session-5", label: "Session 5", title: "Introduction to time series and Linear Regression using OLS", embedUrl: "" },
