@@ -3,7 +3,7 @@ import { Link, NavLink, Route, Routes, useLocation, useParams } from "react-rout
 import {
   ORCID_ID, LINKS, PROFILE_LINKS, AFFILIATION, HERO_LEDE, BIO, SKILLS, LANGUAGES,
   RESEARCH_STATEMENT, INTERESTS, WORKING_PAPERS, REPORTS, PROJECTS, EDUCATION,
-  TEACHING_EXPERIENCE, ACADEMIC_POSITIONS, PROFESSIONAL_EXPERIENCE, COURSES, COPYRIGHT_NOTICE,
+  TEACHING_EXPERIENCE, ACADEMIC_POSITIONS, PROFESSIONAL_EXPERIENCE, COURSES, COLLABORATORS, COPYRIGHT_NOTICE,
 } from "./content.js";
 
 /* ============================================================
@@ -114,7 +114,9 @@ function mergeWithCurated(work, curated) {
   return {
     ...work,
     matched: true,
-    authors: work.contributors.length > 0 ? work.contributors.join(", ") : match.authors,
+    /* The curated author string preserves the correct author order;
+       ORCID contributors are only a fallback. */
+    authors: match.authors || (work.contributors.length > 0 ? work.contributors.join(", ") : null),
     venue: work.journal || match.venue,
     link: match.link || (work.url ? { label: "View", url: work.url } : null),
     abstract: match.abstract,
@@ -332,6 +334,7 @@ const NAV = [
   { to: "/", label: "Home", end: true },
   { to: "/research", label: "Research" },
   { to: "/teaching", label: "Teaching" },
+  { to: "/projects", label: "Projects" },
   { to: "/cv", label: "Curriculum Vitae" },
 ];
 
@@ -356,17 +359,17 @@ function Header({ theme, onToggleTheme }) {
             <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
           ))}
         </nav>
-        <button className="theme-toggle" onClick={onToggleTheme}
-          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
-          {theme === "dark" ? "☀" : "☾"}
-        </button>
         <button className="menu-toggle" onClick={() => setMenuOpen((o) => !o)}
           aria-expanded={menuOpen} aria-label="Menu">
           {menuOpen ? "✕" : "☰"}
         </button>
+        <button className="theme-toggle" onClick={onToggleTheme}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
+          {theme === "dark" ? "☀" : "☾"}
+        </button>
       </div>
       {menuOpen && (
-        <nav className="wrap mobile-nav" aria-label="Main mobile">
+        <nav className="mobile-menu" aria-label="Main mobile">
           {NAV.map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
           ))}
@@ -471,28 +474,24 @@ function HomePage() {
         <div className="wrap">
           <Eyebrow>About</Eyebrow>
           <h2 className="section-title">Finance, sustainability &amp; <em>quantitative methods</em></h2>
-          <div className="prose about-prose">
-            {BIO.map((p, i) => (<p key={i}>{p}</p>))}
-          </div>
-          <div className="about-meta">
+          <div className="cols">
             <div>
+              <div className="prose about-prose">
+                {BIO.map((p, i) => (<p key={i}>{p}</p>))}
+              </div>
               <p className="side-label">Research interests</p>
               <div className="tag-row">
                 {INTERESTS.map((t) => (<span className="tag" key={t}>{t}</span>))}
               </div>
             </div>
-            <div className="about-meta-row">
-              <div>
-                <p className="side-label">Technical skills</p>
-                <div className="tag-row">
-                  {SKILLS.map((s) => (<span className="tag tag-quiet" key={s}>{s}</span>))}
-                </div>
+            <div className="side-card">
+              <p className="side-label">Technical skills</p>
+              <div className="tag-row">
+                {SKILLS.map((s) => (<span className="tag tag-quiet" key={s}>{s}</span>))}
               </div>
-              <div>
-                <p className="side-label">Languages</p>
-                <div className="tag-row">
-                  {LANGUAGES.map((l) => (<span className="tag tag-quiet" key={l}>{l}</span>))}
-                </div>
+              <p className="side-label mt">Languages</p>
+              <div className="tag-row">
+                {LANGUAGES.map((l) => (<span className="tag tag-quiet" key={l}>{l}</span>))}
               </div>
             </div>
           </div>
@@ -504,8 +503,9 @@ function HomePage() {
           <Eyebrow>Explore</Eyebrow>
           <div className="card-grid">
             {[
-              { to: "/research", h: "Research", p: "Publications synchronized from ORCID, working papers, theses and side projects." },
-              { to: "/teaching", h: "Teaching", p: "Postgraduate teaching in Python, quantitative finance and data analysis, with course material available to enrolled students." },
+              { to: "/research", h: "Research", p: "Publications synchronized from ORCID, working papers, theses and co-authors." },
+              { to: "/teaching", h: "Teaching", p: "My teaching positions and courses, with material available online for enrolled students." },
+              { to: "/projects", h: "Projects", p: "Side projects around data, music and automation, built outside of research." },
               { to: "/cv", h: "Curriculum Vitae", p: "Education, academic positions and professional experience. Full CV in English and French." },
             ].map((c) => (
               <Link to={c.to} className="nav-card" key={c.to}>
@@ -611,8 +611,47 @@ function ResearchPage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>Lab</Eyebrow>
-          <h2 className="section-title">Side <em>projects</em></h2>
+          <Eyebrow>People</Eyebrow>
+          <h2 className="section-title">Co-authors &amp; <em>supervisors</em></h2>
+          <div className="card-grid">
+            {COLLABORATORS.map((p) => (
+              <article className="nav-card nav-card-static collab-card" key={p.name}>
+                <h3>{p.name}</h3>
+                <p className="collab-role">{p.role}</p>
+                {p.org && <p>{p.org}</p>}
+                <div className="pub-actions mt-sm">
+                  {p.scholar && <a href={p.scholar} target="_blank" rel="noreferrer">Google Scholar ↗</a>}
+                  {p.website && <a href={p.website} target="_blank" rel="noreferrer">Website ↗</a>}
+                  {p.linkedin && <a href={p.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a>}
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="cta-line">
+            <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[RESEARCH]`}>Discuss research</a>
+          </p>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function ProjectsPage() {
+  return (
+    <>
+      <PageHead title="Projects" />
+      <section className="page-hero">
+        <div className="wrap">
+          <Eyebrow>Projects</Eyebrow>
+          <h1 className="page-title">Side <em>projects</em></h1>
+          <p className="page-sub">
+            Personal projects built outside of research, around data, music and automation.
+          </p>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="wrap">
           <div className="card-grid">
             {PROJECTS.map((p) => (
               <article className="nav-card nav-card-static" key={p.name}>
@@ -628,9 +667,6 @@ function ResearchPage() {
               </article>
             ))}
           </div>
-          <p className="cta-line">
-            <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[RESEARCH]`}>Discuss research</a>
-          </p>
         </div>
       </section>
     </>
@@ -644,7 +680,7 @@ function TeachingPage() {
       <section className="page-hero">
         <div className="wrap">
           <Eyebrow>Teaching</Eyebrow>
-          <h1 className="page-title">Teaching <em>quantitative finance</em></h1>
+          <h1 className="page-title">Teaching</h1>
         </div>
       </section>
 
@@ -765,8 +801,10 @@ function SessionPage() {
 
       <section className="section">
         <div className="wrap">
-          {!unlocked ? (
+          {!session.public && !unlocked ? (
             <AccessGate course={course} onUnlock={tryUnlock} />
+          ) : session.html ? (
+            <div className="session-content" dangerouslySetInnerHTML={{ __html: session.html }} />
           ) : session.embedUrl ? (
             <div className="embed-frame">
               <iframe src={session.embedUrl} title={`${session.label} — ${session.title}`}
@@ -897,6 +935,7 @@ export default function App() {
           <Route path="/teaching" element={<TeachingPage />} />
           <Route path="/teaching/:courseSlug" element={<CoursePage />} />
           <Route path="/teaching/:courseSlug/:slug" element={<SessionPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/cv" element={<CVPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
@@ -1002,13 +1041,48 @@ a:hover { color: var(--green-deep); }
   display: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
   width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 0.95rem;
 }
-.mobile-nav { display: flex; flex-direction: column; border-top: 1px solid var(--line); padding-top: 6px; padding-bottom: 14px; background: var(--bg); }
-.mobile-nav a {
-  font-size: 1.05rem; font-weight: 500; color: var(--ink);
-  padding: 12px 4px; border-bottom: 1px solid var(--line);
+.mobile-menu {
+  position: absolute; top: calc(100% + 8px); right: clamp(16px, 3vw, 44px);
+  width: min(240px, calc(100vw - 32px));
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: var(--shadow-hover); padding: 6px;
+  animation: menupop 0.16s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
-.mobile-nav a.active { color: var(--green-deep); }
-.mobile-nav a:last-child { border-bottom: none; }
+@keyframes menupop { from { opacity: 0; transform: translateY(-6px) scale(0.98); } }
+.mobile-menu a {
+  font-size: 0.95rem; font-weight: 500; color: var(--ink);
+  padding: 10px 14px; border-radius: 9px;
+}
+.mobile-menu a:hover { background: var(--wash); }
+.mobile-menu a.active { color: var(--green-deep); background: var(--wash); }
+
+/* --- collaborators --- */
+.collab-card h3 { font-size: 1.08rem; }
+.collab-card .collab-role { color: var(--green-deep); font-size: 0.82rem; font-weight: 600; margin-top: 4px; }
+.collab-card p { margin-top: 4px; }
+
+/* --- inline session content --- */
+.session-content {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: clamp(20px, 3vw, 34px); box-shadow: var(--shadow); max-width: 900px;
+}
+.session-content h2 { font-weight: 520; font-size: 1.3rem; margin: 18px 0 8px; }
+.session-content h2:first-child { margin-top: 0; }
+.session-content h3 { font-weight: 520; font-size: 1.1rem; margin: 14px 0 6px; }
+.session-content p { margin: 8px 0; }
+.session-content ul, .session-content ol { margin: 8px 0 8px 22px; }
+.session-content li { margin: 4px 0; }
+.session-content a { text-decoration: underline; text-underline-offset: 3px; }
+.session-content code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.84em;
+  background: var(--wash); padding: 1px 6px; border-radius: 6px;
+}
+.session-content .video-embed {
+  aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden;
+  border: 1px solid var(--line); margin: 16px 0; background: #000;
+}
+.session-content .video-embed iframe { width: 100%; height: 100%; border: 0; display: block; }
 
 /* --- hero --- */
 .hero {
@@ -1264,9 +1338,9 @@ a:hover { color: var(--green-deep); }
   font-size: 1.3rem; color: var(--green-deep); background: var(--wash); padding: 0;
 }
 .cv-top { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
-.cv-heading { font-weight: 520; font-size: 1.1rem; line-height: 1.32; letter-spacing: -0.006em; }
-.cv-period { font-size: 0.82rem; font-weight: 600; color: var(--green-deep); white-space: nowrap; }
-.cv-org { font-size: 0.94rem; margin-top: 3px; }
+.cv-heading { font-weight: 520; font-size: 1.02rem; line-height: 1.3; letter-spacing: -0.005em; }
+.cv-period { font-size: 0.78rem; font-weight: 600; color: var(--green-deep); white-space: nowrap; }
+.cv-org { font-size: 0.88rem; margin-top: 2px; }
 .cv-org a { color: var(--soft); border-bottom: 1px solid var(--line); }
 .cv-org a:hover { color: var(--green-deep); border-color: var(--green); }
 .cv-honors { font-style: italic; color: var(--green-deep); }
@@ -1335,7 +1409,7 @@ a:hover { color: var(--green-deep); }
 @media (max-width: 820px) {
   .nav { display: none; }
   .menu-toggle { display: block; margin-left: auto; }
-  .theme-toggle { margin-left: auto; }
+  .theme-toggle { margin-left: 8px; }
   .header-inner { gap: 10px; }
   .hero-grid { grid-template-columns: 1fr; gap: 24px; }
   .hero-side { order: -1; }
