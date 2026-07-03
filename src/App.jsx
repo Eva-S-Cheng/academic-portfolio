@@ -355,9 +355,37 @@ function Header({ theme, onToggleTheme }) {
       <div className="wrap header-inner">
         <Link className="wordmark" to="/">Eva <em>Cheng</em></Link>
         <nav className="nav" aria-label="Main">
-          {NAV.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
-          ))}
+          {NAV.map((item) =>
+            item.to === "/teaching" ? (
+              <div className="nav-drop" key={item.to}>
+                <NavLink to={item.to}>{item.label}</NavLink>
+                <div className="nav-menu">
+                  <div className="nav-menu-panel">
+                    {COURSES.map((c) => (
+                      <div className="nav-menu-item" key={c.slug}>
+                        <Link to={`/teaching/${c.slug}`} className="nav-menu-link">
+                          {c.title}
+                          <span className="nav-menu-arrow" aria-hidden="true">›</span>
+                        </Link>
+                        <div className="nav-submenu">
+                          <div className="nav-menu-panel">
+                            {c.sessions.map((s) => (
+                              <Link key={s.slug} to={`/teaching/${c.slug}/${s.slug}`} className="nav-menu-link nav-session-link">
+                                <span className="nav-session-label">{s.label}</span>
+                                <span className="nav-session-title">{s.title}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
+            )
+          )}
         </nav>
         <button className="menu-toggle" onClick={() => setMenuOpen((o) => !o)}
           aria-expanded={menuOpen} aria-label="Menu">
@@ -858,8 +886,9 @@ function SessionPage() {
             {prev ? (
               <Link className="btn" to={`/teaching/${course.slug}/${prev.slug}`}>← {prev.label}</Link>
             ) : <span />}
+            <Link className="btn btn-solid pager-toc" to={`/teaching/${course.slug}`}>Course contents</Link>
             {next ? (
-              <Link className="btn" to={`/teaching/${course.slug}/${next.slug}`}>{next.label} →</Link>
+              <Link className="btn pager-next" to={`/teaching/${course.slug}/${next.slug}`}>{next.label} →</Link>
             ) : <span />}
           </nav>
         </div>
@@ -1066,6 +1095,42 @@ a:hover { color: var(--green-deep); }
 }
 .nav a:hover { color: var(--ink); background: var(--wash); }
 .nav a.active { color: var(--green-deep); background: var(--wash); }
+
+/* Teaching dropdown: courses on hover, sessions on course hover */
+.nav-drop { position: relative; }
+.nav-menu {
+  display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  padding-top: 10px; z-index: 40;
+}
+.nav-drop:hover .nav-menu, .nav-drop:focus-within .nav-menu { display: block; }
+.nav-menu-panel {
+  min-width: 230px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 14px; box-shadow: var(--shadow-hover); padding: 6px;
+  animation: menupop 0.16s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+.nav-menu-item { position: relative; }
+.nav-menu-link {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+  font-size: 0.92rem; font-weight: 500; color: var(--ink);
+  padding: 9px 13px; border-radius: 9px; white-space: nowrap;
+}
+.nav-menu-link:hover { background: var(--wash); color: var(--green-deep); }
+.nav-menu-arrow { color: var(--soft); font-size: 1rem; }
+.nav-submenu {
+  display: none; position: absolute; left: 100%; top: -6px; padding-left: 8px; z-index: 41;
+}
+.nav-menu-item:hover .nav-submenu, .nav-menu-item:focus-within .nav-submenu { display: block; }
+.nav-submenu .nav-menu-panel { min-width: 320px; max-height: 62vh; overflow-y: auto; }
+.nav-session-link { display: block; }
+.nav-session-label {
+  display: block; font-size: 0.64rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--green-deep);
+}
+.nav-session-title {
+  display: block; font-size: 0.88rem; font-weight: 400; color: var(--ink);
+  max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-session-link:hover .nav-session-title { color: var(--green-deep); }
 .theme-toggle {
   border: 1px solid var(--line); background: var(--surface); color: var(--ink);
   width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 0.9rem;
@@ -1492,7 +1557,10 @@ details.nb-output pre {
 
 .embed-frame { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
 .embed-frame iframe { display: block; width: 100%; height: 76vh; border: 0; }
-.pager { display: flex; justify-content: space-between; margin-top: 28px; }
+.pager { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 28px; }
+.pager > :first-child { justify-self: start; }
+.pager .pager-toc { justify-self: center; }
+.pager .pager-next, .pager > :last-child { justify-self: end; }
 
 /* --- footer --- */
 .site-footer { background: var(--wash); border-top: 1px solid var(--line); margin-top: 22px; }
@@ -1554,6 +1622,8 @@ details.nb-output pre {
   .session-content { grid-template-columns: 1fr; }
   .session-content .video-row { grid-template-columns: 1fr; }
   .session-content .ref-columns { grid-template-columns: 1fr; }
+  .pager { grid-template-columns: 1fr 1fr; }
+  .pager .pager-toc { grid-column: 1 / -1; grid-row: 2; justify-self: stretch; text-align: center; margin-top: 4px; }
   .footer-grid { grid-template-columns: 1fr 1fr; padding-top: 24px; }
   .embed-frame iframe { height: 62vh; }
 }
