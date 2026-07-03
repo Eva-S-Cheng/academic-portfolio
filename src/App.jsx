@@ -1174,6 +1174,25 @@ details.nb-output pre {
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 0.82rem; line-height: 1.5; color: var(--soft); overflow-x: auto;
 }
+
+/* --- exercises & assignments: visibly not course content --- */
+:root { --ex: #9a6b1f; }
+[data-theme="dark"] { --ex: #e0b070; }
+.nb-exercise {
+  border: 1px solid color-mix(in srgb, var(--ex) 32%, var(--line));
+  border-left: 3px solid var(--ex);
+  background: color-mix(in srgb, var(--ex) 6%, var(--surface));
+  border-radius: 12px; padding: 14px 20px 12px; margin: 18px 0;
+}
+.nb-ex-tag {
+  display: inline-block; font-size: 0.66rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ex); background: color-mix(in srgb, var(--ex) 14%, transparent);
+  padding: 3px 11px; border-radius: 999px; margin-bottom: 6px;
+}
+.nb-exercise h3 { margin: 4px 0 6px; font-size: 1.04rem; font-weight: 520; }
+.nb-exercise h3 em { font-style: normal; }
+.nb-exercise p { margin: 5px 0; }
 /* syntax palette, light and dark via variables */
 :root { --code-kw: #135c3d; --code-str: #995f14; --code-com: #8a9088; --code-num: #6d43ad; --code-fn: #0f5a9e; }
 [data-theme="dark"] { --code-kw: #83d6ae; --code-str: #e0b070; --code-com: #7d857c; --code-num: #b79df0; --code-fn: #7db8ec; }

@@ -414,8 +414,7 @@ x - y =  -1</pre></details>
 The investor sells the stock at the price :  120.0
 The profit is =  20.0</pre></details>
 <p>As you may have noticed, some statements are preceded by indentations. Statements that share the same level of indentation belong to the same block, indicating that they should be executed together.</p>
-<h3 id="Blitz-Exercise-(15-min)-:-Automated-traditing-with-a-long-position"><em>Blitz Exercise (15 min) : Automated traditing with a long position</em></h3><p>Using the same process as described earlier, generate the orders for an investor who holds a short position on a stock sold at $95, with a threshold set at 13%. You will have 15 minutes to complete this exercise.</p>
-<h2 id="IV---Loops">IV - Loops</h2><p>Loops are used when you need to repeat a statement or a block of statements multiple times, such as when working with lists, strings, or datasets. There are two basic types of loops:</p>
+<aside class="nb-exercise"><span class="nb-ex-tag">Blitz exercise</span><h3>Blitz Exercise (15 min) : Automated traditing with a long position</h3><p>Using the same process as described earlier, generate the orders for an investor who holds a short position on a stock sold at $95, with a threshold set at 13%. You will have 15 minutes to complete this exercise.</p></aside><h2 id="IV---Loops">IV - Loops</h2><p>Loops are used when you need to repeat a statement or a block of statements multiple times, such as when working with lists, strings, or datasets. There are two basic types of loops:</p>
 <ul>
 <li>"For" loops used when the number of iteration is known</li>
 <li>"While" loops that are used when the number of iteration is not known</li>
@@ -594,8 +593,7 @@ The number after the function :  15</pre></details>
 2) Short strategy on a stock initially priced 100  for which the market price is  90  which threshold profit  15.0 % and threshold loss  5.0 %, has a profit of  0
 3) Long strategy on a stock initially priced 110  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  20
 4) Short strategy on a stock initially priced 100  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  -20</pre></details>
-<h3 id="Assignment-:-Writing-functions-used-in-financial-analysis"><em>Assignment : Writing functions used in financial analysis</em></h3><p>Write a program in Jupyter that calculates the current ratio, return on assets (ROA), and internal rate of return (IRR) using a list of cash flows. Include three examples to illustrate the formulas. Please send the code to the email: eva.cheng@audencia.com</p>
-` },
+<aside class="nb-exercise"><span class="nb-ex-tag">Assignment</span><h3>Assignment : Writing functions used in financial analysis</h3><p>Write a program in Jupyter that calculates the current ratio, return on assets (ROA), and internal rate of return (IRR) using a list of cash flows. Include three examples to illustrate the formulas. Please send the code to the email: eva.cheng@audencia.com</p></aside>` },
          { slug: "session-2", label: "Session 2", title: "Advanced basics of Python for Finance", embedUrl: "" },
          { slug: "session-3", label: "Session 3", title: "Basics of Data Analysis in Python", embedUrl: "" },
          { slug: "session-4", label: "Session 4", title: "Financial Analysis Using Python: Application with the Dupont Analysis", embedUrl: "" },
