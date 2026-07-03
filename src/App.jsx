@@ -1087,7 +1087,7 @@ a:hover { color: var(--green-deep); }
 .wordmark { font-weight: 560; font-size: 1.18rem; color: var(--ink); letter-spacing: -0.01em; }
 .wordmark em { font-style: italic; color: var(--green-deep); }
 .wordmark:hover { color: var(--ink); }
-.nav { display: flex; gap: 4px; margin-left: auto; }
+.nav { display: flex; gap: 4px; margin-left: auto; align-items: center; }
 .nav a {
   font-size: 0.87rem; font-weight: 500; color: var(--soft);
   padding: 7px 14px; border-radius: 999px;
@@ -1097,7 +1097,7 @@ a:hover { color: var(--green-deep); }
 .nav a.active { color: var(--green-deep); background: var(--wash); }
 
 /* Teaching dropdown: courses on hover, sessions on course hover */
-.nav-drop { position: relative; }
+.nav-drop { position: relative; display: flex; align-items: center; }
 .nav-menu {
   display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
   padding-top: 10px; z-index: 40;
