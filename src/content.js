@@ -1295,7 +1295,7 @@ Long        -0.024570   -0.049223  0.004581  1.000000</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">],</span><span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 1" data-asset="session-3/fig-1.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 1" data-asset="session-3/fig-1.png" loading="lazy"/></figure></details>
 <p>To improve the readability of visual representations, it is essential to exclude outliers, label axes, and set appropriate limits. In quantitative methods, several approaches can be used to identify and exclude outliers:</p>
 <ul>
 <li>In <code>normal distribution</code>, points below <code>µ - 3σ</code> or above <code>µ + 3σ</code> are typically excluded.</li>
@@ -1308,13 +1308,13 @@ Long        -0.024570   -0.049223  0.004581  1.000000</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of the Depth of the earthquakes"</span><span class="p">)</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 2" data-asset="session-3/fig-2.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 2" data-asset="session-3/fig-2.png" loading="lazy"/></figure></details>
 <div class="nb-code"><pre><span></span><span class="c1"># Distribution of the magnitude</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of the Magnitude of the earthquakes"</span><span class="p">)</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="n">earthquake_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 3" data-asset="session-3/fig-3.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 3" data-asset="session-3/fig-3.png" loading="lazy"/></figure></details>
 <p>From the graph, we can observe that manually recorded earthquakes display a broader range of magnitudes, while their depths appear more homogeneous. Conversely, automatically recorded earthquakes show greater variability in depth but maintain a more consistent magnitude.</p>
 <p>Two hypotheses may explain this phenomenon:</p>
 <ol>
@@ -1418,13 +1418,13 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of the Magnitude of the earthquakes"</span><span class="p">)</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Magnitude'</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 4" data-asset="session-3/fig-4.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 4" data-asset="session-3/fig-4.png" loading="lazy"/></figure></details>
 <div class="nb-code"><pre><span></span><span class="c1"># Showing the depth</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of the Magnitude of the earthquakes"</span><span class="p">)</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Mode'</span><span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Depth (km)'</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 5" data-asset="session-3/fig-5.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 5" data-asset="session-3/fig-5.png" loading="lazy"/></figure></details>
 <p>Next, we will create a scatter plot reflecting the data without outliers. This visualization will enhance clarity by adding titles to the axes and a main title for the graph, along with any necessary axis limits.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># Creating the visual</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
@@ -1436,7 +1436,7 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Magnitude"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Magnitude and depth of the recorded earthquakes depending on the mode of detection"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 6" data-asset="session-3/fig-6.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 6" data-asset="session-3/fig-6.png" loading="lazy"/></figure></details>
 <p>From the scatter plot, we can conclude that there is no evidence of a relationship between the magnitude and depth of the earthquakes. The manual detection mode identifies lower-magnitude earthquakes, while the automatic method detects those occurring at greater depths.</p>
 <p>Python's capabilities for visualizing data are crucial, highlighting the importance of cleaning latitude and longitude data prior to analysis.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># Let us show a first map with all the data, then we can either separate the data by mode of detection or by year of occurence</span>
@@ -1525,7 +1525,7 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Number of earthquakes"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Number of earthquakes by date"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 7" data-asset="session-3/fig-7.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 7" data-asset="session-3/fig-7.png" loading="lazy"/></figure></details>
 <div class="nb-code"><pre><span></span><span class="c1"># Showing the average magnitude of earthquakes by date</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">earthquakes_data_grouped_date</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">],</span> <span class="n">earthquakes_data_grouped_date</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">])</span>
@@ -1533,7 +1533,7 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Magnitude"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Average magnitude of earthquakes by date"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 8" data-asset="session-3/fig-8.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 8" data-asset="session-3/fig-8.png" loading="lazy"/></figure></details>
 <p>The initial visuals provided lack readability and do not significantly enhance our analysis. It is crucial to maintain simplicity in reports and utilize only relevant visuals. The previous two graphs do not add value; instead, we should consider grouping the data by year for clearer insights.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># First, we add a column to the original table named Year</span>
 <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Year'</span><span class="p">]</span> <span class="o">=</span> <span class="n">earthquake_cleaned_data</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y'</span><span class="p">)</span>
@@ -1676,7 +1676,7 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Number of earthquakes"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Number of earthquakes by year"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 9" data-asset="session-3/fig-9.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 9" data-asset="session-3/fig-9.png" loading="lazy"/></figure></details>
 <div class="nb-code"><pre><span></span><span class="c1"># Showing the number of earthquakes that occured by year</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">earthquakes_data_grouped_year</span><span class="p">[</span><span class="s1">'Year'</span><span class="p">],</span> <span class="n">earthquakes_data_grouped_year</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">])</span>
@@ -1684,7 +1684,7 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Magnitude"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Average magnitude of earthquakes by year"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
-<details class="nb-output" open=""><summary>Output</summary><figure class="nb-figure"><img alt="Figure 10" data-asset="session-3/fig-10.png" loading="lazy"/></figure></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 10" data-asset="session-3/fig-10.png" loading="lazy"/></figure></details>
 <p>From the graphs, we note fewer recorded earthquakes in 2020, 2021, and 2022, with notably lower recorded magnitudes in 2020. However, the average magnitude of earthquakes over the past ten years remains consistent at approximately 4 ± 0.8.</p>
 <h2 id="VI---Conclusion">VI - Conclusion</h2><p>From our analysis, we can draw the following conclusions:</p>
 <ul>
