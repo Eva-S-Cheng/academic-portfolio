@@ -360,13 +360,13 @@
 <p>The first line of code you will learn is one of the simplest and most commonly used examples to illustrate basic syntax: having the computer display "Hello, World!"</p>
 <div class="nb-code"><pre><span></span><span class="c1"># Lines of comments are preceded by a hash, they help you and the person who is reading your code to better understand </span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Hello, World!"</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>Hello, World!</pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Hello, World!</pre></details>
 <p>Each time a code is executed, a portion of the computer's memory is allocated to Python. In this context, you can create a variable or an object to store data in that allocated memory.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># It is important to use a relevant name for your variables </span>
 <span class="n">var</span> <span class="o">=</span> <span class="mi">5</span> 
 <span class="c1"># Several strings can be concatenated into one </span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"var = "</span><span class="p">,</span><span class="n">var</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>var =  5</pre></div>
+<details class="nb-output"><summary>Output</summary><pre>var =  5</pre></details>
 <p>Mathematical and logical operations can be performed on variables using operands such as addition, subtraction, multiplication, and division.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># Variables</span>
 <span class="n">x</span> <span class="o">=</span> <span class="mi">2</span>
@@ -377,9 +377,9 @@
 <span class="nb">print</span><span class="p">(</span><span class="s2">"z = "</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"x + y = "</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"x - y = "</span><span class="p">,</span> <span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>z =  5
+<details class="nb-output"><summary>Output</summary><pre>z =  5
 x + y =  5
-x - y =  -1</pre></div>
+x - y =  -1</pre></details>
 <p>To make your code more understandable, it is essential to use relevant and descriptive names for your variables. Variable names cannot start with a number and may only contain letters, numbers, and underscores (no spaces). There are several types of variables, not just integers or numbers. The most common types include:</p>
 <ul>
 <li>Text : str (stands for string)</li>
@@ -410,9 +410,9 @@ x - y =  -1</pre></div>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"The loss is = "</span><span class="p">,</span> <span class="n">market_price</span> <span class="o">-</span> <span class="n">initial_price</span><span class="p">)</span>
 <span class="k">else</span> <span class="p">:</span>                                                <span class="c1"># Every other cases</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"The investor keeps a long position"</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>Enter a market price : 120
+<details class="nb-output"><summary>Output</summary><pre>Enter a market price : 120
 The investor sells the stock at the price :  120.0
-The profit is =  20.0</pre></div>
+The profit is =  20.0</pre></details>
 <p>As you may have noticed, some statements are preceded by indentations. Statements that share the same level of indentation belong to the same block, indicating that they should be executed together.</p>
 <h3 id="Blitz-Exercise-(15-min)-:-Automated-traditing-with-a-long-position"><em>Blitz Exercise (15 min) : Automated traditing with a long position</em></h3><p>Using the same process as described earlier, generate the orders for an investor who holds a short position on a stock sold at $95, with a threshold set at 13%. You will have 15 minutes to complete this exercise.</p>
 <h2 id="IV---Loops">IV - Loops</h2><p>Loops are used when you need to repeat a statement or a block of statements multiple times, such as when working with lists, strings, or datasets. There are two basic types of loops:</p>
@@ -431,7 +431,7 @@ The profit is =  20.0</pre></div>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"i = "</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
     <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">list_of_number</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Adding elements to the list "new_list", element at index i</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"List 2 : "</span><span class="p">,</span> <span class="n">new_list</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>List 1 :  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+<details class="nb-output"><summary>Output</summary><pre>List 1 :  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 i =  0
 i =  1
 i =  2
@@ -452,14 +452,14 @@ i =  16
 i =  17
 i =  18
 i =  19
-List 2 :  [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38]</pre></div>
+List 2 :  [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38]</pre></details>
 <div class="nb-code"><pre><span></span><span class="c1"># Live coding the equivalent with another synthax</span>
 <span class="n">new_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">list_of_number</span> <span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"i = "</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
     <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"List 2 : "</span><span class="p">,</span> <span class="n">new_list</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>i =  0
+<details class="nb-output"><summary>Output</summary><pre>i =  0
 i =  1
 i =  2
 i =  3
@@ -479,7 +479,7 @@ i =  16
 i =  17
 i =  18
 i =  19
-List 2 :  [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38]</pre></div>
+List 2 :  [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38]</pre></details>
 <p>While "For" loops are used to repeat a group of statements for a known number of iterations, "While" loops are typically employed to repeat blocks of statements for an unknown number of iterations. For example, they can be used to search for an item in a list.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># We generate 100 random numbers from 1 to 100 </span>
 <span class="kn">import</span> <span class="nn">random</span>                         <span class="c1"># Import the library</span>
@@ -501,17 +501,17 @@ List 2 :  [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36
     <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>                         <span class="c1"># DO NOT FORGET to increment the i, otherwise it will create an infinite loop</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\\n</span><span class="s2">"</span><span class="p">)</span>                           <span class="c1"># Line break</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"List : "</span><span class="p">,</span> <span class="n">random_numbers</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>Number 5 found ! It is the  97 th number
+<details class="nb-output"><summary>Output</summary><pre>Number 5 found ! It is the  97 th number
 
 
-List :  [81, 39, 22, 1, 29, 84, 21, 71, 76, 43, 81, 41, 52, 64, 6, 12, 80, 34, 33, 95, 30, 96, 79, 89, 92, 8, 3, 21, 7, 56, 64, 11, 75, 44, 81, 23, 85, 66, 27, 19, 92, 48, 91, 8, 72, 43, 18, 77, 88, 6, 45, 34, 67, 79, 2, 86, 47, 99, 4, 96, 92, 2, 10, 41, 20, 99, 29, 19, 60, 77, 90, 72, 58, 69, 36, 30, 64, 34, 15, 100, 33, 98, 32, 73, 50, 17, 66, 89, 60, 15, 44, 54, 36, 20, 96, 9, 5, 48, 91, 72]</pre></div>
+List :  [81, 39, 22, 1, 29, 84, 21, 71, 76, 43, 81, 41, 52, 64, 6, 12, 80, 34, 33, 95, 30, 96, 79, 89, 92, 8, 3, 21, 7, 56, 64, 11, 75, 44, 81, 23, 85, 66, 27, 19, 92, 48, 91, 8, 72, 43, 18, 77, 88, 6, 45, 34, 67, 79, 2, 86, 47, 99, 4, 96, 92, 2, 10, 41, 20, 99, 29, 19, 60, 77, 90, 72, 58, 69, 36, 30, 64, 34, 15, 100, 33, 98, 32, 73, 50, 17, 66, 89, 60, 15, 44, 54, 36, 20, 96, 9, 5, 48, 91, 72]</pre></details>
 <h2 id="V---Functions">V - Functions</h2><p>To avoid repeating the same lines of code multiple times, you can use functions to enhance code readability and improve understanding. However, functions should be used judiciously.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># Every function is preceded by the "def" key word</span>
 <span class="k">def</span> <span class="nf">say_hello</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Hello World!"</span><span class="p">)</span></pre></div>
 <div class="nb-code"><pre><span></span><span class="c1"># Everytime the function is called, the statement block inside the function is executed</span>
 <span class="n">say_hello</span><span class="p">()</span></pre></div>
-<div class="nb-output"><pre>Hello World!</pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Hello World!</pre></details>
 <p>Variables defined inside a function are limited to the scope of that function (passed by value). It is possible to pass information as arguments, which are specified within the parentheses, with multiple arguments separated by commas.</p>
 <div class="nb-code"><pre><span></span><span class="k">def</span> <span class="nf">double</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"2 x "</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s2">" = "</span><span class="p">,</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
@@ -519,8 +519,8 @@ List :  [81, 39, 22, 1, 29, 84, 21, 71, 76, 43, 81, 41, 52, 64, 6, 12, 80, 34, 3
 <span class="c1"># Testing the function</span>
 <span class="n">double</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">double</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>2 x  12  =  24
-2 x  5  =  10</pre></div>
+<details class="nb-output"><summary>Output</summary><pre>2 x  12  =  24
+2 x  5  =  10</pre></details>
 <p>You can pass information as arguments to a function, and it is also possible to obtain a result from the function and store it in another variable outside of the function.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># Calculating the return of a stock </span>
 <span class="k">def</span> <span class="nf">calculate_return</span><span class="p">(</span><span class="n">final_price</span><span class="p">,</span> <span class="n">initial_price</span><span class="p">):</span>
@@ -529,7 +529,7 @@ List :  [81, 39, 22, 1, 29, 84, 21, 71, 76, 43, 81, 41, 52, 64, 6, 12, 80, 34, 3
 <span class="n">return_stock</span> <span class="o">=</span> <span class="n">calculate_return</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>                   <span class="c1"># Calling the function and storing into a variable</span>
 <span class="n">return_stock</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">return_stock</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>                    <span class="c1"># Round to 4 decimals</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Return = "</span><span class="p">,</span> <span class="n">return_stock</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"%"</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>Return =  11.1 %</pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Return =  11.1 %</pre></details>
 <p>As previously mentionned, variables are <code>passed by value</code>, and the operations performed inside the function are only valid within that function. If the result of the function is not stored, it will not be retained in memory.</p>
 <div class="nb-code"><pre><span></span><span class="k">def</span> <span class="nf">add_five</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
     <span class="n">number</span> <span class="o">=</span> <span class="n">number</span> <span class="o">+</span> <span class="mi">5</span>
@@ -539,9 +539,9 @@ List :  [81, 39, 22, 1, 29, 84, 21, 71, 76, 43, 81, 41, 52, 64, 6, 12, 80, 34, 3
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Number before function : "</span><span class="p">,</span> <span class="n">number</span><span class="p">)</span>
 <span class="n">add_five</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"The number after the function : "</span><span class="p">,</span> <span class="n">number</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>Number before function :  15
+<details class="nb-output"><summary>Output</summary><pre>Number before function :  15
 The number inside the function :  20
-The number after the function :  15</pre></div>
+The number after the function :  15</pre></details>
 <div class="nb-code"><pre><span></span><span class="c1"># We define a function to see whether a buy order or a sell order is executed</span>
 <span class="k">def</span> <span class="nf">calculate_profit_trading_strategy</span><span class="p">(</span><span class="n">initial_price</span><span class="p">,</span> <span class="n">market_price</span><span class="p">,</span> <span class="n">threshold_loss</span><span class="p">,</span> <span class="n">threshold_profit</span><span class="p">,</span> <span class="n">strategy</span><span class="p">):</span>
     <span class="n">profit</span> <span class="o">=</span> <span class="mi">0</span>                     <span class="c1"># Setting a default value for the profit, if no order is excuted the profit  </span>
@@ -590,10 +590,10 @@ The number after the function :  15</pre></div>
       <span class="n">threshold_profit_2</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"</span><span class="si">% a</span><span class="s2">nd threshold loss "</span><span class="p">,</span> <span class="n">threshold_loss_2</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"%, has a profit of "</span><span class="p">,</span> <span class="n">long_profit_2</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"4) Short strategy on a stock initially priced"</span><span class="p">,</span> <span class="n">initial_price_1</span><span class="p">,</span> <span class="s2">" for which the market price is "</span><span class="p">,</span> <span class="n">market_price_2</span><span class="p">,</span> <span class="s2">" which threshold profit "</span><span class="p">,</span>
       <span class="n">threshold_profit_2</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"</span><span class="si">% a</span><span class="s2">nd threshold loss "</span><span class="p">,</span> <span class="n">threshold_loss_2</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"%, has a profit of "</span><span class="p">,</span> <span class="n">short_profit_2</span><span class="p">)</span></pre></div>
-<div class="nb-output"><pre>1) Long strategy on a stock initially priced 100  for which the market price is  90  which threshold profit  15.0 % and threshold loss  5.0 %, has a profit of  -10
+<details class="nb-output"><summary>Output</summary><pre>1) Long strategy on a stock initially priced 100  for which the market price is  90  which threshold profit  15.0 % and threshold loss  5.0 %, has a profit of  -10
 2) Short strategy on a stock initially priced 100  for which the market price is  90  which threshold profit  15.0 % and threshold loss  5.0 %, has a profit of  0
 3) Long strategy on a stock initially priced 110  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  20
-4) Short strategy on a stock initially priced 100  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  -20</pre></div>
+4) Short strategy on a stock initially priced 100  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  -20</pre></details>
 <h3 id="Assignment-:-Writing-functions-used-in-financial-analysis"><em>Assignment : Writing functions used in financial analysis</em></h3><p>Write a program in Jupyter that calculates the current ratio, return on assets (ROA), and internal rate of return (IRR) using a list of cash flows. Include three examples to illustrate the formulas. Please send the code to the email: eva.cheng@audencia.com</p>
 ` },
          { slug: "session-2", label: "Session 2", title: "Advanced basics of Python for Finance", embedUrl: "" },

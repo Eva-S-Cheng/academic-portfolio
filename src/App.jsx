@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, Route, Routes, useLocation, useParams } from "react-router-dom";
 import {
   ORCID_ID, LINKS, PROFILE_LINKS, AFFILIATION, HERO_LEDE, BIO, SKILLS, LANGUAGES,
@@ -775,6 +775,41 @@ function CoursePage() {
   );
 }
 
+function SessionContent({ session }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    root.querySelectorAll(".nb-code").forEach((block) => {
+      if (block.querySelector(".nb-copy")) return;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "nb-copy";
+      btn.textContent = "Copy";
+      btn.setAttribute("aria-label", "Copy code");
+      btn.addEventListener("click", async () => {
+        const code = block.querySelector("pre")?.innerText ?? "";
+        try {
+          await navigator.clipboard.writeText(code);
+          btn.textContent = "Copied ✓";
+          setTimeout(() => { btn.textContent = "Copy"; }, 1500);
+        } catch (err) { console.error("Clipboard failed:", err); }
+      });
+      block.appendChild(btn);
+    });
+  }, [session]);
+
+  return (
+    <div
+      ref={ref}
+      className={session.public ? "session-content" : "session-content protected"}
+      onContextMenu={session.public ? undefined : (e) => e.preventDefault()}
+      dangerouslySetInnerHTML={{ __html: session.html }}
+    />
+  );
+}
+
 function SessionPage() {
   const { courseSlug, slug } = useParams();
   const course = findCourse(courseSlug);
@@ -804,11 +839,7 @@ function SessionPage() {
           {!session.public && !unlocked ? (
             <AccessGate course={course} onUnlock={tryUnlock} />
           ) : session.html ? (
-            <div
-              className={session.public ? "session-content" : "session-content protected"}
-              onContextMenu={session.public ? undefined : (e) => e.preventDefault()}
-              dangerouslySetInnerHTML={{ __html: session.html }}
-            />
+            <SessionContent session={session} />
           ) : session.embedUrl ? (
             <div className="embed-frame">
               <iframe src={session.embedUrl} title={`${session.label} — ${session.title}`}
@@ -1067,24 +1098,26 @@ a:hover { color: var(--green-deep); }
 .collab-card p { margin-top: 4px; }
 
 /* --- inline session content: plain course document --- */
-.session-content { line-height: 1.62; }
+.session-content { line-height: 1.5; font-size: 0.97rem; font-weight: 380; }
 .session-content h2 {
-  font-weight: 520; font-size: 1.32rem; letter-spacing: -0.008em;
-  margin: 30px 0 10px;
+  font-weight: 520; font-size: 1.24rem; letter-spacing: -0.008em;
+  margin: 24px 0 8px;
 }
 .session-content h2:first-child { margin-top: 0; }
-.session-content p { margin: 10px 0; }
-.session-content ul { list-style: none; margin: 6px 0 20px; }
-.session-content li { position: relative; padding: 5px 0 5px 22px; }
+.session-content h1 { font-weight: 520; font-size: 1.45rem; letter-spacing: -0.01em; margin: 24px 0 8px; }
+.session-content h3 { font-weight: 520; font-size: 1.08rem; margin: 16px 0 6px; }
+.session-content p { margin: 7px 0; }
+.session-content ul { list-style: none; margin: 4px 0 12px; }
+.session-content li { position: relative; padding: 2px 0 2px 20px; }
 .session-content li::before {
-  content: ""; position: absolute; left: 2px; top: 14px;
-  width: 6px; height: 6px; border-radius: 2px; background: var(--green);
+  content: ""; position: absolute; left: 2px; top: 10px;
+  width: 5px; height: 5px; border-radius: 2px; background: var(--green);
 }
 .session-content li em { color: var(--green-deep); }
 .session-content a { text-decoration: underline; text-underline-offset: 3px; }
 .session-content code {
-  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.84em;
-  background: var(--wash); padding: 1px 6px; border-radius: 6px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.82em;
+  background: var(--wash); padding: 1px 6px; border-radius: 6px; font-weight: 400;
 }
 .session-content .video-embed {
   aspect-ratio: 16 / 9; max-width: 480px; border-radius: 14px; overflow: hidden;
@@ -1103,23 +1136,43 @@ a:hover { color: var(--green-deep); }
 }
 
 /* --- notebook cells (converted course material) --- */
-.session-content h1 { font-weight: 520; font-size: 1.6rem; letter-spacing: -0.01em; margin: 26px 0 10px; }
 .nb-code {
+  position: relative;
   background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--green);
-  border-radius: 12px; margin: 14px 0; overflow-x: auto; max-width: 1000px;
+  border-radius: 12px; margin: 12px 0; overflow-x: auto;
 }
 .nb-code pre {
-  margin: 0; padding: 13px 18px;
+  margin: 0; padding: 12px 88px 12px 18px;
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.84rem; line-height: 1.55; color: var(--ink);
+  font-size: 0.84rem; line-height: 1.5; color: var(--ink); font-weight: 400;
 }
-.nb-output {
-  background: var(--wash); border-radius: 12px; margin: -6px 0 16px; overflow-x: auto; max-width: 1000px;
+.nb-copy {
+  position: absolute; top: 8px; right: 10px;
+  font-family: var(--font); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
+  padding: 4px 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--wash); color: var(--green-deep);
+  cursor: pointer; user-select: none; -webkit-user-select: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
-.nb-output pre {
-  margin: 0; padding: 11px 18px;
+.nb-copy:hover { border-color: var(--green); }
+details.nb-output {
+  background: var(--wash); border-radius: 12px; margin: -4px 0 14px; overflow: hidden;
+}
+details.nb-output summary {
+  cursor: pointer; list-style: none; padding: 8px 18px;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--green-deep); user-select: none; -webkit-user-select: none;
+}
+details.nb-output summary::-webkit-details-marker { display: none; }
+details.nb-output summary::before {
+  content: "▸"; display: inline-block; margin-right: 8px;
+  transition: transform 0.15s ease;
+}
+details.nb-output[open] summary::before { transform: rotate(90deg); }
+details.nb-output pre {
+  margin: 0; padding: 2px 18px 12px;
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.82rem; line-height: 1.5; color: var(--soft);
+  font-size: 0.82rem; line-height: 1.5; color: var(--soft); overflow-x: auto;
 }
 /* syntax palette, light and dark via variables */
 :root { --code-kw: #135c3d; --code-str: #995f14; --code-com: #8a9088; --code-num: #6d43ad; --code-fn: #0f5a9e; }
