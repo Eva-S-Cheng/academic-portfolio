@@ -1173,11 +1173,14 @@ a:hover { color: var(--green-deep); }
 .session-content h3 { font-weight: 520; font-size: 1.08rem; margin: 16px 0 6px; }
 .session-content p { margin: 7px 0; }
 .session-content ul { list-style: none; margin: 4px 0 12px; }
-.session-content li { position: relative; padding: 2px 0 2px 20px; }
-.session-content li::before {
+.session-content ul > li { position: relative; padding: 2px 0 2px 20px; }
+.session-content ul > li::before {
   content: ""; position: absolute; left: 2px; top: 10px;
   width: 5px; height: 5px; border-radius: 2px; background: var(--green);
 }
+.session-content ol { margin: 4px 0 12px; padding-left: 26px; }
+.session-content ol > li { padding: 2px 0; }
+.session-content ol > li::marker { color: var(--green-deep); font-weight: 600; }
 .session-content li em { color: var(--green-deep); }
 .session-content a { text-decoration: underline; text-underline-offset: 3px; }
 .session-content code {
