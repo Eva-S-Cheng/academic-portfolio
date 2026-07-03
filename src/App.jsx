@@ -1088,8 +1088,8 @@ a:hover { color: var(--green-deep); }
 }
 .session-content .video-embed iframe { width: 100%; height: 100%; border: 0; display: block; }
 .session-content .video-row {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px; margin: 18px 0; max-width: 880px;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px; margin: 26px 0;
 }
 .session-content .video-row .video-embed { max-width: none; margin: 0; }
 .session-content .ref-columns {
