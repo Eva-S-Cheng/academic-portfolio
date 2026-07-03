@@ -1247,7 +1247,8 @@ details.nb-output pre {
 }
 details.nb-output .nb-figure { margin: 0; padding: 4px 18px 14px; }
 details.nb-output .nb-figure img {
-  display: block; max-width: min(100%, 840px);
+  display: block; margin: 0 auto; max-width: min(100%, 560px); max-height: 380px;
+  width: auto; height: auto; object-fit: contain;
   border: 1px solid var(--line); border-radius: 10px; background: #fff;
 }
 details.nb-output .nb-table-wrap { overflow-x: auto; padding: 4px 18px 14px; }
