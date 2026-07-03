@@ -804,7 +804,11 @@ function SessionPage() {
           {!session.public && !unlocked ? (
             <AccessGate course={course} onUnlock={tryUnlock} />
           ) : session.html ? (
-            <div className="session-content" dangerouslySetInnerHTML={{ __html: session.html }} />
+            <div
+              className={session.public ? "session-content" : "session-content protected"}
+              onContextMenu={session.public ? undefined : (e) => e.preventDefault()}
+              dangerouslySetInnerHTML={{ __html: session.html }}
+            />
           ) : session.embedUrl ? (
             <div className="embed-frame">
               <iframe src={session.embedUrl} title={`${session.label} — ${session.title}`}
@@ -1092,6 +1096,40 @@ a:hover { color: var(--green-deep); }
   gap: 14px; margin: 26px 0;
 }
 .session-content .video-row .video-embed { max-width: none; margin: 0; }
+
+/* Gated course material: selection and copying disabled, per the IP notice */
+.session-content.protected {
+  user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+}
+
+/* --- notebook cells (converted course material) --- */
+.session-content h1 { font-weight: 520; font-size: 1.6rem; letter-spacing: -0.01em; margin: 26px 0 10px; }
+.nb-code {
+  background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--green);
+  border-radius: 12px; margin: 14px 0; overflow-x: auto; max-width: 1000px;
+}
+.nb-code pre {
+  margin: 0; padding: 13px 18px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.84rem; line-height: 1.55; color: var(--ink);
+}
+.nb-output {
+  background: var(--wash); border-radius: 12px; margin: -6px 0 16px; overflow-x: auto; max-width: 1000px;
+}
+.nb-output pre {
+  margin: 0; padding: 11px 18px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.82rem; line-height: 1.5; color: var(--soft);
+}
+/* syntax palette, light and dark via variables */
+:root { --code-kw: #135c3d; --code-str: #995f14; --code-com: #8a9088; --code-num: #6d43ad; --code-fn: #0f5a9e; }
+[data-theme="dark"] { --code-kw: #83d6ae; --code-str: #e0b070; --code-com: #7d857c; --code-num: #b79df0; --code-fn: #7db8ec; }
+.nb-code .k, .nb-code .kn, .nb-code .kc, .nb-code .ow, .nb-code .bp { color: var(--code-kw); font-weight: 600; }
+.nb-code .s, .nb-code .s1, .nb-code .s2, .nb-code .sa, .nb-code .si, .nb-code .se { color: var(--code-str); }
+.nb-code .c, .nb-code .c1, .nb-code .ch, .nb-code .cm { color: var(--code-com); font-style: italic; }
+.nb-code .mi, .nb-code .mf, .nb-code .mh { color: var(--code-num); }
+.nb-code .nf, .nb-code .nb, .nb-code .fm, .nb-code .nc { color: var(--code-fn); }
+.nb-code .o, .nb-code .p { color: var(--ink); opacity: 0.75; }
 .session-content .ref-columns {
   display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px clamp(32px, 4vw, 72px); align-items: start;

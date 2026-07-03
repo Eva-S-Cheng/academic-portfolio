@@ -331,7 +331,271 @@
        ipNotice:
          "For intellectual property reasons, course content is not available for copying, pasting, or text selection. If you require a version that allows text selection and copying, please contact me by email.",
        sessions: [
-         { slug: "session-1", label: "Session 1", title: "Introduction to Python for Finance", embedUrl: "" },
+         { slug: "session-1", label: "Session 1", title: "Introduction to Python for Finance", embedUrl: "", html: `
+<p>This class aims to help you understand how Python can enhance your efficiency in finance-related activities. The course will present various use cases in Corporate Finance and Market Finance. You will learn about:</p>
+<ul>
+<li>The basics of Python programming</li>
+<li>Data analytics and visualization</li>
+<li>Financial analysis and corporate finance using Python</li>
+<li>The application of Python in quantitative finance and asset management</li>
+</ul>
+<p>This session aims to introduce you to the fundamentals of Python programming and guide you through the process of writing code step by step. It will cover:</p>
+<ul>
+<li>How to obtain input from the user</li>
+<li>How to use conditional statements</li>
+<li>How to display results</li>
+<li>How to utilize loops and functions</li>
+</ul>
+<h2 id="I---What-is-Python-?">I - What is Python ?</h2>
+<p>Python is an<code>object-oriented</code> programming language deveopped by Guido van Rossum and released in 1991. It is widely used in finance due to its:</p>
+<ul>
+<li>Ease of use and high readability</li>
+<li>Extensive libraries and frameworks</li>
+<li>Similarity to mathematical syntax</li>
+<li>Ability to analyze large datasets</li>
+</ul>
+<p>The execution of a Python program is linear, meaning the code is executed step by step in the order of each statement. In this context, every variable must be pre-defined, although they can be redefined as needed.</p>
+<h2 id="II---First-lines-of-code-in-Python">II - First lines of code in Python</h2>
+<p>Python is a programming language, and the software you use to write and execute your code is known as an Integrated Development Environment (IDE). You can choose from various tools to write your code, such as Spyder, Jupyter, PyCharm, Visual Studio Code, and others. In this class, we will primarily use Jupyter and PyCharm.</p>
+<p>The first line of code you will learn is one of the simplest and most commonly used examples to illustrate basic syntax: having the computer display "Hello, World!"</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Lines of comments are preceded by a hash, they help you and the person who is reading your code to better understand </span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Hello, World!"</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>Hello, World!</pre></div>
+<p>Each time a code is executed, a portion of the computer's memory is allocated to Python. In this context, you can create a variable or an object to store data in that allocated memory.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># It is important to use a relevant name for your variables </span>
+<span class="n">var</span> <span class="o">=</span> <span class="mi">5</span> 
+<span class="c1"># Several strings can be concatenated into one </span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"var = "</span><span class="p">,</span><span class="n">var</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>var =  5</pre></div>
+<p>Mathematical and logical operations can be performed on variables using operands such as addition, subtraction, multiplication, and division.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Variables</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+<span class="c1"># Displays</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"z = "</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"x + y = "</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"x - y = "</span><span class="p">,</span> <span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>z =  5
+x + y =  5
+x - y =  -1</pre></div>
+<p>To make your code more understandable, it is essential to use relevant and descriptive names for your variables. Variable names cannot start with a number and may only contain letters, numbers, and underscores (no spaces). There are several types of variables, not just integers or numbers. The most common types include:</p>
+<ul>
+<li>Text : str (stands for string)</li>
+<li>Numbers : int, float and complex (Integer, Float &amp; Complex)</li>
+<li>Sequence type : list, tuple, range</li>
+<li>Mapping : dict (Dictionnary)</li>
+<li>Boolean : Bool</li>
+<li>Objects : Obj</li>
+</ul>
+<h2 id="III---Conditionnal-statements-in-Python">III - Conditionnal statements in Python</h2>
+<p>Conditional statements are used to control the flow of a program based on specific conditions, allowing a piece of code to execute if the statement evaluates to true. In finance, for instance, they can be used to determine whether to buy or sell a stock based on its price.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># An investor is taking a long poisition (the investor buys the stock with the expectation that its price will increase)</span>
+<span class="n">initial_price</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">threshold_profit</span> <span class="o">=</span> <span class="mf">0.15</span>      <span class="c1"># The % at which the investor accepts to take the profit</span>
+<span class="n">threshold_loss</span> <span class="o">=</span> <span class="mf">0.05</span>        <span class="c1"># The percentage at which the investor accepts the loss</span>
+
+<span class="c1"># Stop loss and take profit</span>
+<span class="n">long_sl</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">threshold_loss</span><span class="p">)</span>      <span class="c1"># The price at which the stock will be sold at a loss (to avoid future losses)</span>
+<span class="n">long_tp</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">threshold_profit</span><span class="p">)</span>    <span class="c1"># The price at which the stock will be sold at a profit</span></pre></div>
+<p>In this section, we will also introduce how to obtain input from the user. Each time the following lines of code are executed, the input variable is redefined by the user. You will also notice that the previous variables are stored in the computer's memory.</p>
+<div class="nb-code"><pre><span></span><span class="n">market_price</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">"Enter a market price : "</span><span class="p">)</span>       <span class="c1"># Getting an input from the user (The type of variable is a string)</span>
+<span class="n">market_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">market_price</span><span class="p">)</span>                    <span class="c1"># Converting into a number</span>
+<span class="k">if</span> <span class="n">market_price</span> <span class="o">&gt;</span> <span class="n">long_tp</span> <span class="p">:</span>                           <span class="c1"># If the price is higher than the Take profit limit</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"The investor sells the stock at the price : "</span><span class="p">,</span> <span class="n">market_price</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"The profit is = "</span><span class="p">,</span> <span class="n">market_price</span> <span class="o">-</span> <span class="n">initial_price</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">market_price</span> <span class="o">&lt;</span> <span class="n">long_sl</span> <span class="p">:</span>                         <span class="c1"># If the first condition is not met then, if this one is met (else if)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"The investor sells the stock at the price : "</span><span class="p">,</span> <span class="n">market_price</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"The loss is = "</span><span class="p">,</span> <span class="n">market_price</span> <span class="o">-</span> <span class="n">initial_price</span><span class="p">)</span>
+<span class="k">else</span> <span class="p">:</span>                                                <span class="c1"># Every other cases</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"The investor keeps a long position"</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>Enter a market price : 120
+The investor sells the stock at the price :  120.0
+The profit is =  20.0</pre></div>
+<p>As you may have noticed, some statements are preceded by indentations. Statements that share the same level of indentation belong to the same block, indicating that they should be executed together.</p>
+<h3 id="Blitz-Exercise-(15-min)-:-Automated-traditing-with-a-long-position"><em>Blitz Exercise (15 min) : Automated traditing with a long position</em></h3><p>Using the same process as described earlier, generate the orders for an investor who holds a short position on a stock sold at $95, with a threshold set at 13%. You will have 15 minutes to complete this exercise.</p>
+<h2 id="IV---Loops">IV - Loops</h2><p>Loops are used when you need to repeat a statement or a block of statements multiple times, such as when working with lists, strings, or datasets. There are two basic types of loops:</p>
+<ul>
+<li>"For" loops used when the number of iteration is known</li>
+<li>"While" loops that are used when the number of iteration is not known</li>
+</ul>
+<div class="nb-code"><pre><span></span><span class="c1"># Creation of a list </span>
+<span class="n">list_of_number</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>      <span class="c1"># Automatically generate a sequence of 20 numbers</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"List 1 : "</span><span class="p">,</span> <span class="n">list_of_number</span><span class="p">)</span>                 <span class="c1"># You will notice that the range starts from 0 and stops at n - 1</span>
+
+<span class="n">new_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># For loop, multiply all element by 2</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_of_number</span><span class="p">))</span> <span class="p">:</span>       <span class="c1"># By convention, we use i, j, k, l, m. The len function returns the length of a list</span>
+    <span class="c1"># The for loop, in this case always goes from 0 to the number set as "range parameter" - 1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"i = "</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">list_of_number</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Adding elements to the list "new_list", element at index i</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"List 2 : "</span><span class="p">,</span> <span class="n">new_list</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>List 1 :  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+i =  0
+i =  1
+i =  2
+i =  3
+i =  4
+i =  5
+i =  6
+i =  7
+i =  8
+i =  9
+i =  10
+i =  11
+i =  12
+i =  13
+i =  14
+i =  15
+i =  16
+i =  17
+i =  18
+i =  19
+List 2 :  [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38]</pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Live coding the equivalent with another synthax</span>
+<span class="n">new_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">list_of_number</span> <span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"i = "</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"List 2 : "</span><span class="p">,</span> <span class="n">new_list</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>i =  0
+i =  1
+i =  2
+i =  3
+i =  4
+i =  5
+i =  6
+i =  7
+i =  8
+i =  9
+i =  10
+i =  11
+i =  12
+i =  13
+i =  14
+i =  15
+i =  16
+i =  17
+i =  18
+i =  19
+List 2 :  [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38]</pre></div>
+<p>While "For" loops are used to repeat a group of statements for a known number of iterations, "While" loops are typically employed to repeat blocks of statements for an unknown number of iterations. For example, they can be used to search for an item in a list.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># We generate 100 random numbers from 1 to 100 </span>
+<span class="kn">import</span> <span class="nn">random</span>                         <span class="c1"># Import the library</span>
+<span class="n">random_numbers</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>                  <span class="c1"># Execute the code 100 times          </span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>        <span class="c1"># Generate a random number from 1 to 100</span>
+    <span class="n">random_numbers</span><span class="o">.</span> <span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># Then we try to find the first occurrence of the number 5</span>
+<span class="n">iterator</span> <span class="o">=</span> <span class="mi">0</span>                          <span class="c1"># It is important to set a starting value for the iterator</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">iterator</span> <span class="o">!=</span> <span class="mi">5</span> <span class="p">:</span>                 <span class="c1"># Not equal to</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">random_numbers</span><span class="p">):</span>      <span class="c1"># If i is bigger than the length of the list, then we did not find the variable</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Number 5 not found !"</span><span class="p">)</span>
+        <span class="k">break</span>                         <span class="c1"># Exit the loop</span>
+    <span class="n">iterator</span> <span class="o">=</span> <span class="n">random_numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">iterator</span> <span class="o">==</span> <span class="mi">5</span> <span class="p">:</span>                <span class="c1"># Double = for comparison</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Number 5 found ! It is the "</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span><span class="s2">"th number"</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>                         <span class="c1"># DO NOT FORGET to increment the i, otherwise it will create an infinite loop</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\\n</span><span class="s2">"</span><span class="p">)</span>                           <span class="c1"># Line break</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"List : "</span><span class="p">,</span> <span class="n">random_numbers</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>Number 5 found ! It is the  97 th number
+
+
+List :  [81, 39, 22, 1, 29, 84, 21, 71, 76, 43, 81, 41, 52, 64, 6, 12, 80, 34, 33, 95, 30, 96, 79, 89, 92, 8, 3, 21, 7, 56, 64, 11, 75, 44, 81, 23, 85, 66, 27, 19, 92, 48, 91, 8, 72, 43, 18, 77, 88, 6, 45, 34, 67, 79, 2, 86, 47, 99, 4, 96, 92, 2, 10, 41, 20, 99, 29, 19, 60, 77, 90, 72, 58, 69, 36, 30, 64, 34, 15, 100, 33, 98, 32, 73, 50, 17, 66, 89, 60, 15, 44, 54, 36, 20, 96, 9, 5, 48, 91, 72]</pre></div>
+<h2 id="V---Functions">V - Functions</h2><p>To avoid repeating the same lines of code multiple times, you can use functions to enhance code readability and improve understanding. However, functions should be used judiciously.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Every function is preceded by the "def" key word</span>
+<span class="k">def</span> <span class="nf">say_hello</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Hello World!"</span><span class="p">)</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Everytime the function is called, the statement block inside the function is executed</span>
+<span class="n">say_hello</span><span class="p">()</span></pre></div>
+<div class="nb-output"><pre>Hello World!</pre></div>
+<p>Variables defined inside a function are limited to the scope of that function (passed by value). It is possible to pass information as arguments, which are specified within the parentheses, with multiple arguments separated by commas.</p>
+<div class="nb-code"><pre><span></span><span class="k">def</span> <span class="nf">double</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"2 x "</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s2">" = "</span><span class="p">,</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
+
+<span class="c1"># Testing the function</span>
+<span class="n">double</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">double</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>2 x  12  =  24
+2 x  5  =  10</pre></div>
+<p>You can pass information as arguments to a function, and it is also possible to obtain a result from the function and store it in another variable outside of the function.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculating the return of a stock </span>
+<span class="k">def</span> <span class="nf">calculate_return</span><span class="p">(</span><span class="n">final_price</span><span class="p">,</span> <span class="n">initial_price</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">final_price</span><span class="o">/</span><span class="n">initial_price</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="n">return_stock</span> <span class="o">=</span> <span class="n">calculate_return</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>                   <span class="c1"># Calling the function and storing into a variable</span>
+<span class="n">return_stock</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">return_stock</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>                    <span class="c1"># Round to 4 decimals</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Return = "</span><span class="p">,</span> <span class="n">return_stock</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"%"</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>Return =  11.1 %</pre></div>
+<p>As previously mentionned, variables are <code>passed by value</code>, and the operations performed inside the function are only valid within that function. If the result of the function is not stored, it will not be retained in memory.</p>
+<div class="nb-code"><pre><span></span><span class="k">def</span> <span class="nf">add_five</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="n">number</span> <span class="o">+</span> <span class="mi">5</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"The number inside the function : "</span><span class="p">,</span> <span class="n">number</span><span class="p">)</span>
+
+<span class="n">number</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Number before function : "</span><span class="p">,</span> <span class="n">number</span><span class="p">)</span>
+<span class="n">add_five</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The number after the function : "</span><span class="p">,</span> <span class="n">number</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>Number before function :  15
+The number inside the function :  20
+The number after the function :  15</pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># We define a function to see whether a buy order or a sell order is executed</span>
+<span class="k">def</span> <span class="nf">calculate_profit_trading_strategy</span><span class="p">(</span><span class="n">initial_price</span><span class="p">,</span> <span class="n">market_price</span><span class="p">,</span> <span class="n">threshold_loss</span><span class="p">,</span> <span class="n">threshold_profit</span><span class="p">,</span> <span class="n">strategy</span><span class="p">):</span>
+    <span class="n">profit</span> <span class="o">=</span> <span class="mi">0</span>                     <span class="c1"># Setting a default value for the profit, if no order is excuted the profit  </span>
+    <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">"long"</span> <span class="p">:</span>        <span class="c1"># If the trading strategy is a long then execute the following statements</span>
+        <span class="n">stop_loss</span> <span class="o">=</span> <span class="n">initial_price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">threshold_loss</span><span class="p">)</span>     
+        <span class="n">take_profit</span> <span class="o">=</span> <span class="n">initial_price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">threshold_profit</span><span class="p">)</span>            <span class="c1"># Strategy is profitable when the price is higher</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">market_price</span> <span class="o">&lt;</span> <span class="n">stop_loss</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">market_price</span> <span class="o">&gt;</span> <span class="n">take_profit</span><span class="p">)</span> <span class="p">:</span> <span class="c1"># When the market price has reached a certain level</span>
+            <span class="n">profit</span> <span class="o">=</span> <span class="n">market_price</span> <span class="o">-</span> <span class="n">initial_price</span>                       <span class="c1"># revenue - cost : the stock is bought at initial_price and sold at market_price</span>
+    <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">"short"</span> <span class="p">:</span>     <span class="c1"># If the strategy is not equal to "long" but is equal to "short", execute the following statements</span>
+        <span class="n">stop_loss</span> <span class="o">=</span> <span class="n">initial_price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">threshold_loss</span><span class="p">)</span>     
+        <span class="n">take_profit</span> <span class="o">=</span> <span class="n">initial_price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">threshold_profit</span><span class="p">)</span>              <span class="c1"># Strategy is profitable when the price is lower</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">market_price</span> <span class="o">&gt;</span> <span class="n">stop_loss</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">market_price</span> <span class="o">&lt;</span> <span class="n">take_profit</span><span class="p">)</span> <span class="p">:</span> <span class="c1"># When the market price has reached a certain level, outside the range</span>
+            <span class="n">profit</span> <span class="o">=</span> <span class="n">initial_price</span> <span class="o">-</span> <span class="n">market_price</span>                       <span class="c1"># revenue - cost : the stock is sold at initial_price and bought at market_price</span>
+    <span class="k">else</span> <span class="p">:</span>                         <span class="c1"># If the strategy is neither long or short, basically in every other cases</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Strategy incorrect"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">profit</span>                  <span class="c1"># return the value of the profit outside the function</span>
+
+<span class="c1"># Create examples</span>
+<span class="n">initial_price_1</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">market_price_1</span> <span class="o">=</span> <span class="mi">90</span>
+<span class="n">threshold_loss_1</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">threshold_profit_1</span> <span class="o">=</span> <span class="mf">0.15</span>
+
+<span class="c1"># Calling functions</span>
+<span class="n">long_profit_1</span> <span class="o">=</span> <span class="n">calculate_profit_trading_strategy</span><span class="p">(</span><span class="n">initial_price_1</span><span class="p">,</span> <span class="n">market_price_1</span><span class="p">,</span> <span class="n">threshold_loss_1</span><span class="p">,</span> <span class="n">threshold_profit_1</span><span class="p">,</span> <span class="s2">"long"</span><span class="p">)</span>
+<span class="n">short_profit_1</span> <span class="o">=</span> <span class="n">calculate_profit_trading_strategy</span><span class="p">(</span><span class="n">initial_price_1</span><span class="p">,</span> <span class="n">market_price_1</span><span class="p">,</span> <span class="n">threshold_loss_1</span><span class="p">,</span> <span class="n">threshold_profit_1</span><span class="p">,</span> <span class="s2">"short"</span><span class="p">)</span>
+
+<span class="c1"># Showing the results</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"1) Long strategy on a stock initially priced"</span><span class="p">,</span> <span class="n">initial_price_1</span><span class="p">,</span> <span class="s2">" for which the market price is "</span><span class="p">,</span> <span class="n">market_price_1</span><span class="p">,</span> <span class="s2">" which threshold profit "</span><span class="p">,</span>
+      <span class="n">threshold_profit_1</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"</span><span class="si">% a</span><span class="s2">nd threshold loss "</span><span class="p">,</span> <span class="n">threshold_loss_1</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"%, has a profit of "</span><span class="p">,</span> <span class="n">long_profit_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"2) Short strategy on a stock initially priced"</span><span class="p">,</span> <span class="n">initial_price_1</span><span class="p">,</span> <span class="s2">" for which the market price is "</span><span class="p">,</span> <span class="n">market_price_1</span><span class="p">,</span> <span class="s2">" which threshold profit "</span><span class="p">,</span>
+      <span class="n">threshold_profit_1</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"</span><span class="si">% a</span><span class="s2">nd threshold loss "</span><span class="p">,</span> <span class="n">threshold_loss_1</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"%, has a profit of "</span><span class="p">,</span> <span class="n">short_profit_1</span><span class="p">)</span>
+
+<span class="c1"># Create examples</span>
+<span class="n">initial_price_2</span> <span class="o">=</span> <span class="mi">110</span>
+<span class="n">market_price_2</span> <span class="o">=</span> <span class="mi">130</span>
+<span class="n">threshold_loss_2</span> <span class="o">=</span> <span class="mf">0.03</span>
+<span class="n">threshold_profit_2</span> <span class="o">=</span> <span class="mf">0.11</span>
+
+<span class="c1"># Calling functions</span>
+<span class="n">long_profit_2</span> <span class="o">=</span> <span class="n">calculate_profit_trading_strategy</span><span class="p">(</span><span class="n">initial_price_2</span><span class="p">,</span> <span class="n">market_price_2</span><span class="p">,</span> <span class="n">threshold_loss_2</span><span class="p">,</span> <span class="n">threshold_profit_2</span><span class="p">,</span> <span class="s2">"long"</span><span class="p">)</span>
+<span class="n">short_profit_2</span> <span class="o">=</span> <span class="n">calculate_profit_trading_strategy</span><span class="p">(</span><span class="n">initial_price_2</span><span class="p">,</span> <span class="n">market_price_2</span><span class="p">,</span> <span class="n">threshold_loss_2</span><span class="p">,</span> <span class="n">threshold_profit_2</span><span class="p">,</span> <span class="s2">"short"</span><span class="p">)</span>
+
+<span class="c1"># Showing the results</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"3) Long strategy on a stock initially priced"</span><span class="p">,</span> <span class="n">initial_price_2</span><span class="p">,</span> <span class="s2">" for which the market price is "</span><span class="p">,</span> <span class="n">market_price_2</span><span class="p">,</span> <span class="s2">" which threshold profit "</span><span class="p">,</span>
+      <span class="n">threshold_profit_2</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"</span><span class="si">% a</span><span class="s2">nd threshold loss "</span><span class="p">,</span> <span class="n">threshold_loss_2</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"%, has a profit of "</span><span class="p">,</span> <span class="n">long_profit_2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"4) Short strategy on a stock initially priced"</span><span class="p">,</span> <span class="n">initial_price_1</span><span class="p">,</span> <span class="s2">" for which the market price is "</span><span class="p">,</span> <span class="n">market_price_2</span><span class="p">,</span> <span class="s2">" which threshold profit "</span><span class="p">,</span>
+      <span class="n">threshold_profit_2</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"</span><span class="si">% a</span><span class="s2">nd threshold loss "</span><span class="p">,</span> <span class="n">threshold_loss_2</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"%, has a profit of "</span><span class="p">,</span> <span class="n">short_profit_2</span><span class="p">)</span></pre></div>
+<div class="nb-output"><pre>1) Long strategy on a stock initially priced 100  for which the market price is  90  which threshold profit  15.0 % and threshold loss  5.0 %, has a profit of  -10
+2) Short strategy on a stock initially priced 100  for which the market price is  90  which threshold profit  15.0 % and threshold loss  5.0 %, has a profit of  0
+3) Long strategy on a stock initially priced 110  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  20
+4) Short strategy on a stock initially priced 100  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  -20</pre></div>
+<h3 id="Assignment-:-Writing-functions-used-in-financial-analysis"><em>Assignment : Writing functions used in financial analysis</em></h3><p>Write a program in Jupyter that calculates the current ratio, return on assets (ROA), and internal rate of return (IRR) using a list of cash flows. Include three examples to illustrate the formulas. Please send the code to the email: eva.cheng@audencia.com</p>
+` },
          { slug: "session-2", label: "Session 2", title: "Advanced basics of Python for Finance", embedUrl: "" },
          { slug: "session-3", label: "Session 3", title: "Basics of Data Analysis in Python", embedUrl: "" },
          { slug: "session-4", label: "Session 4", title: "Financial Analysis Using Python: Application with the Dupont Analysis", embedUrl: "" },
