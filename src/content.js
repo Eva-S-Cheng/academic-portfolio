@@ -162,43 +162,11 @@
    export const COLLABORATORS = [
      {
        name: "Alexandre Garel",
-       role: "Co-author · Master's thesis supervisor",
-       org: "Associate Professor in Sustainable Finance, Audencia Business School",
+       role: "Co-author · Research supervisor",
+       org: "Full Professor in Sustainable Finance, Audencia Business School",
        scholar: "https://scholar.google.com/citations?user=YdbSEhwAAAAJ",
        linkedin: "https://www.linkedin.com/in/alexandre-garel-baa75429/",
-       website: "https://sites.google.com/view/alexandre-garel/accueil",
-     },
-     {
-       name: "I. El Guerch",
-       role: "Co-author",
-       org: "",
-       scholar: "",
-       linkedin: "",
-       website: "",
-     },
-     {
-       name: "A. Langle",
-       role: "Co-author",
-       org: "",
-       scholar: "",
-       linkedin: "",
-       website: "",
-     },
-     {
-       name: "K. Lim",
-       role: "Co-author",
-       org: "",
-       scholar: "",
-       linkedin: "",
-       website: "",
-     },
-     {
-       name: "N. Lucarotti",
-       role: "Co-author",
-       org: "",
-       scholar: "",
-       linkedin: "",
-       website: "",
+       website: "https://agarel86.github.io/site/index.html",
      },
    ];
    
