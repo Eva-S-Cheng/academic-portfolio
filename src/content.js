@@ -2777,7 +2777,756 @@ Root Mean Squared Error: 21.581003077901855</pre></details>
 <li><code>R2</code>: Also known as the "coefficient of determination," it is calculated (1 - RSS / TSS), where RSS is the sum of squared residuals and TSS is the total sum of squares (the variation between the average and actual values). R² indicates the proportion of the variability in Y that can be explained by the explanatory variables.</li>
 </ul>
 ` },
-         { slug: "session-6", label: "Session 6", title: "Building a portfolio and valuing different types of assets", embedUrl: "" },
+         { slug: "session-6", label: "Session 6", title: "Building a portfolio and valuing different types of assets", embedUrl: "", html: `
+<p>This session aims to provide you with methodologies for valuing various types of financial securities and for building an equity portfolio. The session’s content will cover the following key topics:</p>
+<ul>
+<li>Bond Pricing and Valuation</li>
+<li>Stock Pricing</li>
+<li>Constructing an Equity Portfolio</li>
+<li>Basic Trading Strategies</li>
+<li>Understanding Derivatives</li>
+</ul>
+<div class="nb-code"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">MAIN_PATH</span> <span class="o">=</span> <span class="s1">'C:/Users/evche/Documents/Lessons - Audencia BS/Data/Session 6'</span>
+<span class="c1"># Eliminating the waring messages </span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div>
+<h2 id="I---Bonds-:-The-(assumedly)-fixed-income">I - Bonds : The (assumedly) fixed income</h2>
+<p><code>Bonds</code> are financial instruments issued by corporations or governments to raise capital, typically treated as liabilities or debt. These instruments offer investors fixed periodic interest payments (referred to as coupons, wwhich may be <strong>fixed or variable depending on the bond type</strong>) and return the principal (or face value) at maturity. A bond that does not provide periodic interest payments is known as a zero-coupon bond. The following terms are crucial in understanding bond valuation:</p>
+<ul>
+<li>Face Value: The original value of the bond when issued.</li>
+<li>Par Value: The amount the issuer agrees to repay the bondholder at maturity (usually equivalent to the face value).</li>
+<li>Coupons: The fixed periodic interest payments made to the bondholder, not to be confused with the market interest rate.</li>
+<li>Market Interest Rate (r): The prevailing rate of interest in the market. In the scope of the class the yield curve will be assumedly flat for simplicity purposes, <em>in real-world valuation uses the term structure of rates</em>)</li>
+<li>Present Value (PV): The sum of the discounted future cash flows from both coupon payments and the face value. It reflects the price an investor should be willing to pay for the bond. The formula for present value is: <code>PV = Sum (Coupons/(1 + r)^t) + FV /(1 + r)^T</code></li>
+</ul>
+<p>There are typically three main scenarios in bond valuation:</p>
+<ul>
+<li>Profit Calculation: The Trading Price, Face Value, and Interest Rates are known. These allow us to calculate the profit. Profit derives from the difference between the bond's market price and the present expected value of cash flows (coupons + face value), discounted at the interest rate.</li>
+<li>Present Value Calculation: The Face Value and Interest Rate are known, so we compute the Present Value.</li>
+<li>Yield to Maturity (YTM) Calculation: The Face Value and Present Value are known, and we solve for the market interest rate or * Yield to Maturity (YTM).</li>
+</ul>
+<h3 id="1)-Profit-Calculation">1) Profit Calculation</h3><p>The profit on a bond is determined by the periodic interest payments (coupons), the bond’s purchase price (typically the present value), and the selling price or face value upon maturity.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Definition of the function</span>
+<span class="k">def</span> <span class="nf">calculate_bond_profit</span><span class="p">(</span><span class="n">coupon_value</span><span class="p">,</span> <span class="n">number_of_payments</span><span class="p">,</span> <span class="n">years</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">purchase_price</span><span class="p">):</span>
+    <span class="c1"># Calculation of the sum of interests</span>
+    <span class="n">coupons</span> <span class="o">=</span> <span class="n">coupon_value</span> <span class="o">*</span> <span class="n">number_of_payments</span> <span class="o">*</span> <span class="n">years</span>
+    <span class="c1"># Profit</span>
+    <span class="k">return</span> <span class="n">selling_price</span> <span class="o">-</span> <span class="n">purchase_price</span> <span class="o">+</span> <span class="n">coupons</span>
+
+<span class="c1"># Inputs</span>
+<span class="n">coupon_rate</span> <span class="o">=</span> <span class="mf">0.12</span>
+<span class="n">nb_payments_by_year</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">present_value</span> <span class="o">=</span> <span class="mi">105</span>
+<span class="n">face_value</span> <span class="o">=</span> <span class="mi">100</span> 
+<span class="n">maturity</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># Coupon (semi annual)</span>
+<span class="n">coupon</span> <span class="o">=</span> <span class="n">coupon_rate</span> <span class="o">*</span> <span class="n">face_value</span> <span class="o">/</span> <span class="n">nb_payments_by_year</span>
+
+<span class="c1"># Test</span>
+<span class="n">bond_profit</span> <span class="o">=</span> <span class="n">calculate_bond_profit</span><span class="p">(</span><span class="n">coupon</span><span class="p">,</span> <span class="n">nb_payments_by_year</span><span class="p">,</span> <span class="n">maturity</span><span class="p">,</span> <span class="n">face_value</span><span class="p">,</span> <span class="n">present_value</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The profit generated by the bond is $"</span><span class="p">,</span> <span class="n">bond_profit</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The profit generated by the bond is $ 31.0</pre></details>
+<p>It is important to understand that the Face Value and Present Value of a bond are not always identical, due to fluctuations in interest rates and market conditions. The only hypothetical scenario where the Present Value equals the Face Value is when the bond does not pay any coupons and the interest rate is 0%. However, this is unrealistic, as investors generally seek returns on their investments.</p>
+<aside class="nb-exercise"><span class="nb-ex-tag">Exercise</span><h3>2) Calculating the Present Value (<em>In class exercise, live coding or assignment</em>)</h3></aside><div class="nb-code"><pre><span></span><span class="c1">###### Live coding or in class exercise HERE</span>
+<span class="c1"># As we presented a formula in the I, we can reuse it for this section, we assume coupons are constant</span>
+<span class="k">def</span> <span class="nf">calculate_present_value</span><span class="p">(</span><span class="n">annual_coupon</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="n">interest</span><span class="p">):</span>
+    <span class="n">present_value_coupons</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">T</span><span class="p">):</span>
+        <span class="c1"># Sum of Coupons/(1 + r)^t</span>
+        <span class="n">present_value_coupons</span> <span class="o">=</span> <span class="n">present_value_coupons</span> <span class="o">+</span> <span class="n">annual_coupon</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">interest</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Present Value</span>
+    <span class="k">return</span> <span class="n">present_value_coupons</span> <span class="o">+</span> <span class="n">face</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">interest</span><span class="p">)</span><span class="o">**</span><span class="n">T</span>
+
+<span class="c1"># Inputs</span>
+<span class="n">mk_interest_rate</span> <span class="o">=</span> <span class="mf">0.06</span>
+<span class="n">face_value</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">maturity</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">coupon_rate</span> <span class="o">=</span> <span class="mf">0.05</span>
+
+<span class="c1"># Annual coupon</span>
+<span class="n">coupon</span> <span class="o">=</span> <span class="n">coupon_rate</span> <span class="o">*</span> <span class="n">face_value</span>
+
+<span class="c1"># Calculation</span>
+<span class="n">bond_value</span> <span class="o">=</span> <span class="n">calculate_present_value</span><span class="p">(</span><span class="n">coupon</span><span class="p">,</span> <span class="n">maturity</span><span class="p">,</span> <span class="n">face_value</span><span class="p">,</span> <span class="n">mk_interest_rate</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The estimated price for the bond value is $"</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">bond_value</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Therefore, an investor should not pay more than $"</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">bond_value</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"for the bond"</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The estimated price for the bond value is $ 973.27
+Therefore, an investor should not pay more than $ 973.27 for the bond</pre></details>
+<p><strong>Question :</strong> Are the calculations and measures of Present Value (PV) and Yield to Maturity (YTM) comparable to any other metrics used in Corporate Finance?</p>
+<h3 id="3)-Calculating-the-Yield-to-Maturity-(Not-to-be-known-in-the-scope-of-this-class)">3) Calculating the Yield to Maturity (Not to be known in the scope of this class)</h3>
+<div class="nb-code"><pre><span></span><span class="c1"># We have to use a optimized solver, a library exists in Python</span>
+<span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="k">as</span> <span class="nn">optimize</span>
+
+<span class="k">def</span> <span class="nf">ytm_function</span><span class="p">(</span><span class="n">ytm</span><span class="p">,</span> <span class="n">face_value</span><span class="p">,</span> <span class="n">coupon</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">current_price</span><span class="p">):</span>
+    <span class="c1"># Define a function solve the problem by determining ytm for which Current Price = Bond Price</span>
+    <span class="k">return</span> <span class="n">calculate_present_value</span><span class="p">(</span><span class="n">coupon</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">face_value</span><span class="p">,</span> <span class="n">ytm</span><span class="p">)</span> <span class="o">-</span> <span class="n">current_price</span>
+
+<span class="k">def</span> <span class="nf">calculate_ytm</span><span class="p">(</span><span class="n">face_value</span><span class="p">,</span> <span class="n">coupon</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">current_price</span><span class="p">):</span>
+    <span class="c1"># With Newton optimization determine the ytm for which the function has an optimized result (0)</span>
+    <span class="n">ytm</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">newton</span><span class="p">(</span><span class="n">ytm_function</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">face_value</span><span class="p">,</span> <span class="n">coupon</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">current_price</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ytm</span>
+
+<span class="c1"># Inputs</span>
+<span class="n">mk_interest_rate</span> <span class="o">=</span> <span class="mf">0.06</span>
+<span class="n">face_value</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">maturity</span> <span class="o">=</span> <span class="mi">3</span><span class="err">²</span>
+<span class="n">coupon_rate</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">coupon</span> <span class="o">=</span> <span class="n">coupon_rate</span> <span class="o">*</span> <span class="n">face_value</span>
+
+<span class="n">current_price</span> <span class="o">=</span> <span class="mi">950</span>
+
+<span class="n">ytm</span> <span class="o">=</span> <span class="n">calculate_ytm</span><span class="p">(</span><span class="n">face_value</span><span class="p">,</span> <span class="n">coupon</span><span class="p">,</span> <span class="n">maturity</span><span class="p">,</span> <span class="n">current_price</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The Yield to Maturity (YTM) for this example is </span><span class="si">{</span><span class="n">ytm</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The Yield to Maturity (YTM) for this example is 6.90%</pre></details>
+<aside class="nb-exercise"><span class="nb-ex-tag">Exercise</span><h3>II - Equity / Stocks : A share of a company with uncertain return (<em>Live coding</em>)</h3><p>Investing in the stock market involves purchasing shares of a company, representing partial ownership. The value of a stock can be assessed in two primary ways:</p><ul>
+<li>Market Value: This is the share price determined by the total value of the company’s outstanding shares in the stock market. It is typically used for publicly traded companies and serves as a reference for trading.</li>
+<li>Book Value: This reflects the net value of a company's equity as reported on its balance sheet (accounting-based valuation).</li>
+</ul><p>Unlike bonds, investing in stocks does not guarantee periodic interest payments or the return of the initial investment if the company goes bankrupt. However, shareholders often have voting rights on corporate matters at shareholder meetings (for voting stocks). As a result, investing in stocks carries more risk than fixed-income instruments, but it also offers the potential for higher returns.</p><p>In financial analysis, two key measures are commonly used to evaluate stock performance: returns and log returns. While other metrics such as CAGR (Compound Annual Growth Rate) and cumulative return can also be used, these will be discussed in future sessions.</p></aside><aside class="nb-exercise"><span class="nb-ex-tag">Blitz exercise</span><h3><em>Blitz Exercise (10 min) : Subject to be known in class</em></h3><p>Although returns and log returns are similar, they are not identical. Returns are more intuitive and straightforward to interpret, but log returns are widely favored in finance due to several advantages:</p><ul>
+<li>Log returns can be added over time to calculate cumulative returns, making them easier to manipulate.</li>
+<li>They scale linearly, allowing comparisons of performance across different time periods.</li>
+<li>Log returns can easily be converted back (in case of single period) to standard returns with continuous compounding</li>
+</ul></aside><h2 id="III---Construction-of-a-portfolio-by-allocating-different-weights">III - Construction of a portfolio by allocating different weights</h2>
+<p>To build a portfolio, one must select multiple stocks and assign a specific weight to each stock within the portfolio. Weighting a portfolio means allocating a portion of the total investment across various stocks. Effective portfolio construction requires selecting stocks that are not strongly correlated, which helps diversify the portfolio and manage risk. For example, in this session, we will use stocks from the CAC 40 index.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Reading the dataframe that contains the stocks of the CAC 40</span>
+<span class="n">cac_data_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/CAC 40.xlsx'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="c1"># Eliminate the first column (Time in days)</span>
+<span class="n">cac_data_prices</span> <span class="o">=</span> <span class="n">cac_data_prices</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">'AIRP.PA'</span><span class="p">:]</span>
+<span class="n">cac_data_prices</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>AIRP.PA</th>
+<th>AXAF.PA</th>
+<th>BOUY.PA</th>
+<th>BNPP.PA</th>
+<th>TCFP.PA</th>
+<th>CAPP.PA</th>
+<th>ESLX.PA</th>
+<th>OREP.PA</th>
+<th>LVMH.PA</th>
+<th>MICP.PA</th>
+<th>...</th>
+<th>VIE.PA</th>
+<th>VIV.PA</th>
+<th>EUFI.PA</th>
+<th>CAGR.PA</th>
+<th>MT.AS</th>
+<th>ENGIE.PA</th>
+<th>LEGD.PA</th>
+<th>WLN.PA</th>
+<th>STLA.PA</th>
+<th>CAC40</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2014-06-27</th>
+<td>78.428267</td>
+<td>17.510</td>
+<td>30.400</td>
+<td>49.410</td>
+<td>44.385</td>
+<td>52.48</td>
+<td>77.87</td>
+<td>125.90</td>
+<td>126.487209</td>
+<td>88.01</td>
+<td>...</td>
+<td>13.734616</td>
+<td>7.444825</td>
+<td>22.300</td>
+<td>10.600</td>
+<td>25.240572</td>
+<td>19.702120</td>
+<td>44.955</td>
+<td>16.4</td>
+<td>5.831555</td>
+<td>4436.99</td>
+</tr>
+<tr>
+<th>2014-06-30</th>
+<td>79.370082</td>
+<td>17.455</td>
+<td>30.390</td>
+<td>49.545</td>
+<td>44.175</td>
+<td>52.10</td>
+<td>77.45</td>
+<td>125.85</td>
+<td>126.892762</td>
+<td>87.26</td>
+<td>...</td>
+<td>13.416439</td>
+<td>7.384903</td>
+<td>22.460</td>
+<td>10.300</td>
+<td>25.194046</td>
+<td>19.556214</td>
+<td>44.685</td>
+<td>16.6</td>
+<td>5.717678</td>
+<td>4422.84</td>
+</tr>
+<tr>
+<th>2014-07-01</th>
+<td>80.239450</td>
+<td>17.575</td>
+<td>30.345</td>
+<td>51.330</td>
+<td>44.360</td>
+<td>52.65</td>
+<td>78.07</td>
+<td>125.90</td>
+<td>127.073007</td>
+<td>88.29</td>
+<td>...</td>
+<td>13.618915</td>
+<td>7.494416</td>
+<td>22.240</td>
+<td>10.605</td>
+<td>25.426678</td>
+<td>19.609713</td>
+<td>44.890</td>
+<td>16.4</td>
+<td>5.892466</td>
+<td>4461.12</td>
+</tr>
+<tr>
+<th>2014-07-02</th>
+<td>80.175053</td>
+<td>17.590</td>
+<td>29.750</td>
+<td>51.010</td>
+<td>43.955</td>
+<td>52.88</td>
+<td>77.27</td>
+<td>125.60</td>
+<td>126.126719</td>
+<td>88.60</td>
+<td>...</td>
+<td>13.223605</td>
+<td>7.417963</td>
+<td>22.625</td>
+<td>10.560</td>
+<td>25.833784</td>
+<td>19.585395</td>
+<td>44.760</td>
+<td>16.3</td>
+<td>5.937487</td>
+<td>4444.72</td>
+</tr>
+<tr>
+<th>2014-07-03</th>
+<td>81.382508</td>
+<td>18.150</td>
+<td>30.310</td>
+<td>51.250</td>
+<td>44.300</td>
+<td>55.74</td>
+<td>77.63</td>
+<td>127.25</td>
+<td>127.839050</td>
+<td>89.06</td>
+<td>...</td>
+<td>13.209143</td>
+<td>7.550205</td>
+<td>22.980</td>
+<td>10.705</td>
+<td>26.264153</td>
+<td>19.658348</td>
+<td>45.415</td>
+<td>16.4</td>
+<td>6.040770</td>
+<td>4489.88</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>A common method of diversification is to invest in the entire index or all 40 stocks within the CAC 40. However, investing in so many stocks is often inefficient and impractical. Instead, we will select a smaller group of stocks (five in this case) to form the portfolio.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># First of all, let us compute the returns to scale the data </span>
+<span class="n">cac_data_returns</span> <span class="o">=</span> <span class="n">cac_data_prices</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="n">q</span>
+<span class="c1"># Then we can calculate the correlations</span>
+<span class="n">corMaxtrix</span> <span class="o">=</span> <span class="n">cac_data_returns</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+<span class="c1"># Showing the result</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">diverging_palette</span><span class="p">(</span><span class="mi">230</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">as_cmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">rc</span><span class="o">=</span><span class="p">{</span><span class="s1">'figure.figsize'</span><span class="p">:(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">)})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'Correlation Matrix of the stocks'</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corMaxtrix</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 1" data-asset="session-6/fig-1.png" loading="lazy"/></figure></details>
+<p>Based on a correlation heatmap, we can identify the following low pairwise correlation stocks: HRMS.PA, EUFI.PA, CARR.PA, ALSO.PA, and DAST.PA.</p>
+<div class="nb-code"><pre><span></span><span class="n">selected_stocks</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'HRMS.PA'</span><span class="p">,</span> <span class="s1">'EUFI.PA'</span><span class="p">,</span><span class="s1">'CARR.PA'</span><span class="p">,</span> <span class="s1">'ALSO.PA'</span><span class="p">,</span><span class="s1">'DAST.PA'</span><span class="p">]</span>
+<span class="c1"># Creating a dataframe of the selected stocks</span>
+<span class="n">data_portfolio</span> <span class="o">=</span> <span class="n">cac_data_returns</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">selected_stocks</span><span class="p">]</span>
+<span class="c1"># Creating the return of the equally weighted portfolio =&gt; Return = The average of the returns</span>
+<span class="n">data_portfolio</span><span class="p">[</span><span class="s1">'Average'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_portfolio</span><span class="p">[</span><span class="n">selected_stocks</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_stocks</span><span class="p">)</span>
+<span class="n">data_portfolio</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>HRMS.PA</th>
+<th>EUFI.PA</th>
+<th>CARR.PA</th>
+<th>ALSO.PA</th>
+<th>DAST.PA</th>
+<th>Average</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2014-06-27</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<th>2014-06-30</th>
+<td>0.016981</td>
+<td>0.007175</td>
+<td>-0.008100</td>
+<td>-0.007086</td>
+<td>-0.000957</td>
+<td>0.001603</td>
+</tr>
+<tr>
+<th>2014-07-01</th>
+<td>0.001855</td>
+<td>-0.009795</td>
+<td>0.013920</td>
+<td>-0.011080</td>
+<td>0.019264</td>
+<td>0.002833</td>
+</tr>
+<tr>
+<th>2014-07-02</th>
+<td>0.000000</td>
+<td>0.017311</td>
+<td>0.020502</td>
+<td>-0.013673</td>
+<td>-0.005012</td>
+<td>0.003826</td>
+</tr>
+<tr>
+<th>2014-07-03</th>
+<td>0.005926</td>
+<td>0.015691</td>
+<td>0.003049</td>
+<td>0.004043</td>
+<td>0.013223</td>
+<td>0.008386</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>After selecting the stocks, we can assign different weights to each. In an equally weighted portfolio, each stock is given a 20% allocation of the total investment. However, weights can be adjusted to assign different proportions of the investment to each stock. The portfolio's return is then calculated as a weighted average of the returns of the individual stocks.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Define a list containing the weight of each stock </span>
+<span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]</span>
+
+<span class="c1"># Calculating the Weighted Return</span>
+<span class="c1"># Setting it to 0 first</span>
+<span class="n">data_portfolio</span><span class="p">[</span><span class="s1">'Weighted_pf'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1"># For all the stocks that are selected</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_stocks</span><span class="p">)):</span>
+    <span class="c1"># Do the sum of the return of the stock multiplied by the weight of the stock in the portfolio</span>
+    <span class="n">data_portfolio</span><span class="p">[</span><span class="s1">'Weighted_pf'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_portfolio</span><span class="p">[</span><span class="s1">'Weighted_pf'</span><span class="p">]</span> <span class="o">+</span> <span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">data_portfolio</span><span class="p">[</span><span class="n">selected_stocks</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+<span class="c1"># Displaying the Dataframe to show the difference between the equally weighted portfolio and the new portfolio</span>
+<span class="n">data_portfolio</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>HRMS.PA</th>
+<th>EUFI.PA</th>
+<th>CARR.PA</th>
+<th>ALSO.PA</th>
+<th>DAST.PA</th>
+<th>Average</th>
+<th>Weighted_pf</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2014-06-27</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<th>2014-06-30</th>
+<td>0.016981</td>
+<td>0.007175</td>
+<td>-0.008100</td>
+<td>-0.007086</td>
+<td>-0.000957</td>
+<td>0.001603</td>
+<td>0.004468</td>
+</tr>
+<tr>
+<th>2014-07-01</th>
+<td>0.001855</td>
+<td>-0.009795</td>
+<td>0.013920</td>
+<td>-0.011080</td>
+<td>0.019264</td>
+<td>0.002833</td>
+<td>0.001893</td>
+</tr>
+<tr>
+<th>2014-07-02</th>
+<td>0.000000</td>
+<td>0.017311</td>
+<td>0.020502</td>
+<td>-0.013673</td>
+<td>-0.005012</td>
+<td>0.003826</td>
+<td>0.000500</td>
+</tr>
+<tr>
+<th>2014-07-03</th>
+<td>0.005926</td>
+<td>0.015691</td>
+<td>0.003049</td>
+<td>0.004043</td>
+<td>0.013223</td>
+<td>0.008386</td>
+<td>0.009183</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>It is important to note that raw returns may not be the most reliable metric for comparing performance over time. Instead, key measures such as average return, volatility, and cumulative return provide more meaningful comparisons between portfolios.</p>
+<aside class="nb-exercise"><span class="nb-ex-tag">Blitz exercise</span><h3><em>Blitz Exercise (10 min) or Assignment : Subject to be known in class</em></h3></aside><div class="nb-code"><pre><span></span><span class="c1"># Now calculating the cumulative return and plotting it</span>
+<span class="c1"># First of all, reduce the dataframe to 2 columns only</span>
+<span class="n">data_portfolios</span> <span class="o">=</span> <span class="n">data_portfolio</span><span class="p">[[</span><span class="s1">'Average'</span><span class="p">,</span> <span class="s1">'Weighted_pf'</span><span class="p">]]</span>
+<span class="c1"># Calculating the cumulative returns</span>
+<span class="n">data_cumulative_ret</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">data_portfolios</span><span class="p">)</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="c1"># Adding the CAC 40 for comparison</span>
+<span class="n">cac_cumulative_ret</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">cac_data_returns</span><span class="p">[</span><span class="s1">'CAC40'</span><span class="p">])</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="c1"># Creating the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">rc</span><span class="o">=</span><span class="p">{</span><span class="s1">'figure.figsize'</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">)})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_cumulative_ret</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Equally weighted portfolio"</span><span class="p">,</span> <span class="s2">"Second portfolio"</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cac_cumulative_ret</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s2">"CAC 40"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Displaying the cumulative returns of the two portfolios"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 2" data-asset="session-6/fig-2.png" loading="lazy"/></figure></details>
+<p>Based on the graph presented, we can conclude that selecting a smaller, well-diversified set of stocks can lead to a strategy that potentially outperforms the broader market (represented by the CAC 40). Additionally, actively managing weight allocation can outperform a portfolio with equally weighted stocks.</p>
+<h2 id="IV---Trading-strategies">IV - Trading strategies</h2>
+<p>In this part of the session, we will focus on a single stock to simplify the demonstration of trading strategies. It is important to note that these strategies can also be applied to a diversified portfolio. Although there are numerous trading methods, we will limit our discussion to a strategy based on Moving Averages.</p>
+<p>This method involves creating two moving averages with different rolling windows and comparing them to generate trading signals (either buying or selling a stock). The approach is as follows:</p>
+<ol>
+<li>Define two moving averages with different time windows—one shorter and one longer.</li>
+<li>Generate signals when the two moving averages cross :<ul>
+<li>When the short moving average exceeds the long moving average, it indicates that the stock price is rising faster than its historical trend, signaling a potential buying opportunity.</li>
+<li>When the short moving average falls below the long moving average, it suggests that the stock price is declining more rapidly, signaling a potential selling opportunity.</li>
+</ul>
+</li>
+<li>After generating the signals, we simulate the corresponding buy or sell actions.</li>
+<li>Finally, we compare the performance of the strategy with the stock's cumulative return over the same period.</li>
+</ol>
+<div class="nb-code"><pre><span></span><span class="n">data_trading</span> <span class="o">=</span> <span class="n">cac_data_prices</span><span class="p">[[</span><span class="s1">'DAST.PA'</span><span class="p">]]</span>
+<span class="c1"># Moving averages</span>
+<span class="n">short_ma</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">long_ma</span> <span class="o">=</span> <span class="mi">60</span>
+
+<span class="c1"># Let us create a copy of the dataframe instead of overwriting it</span>
+<span class="n">data_trading_ma</span> <span class="o">=</span> <span class="n">data_trading</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Short_MA'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_trading_ma</span><span class="p">[</span><span class="n">data_trading</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">short_ma</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Long_MA'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_trading_ma</span><span class="p">[</span><span class="n">data_trading</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">long_ma</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Eliminating the data because it will pollute the dataset</span>
+<span class="n">data_trading_ma</span> <span class="o">=</span> <span class="n">data_trading_ma</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">data_trading_ma</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>DAST.PA</th>
+<th>Short_MA</th>
+<th>Long_MA</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2014-09-18</th>
+<td>10.550</td>
+<td>10.294000</td>
+<td>9.854000</td>
+</tr>
+<tr>
+<th>2014-09-19</th>
+<td>10.464</td>
+<td>10.319600</td>
+<td>9.871650</td>
+</tr>
+<tr>
+<th>2014-09-22</th>
+<td>10.514</td>
+<td>10.348267</td>
+<td>9.890283</td>
+</tr>
+<tr>
+<th>2014-09-23</th>
+<td>10.402</td>
+<td>10.367333</td>
+<td>9.904033</td>
+</tr>
+<tr>
+<th>2014-09-24</th>
+<td>10.426</td>
+<td>10.386933</td>
+<td>9.918983</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Displaying the data </span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_trading_ma</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">data_trading_ma</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Displaying the stock price and the moving average of DAST.PA"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 3" data-asset="session-6/fig-3.png" loading="lazy"/></figure></details>
+<p>Whenever the short moving average (represented by the yellow curve) crosses the long moving average (represented by the green curve), a signal is generated, indicating whether to buy or sell the stock. To implement this, we first identify the periods where the short moving average exceeds the long moving average using an indicator. By analyzing the changes in this indicator over time, we can pinpoint when the two curves intersect and generate the appropriate trading signals.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Initial values</span>
+<span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'indicator'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1"># Identifying the times when the short moving average is greater than the long one</span>
+<span class="n">data_trading_ma</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data_trading_ma</span><span class="p">[</span><span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Short_MA'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Long_MA'</span><span class="p">]]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">'indicator'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1"># Then defining the positions =&gt; 1 for buy and -1 for sell</span>
+<span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Position'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'indicator'</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Eliminating the data that is not relevant</span>
+<span class="n">data_trading_ma</span> <span class="o">=</span> <span class="n">data_trading_ma</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+<span class="c1"># Displaying a graph with the positions</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_trading_ma</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+<span class="c1"># Buy</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_trading_ma</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Position'</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+         <span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Short_MA'</span><span class="p">][</span><span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Position'</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">],</span> <span class="s1">'^'</span><span class="p">,</span> <span class="n">markersize</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'g'</span><span class="p">)</span>
+<span class="c1"># Sell</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_trading_ma</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Position'</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+         <span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Short_MA'</span><span class="p">][</span><span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Position'</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span> <span class="s1">'v'</span><span class="p">,</span> <span class="n">markersize</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'r'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Positions according to the Moving Average Method"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 4" data-asset="session-6/fig-4.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Assessing the strategy with cumulative returns, an indicator of 1 indicates the investor is holding the stock</span>
+<span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'Strategy'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_trading_ma</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="c1"># Taking the first and last columns</span>
+<span class="n">data_comparison</span> <span class="o">=</span> <span class="n">data_trading_ma</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+<span class="c1"># Calculating the returns</span>
+<span class="n">data_comparison_returns</span> <span class="o">=</span> <span class="n">data_comparison</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span> 
+<span class="n">data_comparison_returns</span><span class="p">[</span><span class="s1">'Strategy'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_comparison_returns</span><span class="p">[</span><span class="s1">'Strategy'</span><span class="p">]</span> <span class="o">*</span> <span class="n">data_trading_ma</span><span class="p">[</span><span class="s1">'indicator'</span><span class="p">]</span>
+<span class="c1"># Calculating the cumulative returns</span>
+<span class="n">data_comparison_returns</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">data_comparison_returns</span><span class="p">)</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+<span class="c1"># Displaying</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_comparison_returns</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">data_comparison_returns</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Comparing the strategy to the actual evolution of the stock price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 5" data-asset="session-6/fig-5.png" loading="lazy"/></figure></details>
+<p>From the graph, we observe that the strategy tends to follow the same general trends as the stock’s price movements. However, the fluctuations appear less pronounced, suggesting that the strategy may help mitigate the impact of high volatility in the stock price. As a result, this approach can be particularly useful in smoothing out sharp price swings and providing a more stable trading framework.</p>
+<p>On the orange curve (the curve representing our strategy), the flat parts indicates periods when the portfolio is not reallocated, thereby avoiding excessive losses</p>
+<h2 id="To-go-further---Options-and-futures-:-Contracts-used-for-speculation">To go further - Options and futures : Contracts used for speculation</h2>
+<p>A derivative is a financial contract whose value is derived from the performance of an underlying asset. There are several types of derivatives, with the most common being forwards, futures, options, and swaps:</p>
+<ul>
+<li>Futures: A standardized agreement to buy (go long) or sell (go short) a specific underlying asset at a predetermined price at a specified future date, known as the maturity date.</li>
+<li>Forwards: Similar to futures, but forwards are customized contracts negotiated between two parties over-the-counter (OTC). This flexibility allows for tailored terms based on each party's needs.</li>
+<li>Options: A contract granting the holder the right, but not the obligation, to buy (call) or sell (put) an underlying asset at a predetermined price (the strike price) on or before maturity. This right is purchased by paying a premium.</li>
+<li>Swaps: Contracts where two parties exchange cash flows from different financial instruments. This can occur, for example, when two companies agree to swap investments in each other.</li>
+</ul>
+<h3 id="a)-Calculate-the-payoff-of-a-future">a) Calculate the payoff of a future</h3><p>With a future, the investor is obligated to buy or sell the asset at the predetermined price, regardless of how the market price fluctuates by the time of maturity. This contrasts with an option, where the holder has the right but not the obligation to complete the transaction, which offers more flexibility in potential payoffs.</p>
+<div class="nb-code"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Creating the function</span>
+<span class="k">def</span> <span class="nf">calculate_payoff_future</span><span class="p">(</span><span class="n">future_price</span><span class="p">,</span> <span class="n">fair_price</span><span class="p">,</span> <span class="n">contract_type</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">contract_type</span> <span class="o">==</span> <span class="s2">"LONG"</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="n">future_price</span> <span class="o">-</span> <span class="n">fair_price</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="n">fair_price</span> <span class="o">-</span> <span class="n">future_price</span>
+
+<span class="c1"># It is also possible to estimate the current value of the fair value using </span>
+<span class="k">def</span> <span class="nf">fair_value_future</span><span class="p">(</span><span class="n">spot</span><span class="p">,</span> <span class="n">rf_rate</span><span class="p">,</span> <span class="n">dividend</span><span class="p">,</span> <span class="n">maturity</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">spot</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">rf_rate</span> <span class="o">-</span> <span class="n">dividend</span><span class="p">)</span> <span class="o">*</span> <span class="n">maturity</span><span class="p">)</span>
+
+<span class="c1"># Simulation </span>
+<span class="n">current_price</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">agreement_price</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">future_price</span> <span class="o">=</span> <span class="mi">125</span>
+<span class="n">duration</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">risk_free_rate</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">dividends</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">future_type</span> <span class="o">=</span> <span class="s2">"LONG"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The payoff of the future would be "</span><span class="p">,</span> <span class="n">calculate_payoff_future</span><span class="p">(</span><span class="n">future_price</span><span class="p">,</span> <span class="n">agreement_price</span><span class="p">,</span> <span class="n">future_type</span><span class="p">))</span>
+<span class="n">calculated_fair_value</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">fair_value_future</span><span class="p">(</span><span class="n">current_price</span><span class="p">,</span> <span class="n">risk_free_rate</span><span class="p">,</span> <span class="n">dividends</span><span class="p">,</span> <span class="n">duration</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"A plausible fair value considering the previous parameters would be "</span><span class="p">,</span> <span class="n">calculated_fair_value</span><span class="p">,</span> <span class="s2">"with a payoff of "</span><span class="p">,</span> 
+      <span class="n">calculate_payoff_future</span><span class="p">(</span><span class="n">future_price</span><span class="p">,</span> <span class="n">calculated_fair_value</span><span class="p">,</span> <span class="n">future_type</span><span class="p">))</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The payoff of the future would be  5
+A plausible fair value considering the previous parameters would be  116.18 with a payoff of  8.819999999999993</pre></details>
+<h3 id="b)-Calculate-the-payoffs-of-an-option">b) Calculate the payoffs of an option</h3><p>Options are generally sold for a premium, and the potential payoffs depend on whether the investor is buying or selling the option, as well as the type of option (call or put). Here are the common strategies and potential payoffs:</p>
+<ul>
+<li>Selling a Call: The seller expects the asset's price to stay below the strike price at maturity.<ul>
+<li>Best case: Profit = premium.</li>
+<li>Worst case: Profit = premium - (future price - strike price).</li>
+</ul>
+</li>
+<li>Selling a Put: The seller expects the asset's price to stay above the strike price at maturity.<ul>
+<li>Best case: Profit = premium.</li>
+<li>Worst case: Profit = premium - (strike price - future price).</li>
+</ul>
+</li>
+<li>Buying a Call: The buyer expects the asset's price to rise above the strike price at maturity.<ul>
+<li>Best case: Profit = (future price - strike price) - premium.</li>
+<li>Worst case: Profit = -premium (loss limited to the premium paid).</li>
+</ul>
+</li>
+<li>Buying a Put: The buyer expects the asset's price to fall below the strike price at maturity.<ul>
+<li>Best case: Profit = (strike price - future price) - premium.</li>
+<li>Worst case: Profit = -premium (loss limited to the premium paid).</li>
+</ul>
+</li>
+</ul>
+<div class="nb-code"><pre><span></span><span class="c1"># Transforming the previous statements into lines of codes</span>
+<span class="k">def</span> <span class="nf">calculate_payoff_option</span><span class="p">(</span><span class="n">strike</span><span class="p">,</span> <span class="n">future_price</span><span class="p">,</span> <span class="n">option_premium</span><span class="p">,</span> <span class="n">option_type</span><span class="p">,</span> <span class="n">side</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s2">"Buyer"</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="n">option_type</span> <span class="o">==</span> <span class="s2">"CALL"</span><span class="p">:</span>
+            <span class="c1"># For the investor who buys the CALL</span>
+            <span class="k">if</span> <span class="n">strike</span> <span class="o">&lt;</span> <span class="n">future_price</span> <span class="p">:</span>
+                <span class="c1"># The call option is executed</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"CALL executed for the buyer"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">future_price</span> <span class="o">-</span> <span class="n">strike</span> <span class="o">-</span> <span class="n">option_premium</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="c1"># The call option is not executed</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"CALL not executed for the buyer"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="o">-</span> <span class="n">option_premium</span>
+        <span class="k">elif</span> <span class="n">option_type</span> <span class="o">==</span> <span class="s2">"PUT"</span><span class="p">:</span>
+            <span class="c1"># For the investor who buys a PUT</span>
+            <span class="k">if</span> <span class="n">strike</span> <span class="o">&gt;</span> <span class="n">future_price</span> <span class="p">:</span>
+                <span class="c1"># The put option is executed</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"PUT executed for the buyer"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">strike</span> <span class="o">-</span> <span class="n">future_price</span> <span class="o">-</span> <span class="n">option_premium</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="c1"># The put option is not executed</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"PUT not executed for the buyer"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="o">-</span> <span class="n">option_premium</span>
+    <span class="k">elif</span> <span class="n">side</span> <span class="o">==</span> <span class="s2">"Seller"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">option_type</span> <span class="o">==</span> <span class="s2">"CALL"</span><span class="p">:</span>
+            <span class="c1"># For the investor who sells the CALL</span>
+            <span class="k">if</span> <span class="n">strike</span> <span class="o">&lt;</span> <span class="n">future_price</span> <span class="p">:</span>
+                <span class="c1"># The call option is executed</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"CALL executed for the seller"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">option_premium</span> <span class="o">-</span> <span class="n">future_price</span> <span class="o">+</span> <span class="n">strike</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="c1"># The call option is not executed</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"CALL not executed for the seller"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">option_premium</span>
+        <span class="k">elif</span> <span class="n">option_type</span> <span class="o">==</span> <span class="s2">"PUT"</span><span class="p">:</span>
+            <span class="c1"># For the investor who buys a PUT</span>
+            <span class="k">if</span> <span class="n">strike</span> <span class="o">&gt;</span> <span class="n">future_price</span> <span class="p">:</span>
+                <span class="c1"># The put option is executed</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"PUT executed for the seller"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">option_premium</span> <span class="o">-</span> <span class="n">strike</span> <span class="o">+</span> <span class="n">future_price</span> 
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="c1"># The put option is not executed</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"PUT  not executed for the seller"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">option_premium</span>
+            
+<span class="c1"># Parameters</span>
+<span class="n">contractual_strike</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">ending_price</span> <span class="o">=</span> <span class="mi">135</span>
+<span class="n">option_premium</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># Running the test </span>
+<span class="n">payoff_call_buyer</span> <span class="o">=</span> <span class="n">calculate_payoff_option</span><span class="p">(</span><span class="n">contractual_strike</span><span class="p">,</span> <span class="n">ending_price</span><span class="p">,</span> <span class="n">option_premium</span><span class="p">,</span> <span class="s2">"CALL"</span><span class="p">,</span> <span class="s2">"Buyer"</span><span class="p">)</span>
+<span class="n">payoff_call_seller</span> <span class="o">=</span> <span class="n">calculate_payoff_option</span><span class="p">(</span><span class="n">contractual_strike</span><span class="p">,</span> <span class="n">ending_price</span><span class="p">,</span> <span class="n">option_premium</span><span class="p">,</span> <span class="s2">"CALL"</span><span class="p">,</span> <span class="s2">"Seller"</span><span class="p">)</span>
+<span class="n">payoff_put_buyer</span> <span class="o">=</span> <span class="n">calculate_payoff_option</span><span class="p">(</span><span class="n">contractual_strike</span><span class="p">,</span> <span class="n">ending_price</span><span class="p">,</span> <span class="n">option_premium</span><span class="p">,</span> <span class="s2">"PUT"</span><span class="p">,</span> <span class="s2">"Buyer"</span><span class="p">)</span>
+<span class="n">payoff_put_seller</span> <span class="o">=</span> <span class="n">calculate_payoff_option</span><span class="p">(</span><span class="n">contractual_strike</span><span class="p">,</span> <span class="n">ending_price</span><span class="p">,</span> <span class="n">option_premium</span><span class="p">,</span> <span class="s2">"PUT"</span><span class="p">,</span> <span class="s2">"Seller"</span><span class="p">)</span>
+
+<span class="c1"># Print</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\\n</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Payoff of the CALL Purchaser : "</span><span class="p">,</span> <span class="n">payoff_call_buyer</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Payoff of the CALL Seller : "</span><span class="p">,</span> <span class="n">payoff_call_seller</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Payoff of the PUT Purchaser : "</span><span class="p">,</span> <span class="n">payoff_put_buyer</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Payoff of the PUT Seller : "</span><span class="p">,</span> <span class="n">payoff_put_seller</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>CALL executed for the buyer
+CALL executed for the seller
+PUT not executed for the buyer
+PUT  not executed for the seller
+
+
+Payoff of the CALL Purchaser :  10
+Payoff of the CALL Seller :  -10
+Payoff of the PUT Purchaser :  -5
+Payoff of the PUT Seller :  5</pre></details>
+<p>Although this session does not cover option pricing, the pricing methods will be explored in Session 7. In that session, we will use Monte Carlo simulations to estimate the fair price of a call or put option—i.e., the amount an investor should be willing to pay for the option.</p>
+<p>Heuristic investment rule : When building an investment portfolio consisting of high-risk (high-yield) and low-risk (bonds) assets, it is essential to consider an individual’s age as a guiding factor for asset allocation. A general rule, endorsed by economists, is to allocate a percentage of the portfolio to low-risk assets based on your age. For instance, if you are 25 years old, 25% of your portfolio should be invested in low-risk assets, while the remaining 75% can be allocated to high-yield (riskier) investments.</p>
+<p><em>This rule is purely practical and is not derived from rigorous portfolio theory</em></p>
+` },
          { slug: "session-7", label: "Session 7", title: "Quantitative methods and simulations for Finance", embedUrl: "" },
          { slug: "session-8", label: "Session 8", title: "Financial risk assessment", embedUrl: "" },
          { slug: "final-project", label: "Final Project", title: "Portfolio diversification, risk management, and strategy development", embedUrl: "", html: `
