@@ -738,6 +738,11 @@ function TeachingPage() {
               <Link to={`/teaching/${c.slug}`} className="nav-card" key={c.slug}>
                 <h3>{c.title}</h3>
                 <p>{c.org} · {c.sessions.length} pages of material{c.accessCodeHash ? " · access code required" : ""}</p>
+                {c.satisfaction && (
+                  <div className="tag-row mt-sm">
+                    <span className="tag">{c.satisfaction} student satisfaction</span>
+                  </div>
+                )}
                 <span className="nav-card-cta">Open the course →</span>
               </Link>
             ))}

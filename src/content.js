@@ -314,6 +314,7 @@
        slug: "python-for-finance",
        title: "Python for Finance",
        org: "Audencia Business School",
+       satisfaction: "91%",
        accessCodeHash:
          "7fdf98b53e01373c764f61cb6038465eafcb04fafc3307a7a28692fc216f14dd",
        description:
