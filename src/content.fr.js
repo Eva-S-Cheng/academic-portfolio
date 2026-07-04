@@ -7,15 +7,15 @@
 
 export const FR = {
   AFFILIATION:
-    "Chercheuse invit\u00e9e, Audencia Business School \u00b7 Doctorante entrante, ESCP Business School",
+    "Chercheuse invit\u00e9e, Audencia Business School \u00b7 Future Doctorante, ESCP Business School",
 
   HERO_LEDE:
     "J'\u00e9tudie la mani\u00e8re dont les risques climatiques, naturels et sociaux influencent les d\u00e9cisions des entreprises et les march\u00e9s financiers, comment les investisseurs orientent les pratiques de durabilit\u00e9 des entreprises, et comment l'intelligence artificielle peut soutenir l'analyse des publications d'entreprises.",
 
   BIO: [
     "Ma recherche se situe \u00e0 l'intersection de la finance, de la durabilit\u00e9 et des m\u00e9thodes quantitatives. J'examine comment les risques climatiques, naturels et sociaux influencent les d\u00e9cisions des entreprises et les march\u00e9s financiers, comment les investisseurs orientent les pratiques de durabilit\u00e9 des entreprises, et comment l'intelligence artificielle peut \u00eatre appliqu\u00e9e \u00e0 l'analyse des publications d'entreprises et du reporting de durabilit\u00e9. Mes travaux mobilisent l'\u00e9conom\u00e9trie, la valorisation d'actifs financiers et immobiliers, et le machine learning appliqu\u00e9 \u00e0 la finance.",
-    "Je suis venue \u00e0 la recherche apr\u00e8s plusieurs ann\u00e9es en entreprise. Apr\u00e8s un MSc in Data Management for Finance, dont je suis sortie major de promotion, j'ai travaill\u00e9 comme analyste financi\u00e8re en promotion immobili\u00e8re puis comme gestionnaire actif-passif en banque, en m'appuyant sur une premi\u00e8re exp\u00e9rience de data analyst. Ce parcours nourrit les questions empiriques que j'\u00e9tudie.",
-    "Je suis actuellement chercheuse invit\u00e9e \u00e0 Audencia Business School, en position pr\u00e9doctorale, en pr\u00e9paration de mon doctorat \u00e0 ESCP Business School. J'ai \u00e9galement enseign\u00e9 Python et la finance quantitative \u00e0 des \u00e9tudiants de niveau master en tant que charg\u00e9e de cours.",
+    "Je suis venue \u00e0 faire de la recherche apr\u00e8s plusieurs ann\u00e9es en entreprise. Apr\u00e8s un MSc in Data Management for Finance, dont je suis sortie major de promotion, j'ai travaill\u00e9 comme analyste financi\u00e8re en promotion immobili\u00e8re puis comme gestionnaire actif-passif en banque, en m'appuyant sur une premi\u00e8re exp\u00e9rience de data analyst. Ce parcours nourrit les questions empiriques que j'\u00e9tudie.",
+    "Je suis actuellement chercheuse invit\u00e9e \u00e0 Audencia Business School, en position pr\u00e9doctorale, en pr\u00e9paration de mon doctorat \u00e0 ESCP Business School. J'ai \u00e9galement enseign\u00e9 Python et la finance quantitative \u00e0 des \u00e9tudiants de niveau master en tant que vacataire.",
   ],
 
   RESEARCH_STATEMENT: [
@@ -75,7 +75,7 @@ export const FR = {
     {
       name: "Alberta Di Giuli",
       role: "Directrice de th\u00e8se",
-      org: "Professeure de finance & Doyenne du campus de Turin, ESCP Business School",
+      org: "Professeure de finance & Dean du campus de Turin, ESCP Business School",
       scholar: "https://scholar.google.com/citations?user=wyQf0M0AAAAJ",
       linkedin: "https://it.linkedin.com/in/alberta-di-giuli",
       website: "https://sites.google.com/site/albertadigiuli/home",
@@ -112,7 +112,7 @@ export const FR = {
         "L'ESILV forme des ing\u00e9nieurs g\u00e9n\u00e9ralistes avec une forte dominante num\u00e9rique. Le cursus int\u00e8gre la finance de march\u00e9, la programmation et les math\u00e9matiques appliqu\u00e9es avanc\u00e9es, offrant un socle solide en finance quantitative. Les enseignements couvrent les concepts financiers, les risques de march\u00e9, la programmation pour la finance (R, Python, VBA et C++), le machine learning pour la gestion d'actifs, l'\u00e9conom\u00e9trie, les probabilit\u00e9s avanc\u00e9es, le calcul stochastique, l'investissement et la gestion d'actifs, ainsi que le pricing et la couverture de produits d\u00e9riv\u00e9s.",
     },
     {
-      degree: "Licence Sciences, Technologies, Sant\u00e9, sp\u00e9cialit\u00e9 informatique",
+      degree: "Licence Sciences, Technologies, Sant\u00e9, mention informatique",
       school: "Universit\u00e9 Gustave Eiffel",
       orgUrl: "https://www.univ-gustave-eiffel.fr",
       orgDomain: "univ-gustave-eiffel.fr",
@@ -145,19 +145,19 @@ export const FR = {
 
   TEACHING_EXPERIENCE: [
     {
-      role: "Charg\u00e9e de cours en Python et finance quantitative",
+      role: "Enseignante vacataire en Python et finance quantitative",
       org: "Audencia Business School",
       orgUrl: "https://www.audencia.com",
       orgDomain: "audencia.com",
       period: "2024 \u2013 aujourd'hui",
       details:
-        "En tant que charg\u00e9e de cours \u00e0 Audencia, j'enseigne Python, la finance quantitative et l'analyse de donn\u00e9es, avec un accent sur les applications pratiques de la th\u00e9orie financi\u00e8re. Le programme couvre la mod\u00e9lisation financi\u00e8re, l'\u00e9valuation des risques et l'analyse de donn\u00e9es en Python. Les \u00e9tudiants apprennent les m\u00e9thodes de programmation Python pour la finance, leur permettant de traiter, explorer, visualiser et analyser les donn\u00e9es. Le cours aborde notamment l'analyse de donn\u00e9es, la construction de portefeuille, la mesure du risque et l'utilisation des biblioth\u00e8ques Python pour les simulations et pr\u00e9dictions en finance de march\u00e9.",
+        "En tant qu'enseignante vacataire \u00e0 Audencia, j'enseigne Python, la finance quantitative et l'analyse de donn\u00e9es, avec un accent sur les applications pratiques de la th\u00e9orie financi\u00e8re. Le programme couvre la mod\u00e9lisation financi\u00e8re, l'\u00e9valuation des risques et l'analyse de donn\u00e9es en Python. Les \u00e9tudiants apprennent les m\u00e9thodes de programmation Python pour la finance, leur permettant de traiter, explorer, visualiser et analyser les donn\u00e9es. Le cours aborde notamment l'analyse de donn\u00e9es, la construction de portefeuille, la mesure du risque et l'utilisation des biblioth\u00e8ques Python pour les simulations et pr\u00e9dictions en finance de march\u00e9.",
     },
   ],
 
   ACADEMIC_POSITIONS: [
     {
-      role: "Assistante de recherche invit\u00e9e",
+      role: "Chercheuse invit\u00e9e (au statut prédoctoral)",
       org: "Audencia Business School",
       orgUrl: "https://www.audencia.com",
       orgDomain: "audencia.com",
@@ -165,13 +165,13 @@ export const FR = {
       details: null,
     },
     {
-      role: "Charg\u00e9e de cours en Python et finance quantitative",
+      role: "Enseignante vacataire en Python et finance quantitative",
       org: "Audencia Business School",
       orgUrl: "https://www.audencia.com",
       orgDomain: "audencia.com",
       period: "2024 \u2013 aujourd'hui",
       details:
-        "En tant que charg\u00e9e de cours \u00e0 Audencia, j'enseigne Python, la finance quantitative et l'analyse de donn\u00e9es, avec un accent sur les applications pratiques de la th\u00e9orie financi\u00e8re. Le programme couvre la mod\u00e9lisation financi\u00e8re, l'\u00e9valuation des risques et l'analyse de donn\u00e9es en Python. Les \u00e9tudiants apprennent les m\u00e9thodes de programmation Python pour la finance, leur permettant de traiter, explorer, visualiser et analyser les donn\u00e9es. Le cours aborde notamment l'analyse de donn\u00e9es, la construction de portefeuille, la mesure du risque et l'utilisation des biblioth\u00e8ques Python pour les simulations et pr\u00e9dictions en finance de march\u00e9.",
+        "En tant qu'enseignante vacataire \u00e0 Audencia, j'enseigne Python, la finance quantitative et l'analyse de donn\u00e9es, avec un accent sur les applications pratiques de la th\u00e9orie financi\u00e8re. Le programme couvre la mod\u00e9lisation financi\u00e8re, l'\u00e9valuation des risques et l'analyse de donn\u00e9es en Python. Les \u00e9tudiants apprennent les m\u00e9thodes de programmation Python pour la finance, leur permettant de traiter, explorer, visualiser et analyser les donn\u00e9es. Le cours aborde notamment l'analyse de donn\u00e9es, la construction de portefeuille, la mesure du risque et l'utilisation des biblioth\u00e8ques Python pour les simulations et pr\u00e9dictions en finance de march\u00e9.",
     },
   ],
 
