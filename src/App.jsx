@@ -1,10 +1,100 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, Route, Routes, useLocation, useParams } from "react-router-dom";
 import {
   ORCID_ID, LINKS, PROFILE_LINKS, AFFILIATION, HERO_LEDE, BIO, SKILLS, LANGUAGES,
   RESEARCH_STATEMENT, INTERESTS, WORKING_PAPERS, REPORTS, PROJECTS, EDUCATION,
   TEACHING_EXPERIENCE, ACADEMIC_POSITIONS, PROFESSIONAL_EXPERIENCE, COURSES, COLLABORATORS, COPYRIGHT_NOTICE,
 } from "./content.js";
+import { FR } from "./content.fr.js";
+
+/* ---------- Language (EN default, FR optional; courses stay EN) ---------- */
+
+const EN_CONTENT = {
+  AFFILIATION, HERO_LEDE, BIO, RESEARCH_STATEMENT, INTERESTS, LANGUAGES, PROJECTS,
+  COLLABORATORS, EDUCATION, TEACHING_EXPERIENCE, ACADEMIC_POSITIONS, PROFESSIONAL_EXPERIENCE,
+};
+
+const UI = {
+  en: {
+    nav: { home: "Home", research: "Research", teaching: "Teaching", projects: "Projects", cv: "Curriculum Vitae" },
+    heroExplore: "Explore my research", heroDownload: "Download CV ↗",
+    aboutEyebrow: "About", aboutTitle: ["Finance, sustainability & ", "quantitative methods"],
+    interestsLabel: "Research interests", skillsLabel: "Technical skills", languagesLabel: "Languages",
+    exploreEyebrow: "Explore", browse: "Browse →",
+    cardResearchP: "Publications synchronized from ORCID, working papers, theses and co-authors.",
+    cardTeachingP: "My teaching positions and courses, with material available online for enrolled students.",
+    cardProjectsP: "Side projects around data, music and automation, built outside of research.",
+    cardCvP: "Education, academic positions and professional experience. Full CV in English and French.",
+    researchTitle: ["Research & ", "projects"],
+    pubEyebrow: "Synchronized from ORCID ", pubTitle: ["Publications & ", "working papers"],
+    reportsEyebrow: "Not for publication", reportsTitle: ["Theses & ", "research reports"],
+    interestsTitle: ["Research ", "interests"],
+    peopleEyebrow: "People", peopleTitle: ["Co-authors & ", "supervisors"],
+    discussBtn: "Discuss research",
+    orcidError: ["The ORCID record could not be loaded. It remains available on ", " and ", ". The entries below are listed from this site's records."],
+    abstract: "Abstract", hideAbstract: "Hide abstract", cite: "Cite", view: "View",
+    copyClipboard: "Copy to clipboard", copied: "Copied ✓",
+    teachingTitle: "Teaching", positionsEyebrow: "Positions",
+    coursesEyebrow: "Courses", coursesTitle: ["Course ", "material"],
+    pagesOf: "pages of material", codeRequired: "access code required",
+    satisfaction: "student satisfaction", openCourse: "Open the course →",
+    contactTeaching: "Contact about teaching",
+    projectsTitle: ["Side ", "projects"],
+    projectsSub: "Personal projects built outside of research, around data, music and automation.",
+    cvTitle: ["Curriculum ", "Vitae"],
+    academicPositions: "Academic positions", education: "Education", professionalExp: "Professional experience",
+    getInTouch: "Get in touch", details: "Details", hideDetails: "Hide details",
+    courseContents: "Course contents",
+    gateTitle: "This material is reserved for enrolled students.",
+    gateSub: "Enter the access code provided in class. It will be remembered on this device.",
+    gatePlaceholder: "Access code", gateUnlock: "Unlock", gateChecking: "Checking…",
+    gateError: "Incorrect code. Please try again.", gateNoCode: "No code?", gateContact: "Contact me by email",
+    notFoundEyebrow: "Error 404", notFoundTitle: "This page does not exist", backHome: "Back to home",
+    footContact: "Contact", footProfiles: "Profiles", footNavigate: "Navigate",
+    colophon: ["Publications are synchronized from ", "."],
+  },
+  fr: {
+    nav: { home: "Accueil", research: "Recherche", teaching: "Enseignement", projects: "Projets", cv: "Curriculum Vitae" },
+    heroExplore: "Explorer ma recherche", heroDownload: "Télécharger le CV ↗",
+    aboutEyebrow: "À propos", aboutTitle: ["Finance, durabilité & ", "méthodes quantitatives"],
+    interestsLabel: "Intérêts de recherche", skillsLabel: "Compétences techniques", languagesLabel: "Langues",
+    exploreEyebrow: "Explorer", browse: "Parcourir →",
+    cardResearchP: "Publications synchronisées depuis ORCID, documents de travail, thèses et co-auteurs.",
+    cardTeachingP: "Mes postes d'enseignement et mes cours, avec les supports en ligne pour les étudiants inscrits.",
+    cardProjectsP: "Projets personnels autour de la data, de la musique et de l'automatisation, hors recherche.",
+    cardCvP: "Formation, positions académiques et expérience professionnelle. CV complet en anglais et en français.",
+    researchTitle: ["Recherche & ", "projets"],
+    pubEyebrow: "Synchronisé depuis ORCID ", pubTitle: ["Publications & ", "documents de travail"],
+    reportsEyebrow: "Non destinés à publication", reportsTitle: ["Thèses & ", "rapports de recherche"],
+    interestsTitle: ["Intérêts de ", "recherche"],
+    peopleEyebrow: "Collaborations", peopleTitle: ["Co-auteurs & ", "encadrants"],
+    discussBtn: "Discuter de recherche",
+    orcidError: ["Le registre ORCID n'a pas pu être chargé. Il reste disponible sur ", " et ", ". Les entrées ci-dessous proviennent des fiches de ce site."],
+    abstract: "Résumé", hideAbstract: "Masquer le résumé", cite: "Citer", view: "Voir",
+    copyClipboard: "Copier", copied: "Copié ✓",
+    teachingTitle: "Enseignement", positionsEyebrow: "Postes",
+    coursesEyebrow: "Cours", coursesTitle: ["Supports de ", "cours"],
+    pagesOf: "pages de contenu", codeRequired: "code d'accès requis",
+    satisfaction: "de satisfaction étudiante", openCourse: "Ouvrir le cours →",
+    contactTeaching: "Me contacter (enseignement)",
+    projectsTitle: ["Projets ", "personnels"],
+    projectsSub: "Projets personnels menés en dehors de la recherche, autour de la data, de la musique et de l'automatisation.",
+    cvTitle: ["Curriculum ", "Vitae"],
+    academicPositions: "Positions académiques", education: "Formation", professionalExp: "Expérience professionnelle",
+    getInTouch: "Me contacter", details: "Détails", hideDetails: "Masquer les détails",
+    courseContents: "Sommaire du cours",
+    gateTitle: "Ce contenu est réservé aux étudiants inscrits.",
+    gateSub: "Saisissez le code d'accès communiqué en cours. Il sera mémorisé sur cet appareil.",
+    gatePlaceholder: "Code d'accès", gateUnlock: "Déverrouiller", gateChecking: "Vérification…",
+    gateError: "Code incorrect. Veuillez réessayer.", gateNoCode: "Pas de code ?", gateContact: "Contactez-moi par email",
+    notFoundEyebrow: "Erreur 404", notFoundTitle: "Cette page n'existe pas", backHome: "Retour à l'accueil",
+    footContact: "Contact", footProfiles: "Profils", footNavigate: "Navigation",
+    colophon: ["Les publications sont synchronisées depuis ", "."],
+  },
+};
+
+const LangContext = createContext({ lang: "en", setLang: () => {}, t: UI.en, pick: (k) => EN_CONTENT[k] });
+const useLang = () => useContext(LangContext);
 
 /* ============================================================
    Eva Cheng — Academic Portfolio · v8
@@ -162,6 +252,7 @@ function useCourseAccess(course) {
 }
 
 function AccessGate({ course, onUnlock }) {
+  const { t } = useLang();
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -176,27 +267,25 @@ function AccessGate({ course, onUnlock }) {
 
   return (
     <div className="gate">
-      <p className="gate-title">This material is reserved for enrolled students.</p>
-      <p className="gate-sub">
-        Enter the access code provided in class. It will be remembered on this device.
-      </p>
+      <p className="gate-title">{t.gateTitle}</p>
+      <p className="gate-sub">{t.gateSub}</p>
       <div className="gate-row">
         <input
           className="gate-input"
           type="password"
           value={code}
-          placeholder="Access code"
+          placeholder={t.gatePlaceholder}
           aria-label="Access code"
           onChange={(e) => { setCode(e.target.value); setError(false); }}
           onKeyDown={(e) => e.key === "Enter" && submit()}
         />
         <button className="btn btn-solid" onClick={submit} disabled={checking}>
-          {checking ? "Checking…" : "Unlock"}
+          {checking ? t.gateChecking : t.gateUnlock}
         </button>
       </div>
-      {error && <p className="gate-error">Incorrect code. Please try again.</p>}
+      {error && <p className="gate-error">{t.gateError}</p>}
       <p className="gate-help">
-        No code? <a href={`mailto:${LINKS.emailPro}?subject=[QUESTION_PYTHON] Access code`}>Contact me by email</a>.
+        {t.gateNoCode} <a href={`mailto:${LINKS.emailPro}?subject=[QUESTION_PYTHON] Access code`}>{t.gateContact}</a>.
       </p>
     </div>
   );
@@ -221,6 +310,7 @@ function useClipboard() {
 }
 
 function CiteModal({ citation, onClose }) {
+  const { t } = useLang();
   const [tab, setTab] = useState("bibtex");
   const { copied, copy } = useClipboard();
   const text = tab === "bibtex" ? citation.bibtex : citation.apa;
@@ -248,7 +338,7 @@ function CiteModal({ citation, onClose }) {
         <pre className="cite-block">{text}</pre>
         <div className="modal-foot">
           <button className="btn btn-solid" onClick={() => copy(text)}>
-            {copied ? "Copied ✓" : "Copy to clipboard"}
+            {copied ? t.copied : t.copyClipboard}
           </button>
         </div>
       </div>
@@ -257,6 +347,7 @@ function CiteModal({ citation, onClose }) {
 }
 
 function PubItem({ title, authors, venue, year, type, link, citation, abstract }) {
+  const { t } = useLang();
   const [open, setOpen] = useState(false);
   const [citing, setCiting] = useState(false);
   return (
@@ -270,10 +361,10 @@ function PubItem({ title, authors, venue, year, type, link, citation, abstract }
       {venue && <p className="pub-venue">{venue}</p>}
       <div className="pub-actions">
         {link && <a href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>}
-        {citation && <button onClick={() => setCiting(true)}>Cite</button>}
+        {citation && <button onClick={() => setCiting(true)}>{t.cite}</button>}
         {abstract && (
           <button onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-            {open ? "Hide abstract" : "Abstract"}
+            {open ? t.hideAbstract : t.abstract}
           </button>
         )}
       </div>
@@ -302,6 +393,7 @@ function OrgMark({ domain, name, logoUrl }) {
 }
 
 function CvEntry({ heading, org, orgUrl, orgDomain, logoUrl, period, honors, details }) {
+  const { t } = useLang();
   const [open, setOpen] = useState(false);
   return (
     <article className="cv-entry">
@@ -318,7 +410,7 @@ function CvEntry({ heading, org, orgUrl, orgDomain, logoUrl, period, honors, det
         {details && (
           <>
             <button className="text-link" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-              {open ? "Hide details" : "Details"}
+              {open ? t.hideDetails : t.details}
             </button>
             {open && <p className="cv-details">{details}</p>}
           </>
@@ -331,14 +423,15 @@ function CvEntry({ heading, org, orgUrl, orgDomain, logoUrl, period, honors, det
 /* ---------- Chrome ---------- */
 
 const NAV = [
-  { to: "/", label: "Home", end: true },
-  { to: "/research", label: "Research" },
-  { to: "/teaching", label: "Teaching" },
-  { to: "/projects", label: "Projects" },
-  { to: "/cv", label: "Curriculum Vitae" },
+  { to: "/", key: "home", end: true },
+  { to: "/research", key: "research" },
+  { to: "/teaching", key: "teaching" },
+  { to: "/projects", key: "projects" },
+  { to: "/cv", key: "cv" },
 ];
 
 function Header({ theme, onToggleTheme }) {
+  const { lang, setLang, t } = useLang();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
@@ -358,7 +451,7 @@ function Header({ theme, onToggleTheme }) {
           {NAV.map((item) =>
             item.to === "/teaching" ? (
               <div className="nav-drop" key={item.to}>
-                <NavLink to={item.to}>{item.label}</NavLink>
+                <NavLink to={item.to}>{t.nav[item.key]}</NavLink>
                 <div className="nav-menu">
                   <div className="nav-menu-panel">
                     {COURSES.map((c) => (
@@ -383,13 +476,17 @@ function Header({ theme, onToggleTheme }) {
                 </div>
               </div>
             ) : (
-              <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
+              <NavLink key={item.to} to={item.to} end={item.end}>{t.nav[item.key]}</NavLink>
             )
           )}
         </nav>
         <button className="menu-toggle" onClick={() => setMenuOpen((o) => !o)}
           aria-expanded={menuOpen} aria-label="Menu">
           {menuOpen ? "✕" : "☰"}
+        </button>
+        <button className="lang-toggle" onClick={() => setLang(lang === "fr" ? "en" : "fr")}
+          aria-label={lang === "fr" ? "Switch to English" : "Passer en français"}>
+          {lang === "fr" ? "EN" : "FR"}
         </button>
         <button className="theme-toggle" onClick={onToggleTheme}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
@@ -399,7 +496,7 @@ function Header({ theme, onToggleTheme }) {
       {menuOpen && (
         <nav className="mobile-menu" aria-label="Main mobile">
           {NAV.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end}>{item.label}</NavLink>
+            <NavLink key={item.to} to={item.to} end={item.end}>{t.nav[item.key]}</NavLink>
           ))}
         </nav>
       )}
@@ -408,20 +505,21 @@ function Header({ theme, onToggleTheme }) {
 }
 
 function Footer() {
+  const { t, pick } = useLang();
   return (
     <footer className="site-footer">
       <div className="wrap footer-grid">
         <div>
           <p className="footer-name">Eva <em>Cheng</em></p>
-          <p className="footer-aff">{AFFILIATION}</p>
+          <p className="footer-aff">{pick("AFFILIATION")}</p>
         </div>
         <div>
-          <p className="foot-label">Contact</p>
+          <p className="foot-label">{t.footContact}</p>
           <p className="foot-line"><a href={`mailto:${LINKS.emailAcademic}`}>{LINKS.emailAcademic}</a></p>
           <p className="foot-line"><a href={`mailto:${LINKS.emailPro}`}>{LINKS.emailPro}</a></p>
         </div>
         <div>
-          <p className="foot-label">Profiles</p>
+          <p className="foot-label">{t.footProfiles}</p>
           {PROFILE_LINKS.map((l) => (
             <p className="foot-line" key={l.label}>
               <a href={l.url} target="_blank" rel="noreferrer">{l.label}</a>
@@ -429,9 +527,9 @@ function Footer() {
           ))}
         </div>
         <div>
-          <p className="foot-label">Navigate</p>
+          <p className="foot-label">{t.footNavigate}</p>
           {NAV.map((item) => (
-            <p className="foot-line" key={item.to}><Link to={item.to}>{item.label}</Link></p>
+            <p className="foot-line" key={item.to}><Link to={item.to}>{t.nav[item.key]}</Link></p>
           ))}
           {COURSES.map((c) => (
             <p className="foot-line" key={c.slug}><Link to={`/teaching/${c.slug}`}>{c.title}</Link></p>
@@ -439,8 +537,8 @@ function Footer() {
         </div>
       </div>
       <div className="wrap colophon">
-        © {new Date().getFullYear()} Eva Cheng. Publications are synchronized from{" "}
-        <a href={LINKS.orcid} target="_blank" rel="noreferrer">ORCID</a>. {COPYRIGHT_NOTICE}
+        © {new Date().getFullYear()} Eva Cheng. {t.colophon[0]}
+        <a href={LINKS.orcid} target="_blank" rel="noreferrer">ORCID</a>{t.colophon[1]} {COPYRIGHT_NOTICE}
       </div>
     </footer>
   );
@@ -473,18 +571,19 @@ function Portrait() {
 /* ---------- Pages ---------- */
 
 function HomePage() {
+  const { t, pick } = useLang();
   return (
     <>
       <PageHead title="" />
       <section className="hero">
         <div className="wrap hero-grid">
           <div>
-            <Eyebrow>{AFFILIATION}</Eyebrow>
+            <Eyebrow>{pick("AFFILIATION")}</Eyebrow>
             <h1 className="hero-name">Eva <em>Cheng</em></h1>
-            <p className="hero-lede">{HERO_LEDE}</p>
+            <p className="hero-lede">{pick("HERO_LEDE")}</p>
             <div className="btn-row">
-              <Link className="btn btn-solid" to="/research">Explore my research</Link>
-              <a className="btn" href={LINKS.cvEN} target="_blank" rel="noreferrer">Download CV ↗</a>
+              <Link className="btn btn-solid" to="/research">{t.heroExplore}</Link>
+              <a className="btn" href={LINKS.cvEN} target="_blank" rel="noreferrer">{t.heroDownload}</a>
             </div>
             <ul className="hero-profiles" aria-label="Profiles">
               {PROFILE_LINKS.map((l) => (
@@ -500,26 +599,26 @@ function HomePage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>About</Eyebrow>
-          <h2 className="section-title">Finance, sustainability &amp; <em>quantitative methods</em></h2>
+          <Eyebrow>{t.aboutEyebrow}</Eyebrow>
+          <h2 className="section-title">{t.aboutTitle[0]}<em>{t.aboutTitle[1]}</em></h2>
           <div className="cols">
             <div>
               <div className="prose about-prose">
-                {BIO.map((p, i) => (<p key={i}>{p}</p>))}
+                {pick("BIO").map((p, i) => (<p key={i}>{p}</p>))}
               </div>
-              <p className="side-label">Research interests</p>
+              <p className="side-label">{t.interestsLabel}</p>
               <div className="tag-row">
-                {INTERESTS.map((t) => (<span className="tag" key={t}>{t}</span>))}
+                {pick("INTERESTS").map((x) => (<span className="tag" key={x}>{x}</span>))}
               </div>
             </div>
             <div className="side-card">
-              <p className="side-label">Technical skills</p>
+              <p className="side-label">{t.skillsLabel}</p>
               <div className="tag-row">
                 {SKILLS.map((s) => (<span className="tag tag-quiet" key={s}>{s}</span>))}
               </div>
-              <p className="side-label mt">Languages</p>
+              <p className="side-label mt">{t.languagesLabel}</p>
               <div className="tag-row">
-                {LANGUAGES.map((l) => (<span className="tag tag-quiet" key={l}>{l}</span>))}
+                {pick("LANGUAGES").map((l) => (<span className="tag tag-quiet" key={l}>{l}</span>))}
               </div>
             </div>
           </div>
@@ -528,18 +627,18 @@ function HomePage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>Explore</Eyebrow>
+          <Eyebrow>{t.exploreEyebrow}</Eyebrow>
           <div className="card-grid">
             {[
-              { to: "/research", h: "Research", p: "Publications synchronized from ORCID, working papers, theses and co-authors." },
-              { to: "/teaching", h: "Teaching", p: "My teaching positions and courses, with material available online for enrolled students." },
-              { to: "/projects", h: "Projects", p: "Side projects around data, music and automation, built outside of research." },
-              { to: "/cv", h: "Curriculum Vitae", p: "Education, academic positions and professional experience. Full CV in English and French." },
+              { to: "/research", h: t.nav.research, p: t.cardResearchP },
+              { to: "/teaching", h: t.nav.teaching, p: t.cardTeachingP },
+              { to: "/projects", h: t.nav.projects, p: t.cardProjectsP },
+              { to: "/cv", h: t.nav.cv, p: t.cardCvP },
             ].map((c) => (
               <Link to={c.to} className="nav-card" key={c.to}>
                 <h3>{c.h}</h3>
                 <p>{c.p}</p>
-                <span className="nav-card-cta">Browse →</span>
+                <span className="nav-card-cta">{t.browse}</span>
               </Link>
             ))}
           </div>
@@ -550,6 +649,7 @@ function HomePage() {
 }
 
 function ResearchPage() {
+  const { t, pick } = useLang();
   const { status, works } = useOrcidWorks();
   const curated = useMemo(() => [...WORKING_PAPERS, ...REPORTS], []);
 
@@ -565,8 +665,8 @@ function ResearchPage() {
       <PageHead title="Research" />
       <section className="page-hero">
         <div className="wrap">
-          <Eyebrow>Research</Eyebrow>
-          <h1 className="page-title">Research &amp; <em>projects</em></h1>
+          <Eyebrow>{t.nav.research}</Eyebrow>
+          <h1 className="page-title">{t.researchTitle[0]}<em>{t.researchTitle[1]}</em></h1>
         </div>
       </section>
 
@@ -574,12 +674,12 @@ function ResearchPage() {
         <div className="wrap">
           <div className="cols">
             <div className="prose">
-              {RESEARCH_STATEMENT.map((p, i) => (<p key={i}>{p}</p>))}
+              {pick("RESEARCH_STATEMENT").map((p, i) => (<p key={i}>{p}</p>))}
             </div>
             <div className="side-card">
-              <p className="side-label">Research interests</p>
+              <p className="side-label">{t.interestsLabel}</p>
               <div className="tag-row">
-                {INTERESTS.map((t) => (<span className="tag" key={t}>{t}</span>))}
+                {pick("INTERESTS").map((x) => (<span className="tag" key={x}>{x}</span>))}
               </div>
             </div>
           </div>
@@ -588,8 +688,8 @@ function ResearchPage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>Synchronized from ORCID {ORCID_ID}</Eyebrow>
-          <h2 className="section-title">Publications &amp; <em>working papers</em></h2>
+          <Eyebrow>{t.pubEyebrow}{ORCID_ID}</Eyebrow>
+          <h2 className="section-title">{t.pubTitle[0]}<em>{t.pubTitle[1]}</em></h2>
 
           {status === "loading" && (
             <div className="skeleton-list" aria-hidden="true">
@@ -598,10 +698,9 @@ function ResearchPage() {
           )}
           {status === "error" && (
             <p className="notice">
-              The ORCID record could not be loaded. It remains available on{" "}
-              <a href={LINKS.orcid} target="_blank" rel="noreferrer">orcid.org</a> and{" "}
-              <a href={LINKS.scholar} target="_blank" rel="noreferrer">Google Scholar</a>.
-              The entries below are listed from this site's records.
+              {t.orcidError[0]}
+              <a href={LINKS.orcid} target="_blank" rel="noreferrer">orcid.org</a>{t.orcidError[1]}
+              <a href={LINKS.scholar} target="_blank" rel="noreferrer">Google Scholar</a>{t.orcidError[2]}
             </p>
           )}
 
@@ -611,7 +710,7 @@ function ResearchPage() {
                 authors={w.matched ? w.authors : (w.contributors.length > 0 ? w.contributors.join(", ") : null)}
                 venue={w.matched ? w.venue : w.journal}
                 type={w.type} year={w.year}
-                link={w.matched ? w.link : (w.url ? { label: "View", url: w.url } : null)}
+                link={w.matched ? w.link : (w.url ? { label: t.view, url: w.url } : null)}
                 citation={w.citation} abstract={w.abstract} />
             ))}
             {(status !== "loading" ? wpNotInOrcid : []).map((p) => (
@@ -625,8 +724,8 @@ function ResearchPage() {
       {(status === "loading" || reportsNotInOrcid.length > 0) && (
         <section className="section">
           <div className="wrap">
-            <Eyebrow>Not for publication</Eyebrow>
-            <h2 className="section-title">Theses &amp; <em>research reports</em></h2>
+            <Eyebrow>{t.reportsEyebrow}</Eyebrow>
+            <h2 className="section-title">{t.reportsTitle[0]}<em>{t.reportsTitle[1]}</em></h2>
             <div className="pub-list">
               {(status !== "loading" ? reportsNotInOrcid : REPORTS).map((p) => (
                 <PubItem key={p.title} title={p.title} authors={p.authors}
@@ -639,10 +738,10 @@ function ResearchPage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>People</Eyebrow>
-          <h2 className="section-title">Co-authors &amp; <em>supervisors</em></h2>
+          <Eyebrow>{t.peopleEyebrow}</Eyebrow>
+          <h2 className="section-title">{t.peopleTitle[0]}<em>{t.peopleTitle[1]}</em></h2>
           <div className="card-grid">
-            {COLLABORATORS.map((p) => (
+            {pick("COLLABORATORS").map((p) => (
               <article className="nav-card nav-card-static collab-card" key={p.name}>
                 <h3>{p.name}</h3>
                 <p className="collab-role">{p.role}</p>
@@ -656,7 +755,7 @@ function ResearchPage() {
             ))}
           </div>
           <p className="cta-line">
-            <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[RESEARCH]`}>Discuss research</a>
+            <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[RESEARCH]`}>{t.discussBtn}</a>
           </p>
         </div>
       </section>
@@ -665,23 +764,22 @@ function ResearchPage() {
 }
 
 function ProjectsPage() {
+  const { t, pick } = useLang();
   return (
     <>
       <PageHead title="Projects" />
       <section className="page-hero">
         <div className="wrap">
-          <Eyebrow>Projects</Eyebrow>
-          <h1 className="page-title">Side <em>projects</em></h1>
-          <p className="page-sub">
-            Personal projects built outside of research, around data, music and automation.
-          </p>
+          <Eyebrow>{t.nav.projects}</Eyebrow>
+          <h1 className="page-title">{t.projectsTitle[0]}<em>{t.projectsTitle[1]}</em></h1>
+          <p className="page-sub">{t.projectsSub}</p>
         </div>
       </section>
 
       <section className="section">
         <div className="wrap">
           <div className="card-grid">
-            {PROJECTS.map((p) => (
+            {pick("PROJECTS").map((p) => (
               <article className="nav-card nav-card-static" key={p.name}>
                 <h3>
                   {p.link ? (
@@ -702,27 +800,28 @@ function ProjectsPage() {
 }
 
 function TeachingPage() {
+  const { t, pick } = useLang();
   return (
     <>
       <PageHead title="Teaching" />
       <section className="page-hero">
         <div className="wrap">
-          <Eyebrow>Teaching</Eyebrow>
-          <h1 className="page-title">Teaching</h1>
+          <Eyebrow>{t.nav.teaching}</Eyebrow>
+          <h1 className="page-title">{t.teachingTitle}</h1>
         </div>
       </section>
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>Positions</Eyebrow>
+          <Eyebrow>{t.positionsEyebrow}</Eyebrow>
           <div className="prose wide-prose">
-            {TEACHING_EXPERIENCE.map((t) => (
-              <div key={t.role + t.period}>
-                <h3 className="sub-heading">{t.role}</h3>
+            {pick("TEACHING_EXPERIENCE").map((x) => (
+              <div key={x.role + x.period}>
+                <h3 className="sub-heading">{x.role}</h3>
                 <p className="pub-venue">
-                  {t.orgUrl ? <a href={t.orgUrl} target="_blank" rel="noreferrer">{t.org}</a> : t.org} · {t.period}
+                  {x.orgUrl ? <a href={x.orgUrl} target="_blank" rel="noreferrer">{x.org}</a> : x.org} · {x.period}
                 </p>
-                {t.details && <p className="mt-sm">{t.details}</p>}
+                {x.details && <p className="mt-sm">{x.details}</p>}
               </div>
             ))}
           </div>
@@ -731,24 +830,24 @@ function TeachingPage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>Courses</Eyebrow>
-          <h2 className="section-title">Course <em>material</em></h2>
+          <Eyebrow>{t.coursesEyebrow}</Eyebrow>
+          <h2 className="section-title">{t.coursesTitle[0]}<em>{t.coursesTitle[1]}</em></h2>
           <div className="card-grid">
             {COURSES.map((c) => (
               <Link to={`/teaching/${c.slug}`} className="nav-card" key={c.slug}>
                 <h3>{c.title}</h3>
-                <p>{c.org} · {c.sessions.length} pages of material{c.accessCodeHash ? " · access code required" : ""}</p>
+                <p>{c.org} · {c.sessions.length} {t.pagesOf}{c.accessCodeHash ? ` · ${t.codeRequired}` : ""}</p>
                 {c.satisfaction && (
                   <div className="tag-row mt-sm">
-                    <span className="tag">{c.satisfaction} student satisfaction</span>
+                    <span className="tag">{c.satisfaction} {t.satisfaction}</span>
                   </div>
                 )}
-                <span className="nav-card-cta">Open the course →</span>
+                <span className="nav-card-cta">{t.openCourse}</span>
               </Link>
             ))}
           </div>
           <p className="cta-line">
-            <a className="btn" href={`mailto:${LINKS.emailPro}?subject=[TEACHING]`}>Contact about teaching</a>
+            <a className="btn" href={`mailto:${LINKS.emailPro}?subject=[TEACHING]`}>{t.contactTeaching}</a>
           </p>
         </div>
       </section>
@@ -757,6 +856,7 @@ function TeachingPage() {
 }
 
 function CoursePage() {
+  const { t } = useLang();
   const { courseSlug } = useParams();
   const course = findCourse(courseSlug);
   if (!course) return <NotFoundPage />;
@@ -767,7 +867,7 @@ function CoursePage() {
       <section className="page-hero">
         <div className="wrap">
           <Eyebrow>
-            <Link to="/teaching" className="crumb">Teaching</Link> / {course.title}
+            <Link to="/teaching" className="crumb">{t.nav.teaching}</Link> / {course.title}
           </Eyebrow>
           <h1 className="page-title">{course.title}</h1>
           <p className="page-sub">{course.org}</p>
@@ -847,6 +947,7 @@ function SessionContent({ session }) {
 }
 
 function SessionPage() {
+  const { t } = useLang();
   const { courseSlug, slug } = useParams();
   const course = findCourse(courseSlug);
   const index = course ? course.sessions.findIndex((s) => s.slug === slug) : -1;
@@ -862,7 +963,7 @@ function SessionPage() {
       <section className="page-hero">
         <div className="wrap">
           <Eyebrow>
-            <Link to="/teaching" className="crumb">Teaching</Link> /{" "}
+            <Link to="/teaching" className="crumb">{t.nav.teaching}</Link> /{" "}
             <Link to={`/teaching/${course.slug}`} className="crumb">{course.title}</Link> /{" "}
             {session.label}
           </Eyebrow>
@@ -894,7 +995,7 @@ function SessionPage() {
             {prev ? (
               <Link className="btn" to={`/teaching/${course.slug}/${prev.slug}`}>← {prev.label}</Link>
             ) : <span />}
-            <Link className="btn btn-solid pager-toc" to={`/teaching/${course.slug}`}>Course contents</Link>
+            <Link className="btn btn-solid pager-toc" to={`/teaching/${course.slug}`}>{t.courseContents}</Link>
             {next ? (
               <Link className="btn pager-next" to={`/teaching/${course.slug}/${next.slug}`}>{next.label} →</Link>
             ) : <span />}
@@ -906,13 +1007,14 @@ function SessionPage() {
 }
 
 function CVPage() {
+  const { t, pick } = useLang();
   return (
     <>
       <PageHead title="Curriculum Vitae" />
       <section className="page-hero">
         <div className="wrap">
-          <Eyebrow>Curriculum Vitae</Eyebrow>
-          <h1 className="page-title">Curriculum <em>Vitae</em></h1>
+          <Eyebrow>{t.nav.cv}</Eyebrow>
+          <h1 className="page-title">{t.cvTitle[0]}<em>{t.cvTitle[1]}</em></h1>
           <div className="btn-row">
             <a className="btn btn-solid" href={LINKS.cvEN} target="_blank" rel="noreferrer">Download (English) ↗</a>
             <a className="btn" href={LINKS.cvFR} target="_blank" rel="noreferrer">Télécharger (français) ↗</a>
@@ -922,9 +1024,9 @@ function CVPage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>Academic positions</Eyebrow>
+          <Eyebrow>{t.academicPositions}</Eyebrow>
           <div className="cv-list">
-            {ACADEMIC_POSITIONS.map((p) => (
+            {pick("ACADEMIC_POSITIONS").map((p) => (
               <CvEntry key={p.role + p.period} heading={p.role} org={p.org} orgUrl={p.orgUrl}
                 orgDomain={p.orgDomain} period={p.period} details={p.details} />
             ))}
@@ -934,9 +1036,9 @@ function CVPage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>Education</Eyebrow>
+          <Eyebrow>{t.education}</Eyebrow>
           <div className="cv-list">
-            {EDUCATION.map((e) => (
+            {pick("EDUCATION").map((e) => (
               <CvEntry key={e.degree} heading={e.degree} org={e.school} orgUrl={e.orgUrl}
                 orgDomain={e.orgDomain} period={e.year} honors={e.honors} details={e.details} />
             ))}
@@ -946,15 +1048,15 @@ function CVPage() {
 
       <section className="section">
         <div className="wrap">
-          <Eyebrow>Professional experience</Eyebrow>
+          <Eyebrow>{t.professionalExp}</Eyebrow>
           <div className="cv-list">
-            {PROFESSIONAL_EXPERIENCE.map((w) => (
+            {pick("PROFESSIONAL_EXPERIENCE").map((w) => (
               <CvEntry key={w.role + w.period} heading={w.role} org={w.org} orgUrl={w.orgUrl}
                 orgDomain={w.orgDomain} logoUrl={w.logoUrl} period={w.period} details={w.details} />
             ))}
           </div>
           <p className="cta-line">
-            <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[WORK]`}>Get in touch</a>
+            <a className="btn btn-solid" href={`mailto:${LINKS.emailPro}?subject=[WORK]`}>{t.getInTouch}</a>
           </p>
         </div>
       </section>
@@ -963,15 +1065,16 @@ function CVPage() {
 }
 
 function NotFoundPage() {
+  const { t } = useLang();
   return (
     <>
       <PageHead title="Page not found" />
       <section className="page-hero">
         <div className="wrap">
-          <Eyebrow>Error 404</Eyebrow>
-          <h1 className="page-title">This page does not exist</h1>
+          <Eyebrow>{t.notFoundEyebrow}</Eyebrow>
+          <h1 className="page-title">{t.notFoundTitle}</h1>
           <div className="btn-row">
-            <Link className="btn btn-solid" to="/">Back to home</Link>
+            <Link className="btn btn-solid" to="/">{t.backHome}</Link>
           </div>
         </div>
       </section>
@@ -990,13 +1093,33 @@ export default function App() {
     return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   });
 
+  const [lang, setLang] = useState(() => {
+    try {
+      const saved = localStorage.getItem("lang");
+      if (saved === "en" || saved === "fr") return saved;
+    } catch { /* storage unavailable */ }
+    return "en";
+  });
+
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     try { localStorage.setItem("theme", theme); } catch { /* storage unavailable */ }
   }, [theme]);
 
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    try { localStorage.setItem("lang", lang); } catch { /* storage unavailable */ }
+  }, [lang]);
+
+  const langValue = useMemo(() => ({
+    lang,
+    setLang,
+    t: UI[lang],
+    pick: (k) => (lang === "fr" && FR[k] !== undefined ? FR[k] : EN_CONTENT[k]),
+  }), [lang]);
+
   return (
-    <>
+    <LangContext.Provider value={langValue}>
       <style>{STYLES}</style>
       <ScrollToTop />
       <Header theme={theme} onToggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))} />
@@ -1013,7 +1136,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
-    </>
+    </LangContext.Provider>
   );
 }
 
@@ -1157,6 +1280,13 @@ a:hover { color: var(--green-deep); }
   transition: border-color 0.15s ease, transform 0.2s ease;
 }
 .theme-toggle:hover { border-color: var(--green); transform: rotate(12deg); }
+.lang-toggle {
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  height: 34px; padding: 0 12px; border-radius: 999px; cursor: pointer;
+  font-family: var(--font); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.08em;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.lang-toggle:hover { border-color: var(--green); color: var(--green-deep); }
 .menu-toggle {
   display: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
   width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 0.95rem;
@@ -1670,6 +1800,7 @@ details.nb-output .nb-table-wrap { overflow-x: auto; padding: 4px 18px 14px; }
 @media (max-width: 820px) {
   .nav { display: none; }
   .menu-toggle { display: block; margin-left: auto; }
+  .lang-toggle { margin-left: 8px; }
   .theme-toggle { margin-left: 8px; }
   .header-inner { gap: 10px; }
   .hero-grid { grid-template-columns: 1fr; gap: 24px; }
