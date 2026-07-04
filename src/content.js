@@ -1457,7 +1457,7 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
                      <span class="n">color</span> <span class="o">=</span><span class="s1">'Magnitude'</span><span class="p">,</span> <span class="n">hover_name</span> <span class="o">=</span><span class="s1">'Region'</span><span class="p">,</span>  <span class="n">title</span> <span class="o">=</span> <span class="s2">"Magnitude of the manually detected earthquakes"</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
 <details class="nb-output"><summary>Output</summary><pre><figure 0="" 640x480="" axes="" size="" with=""></figure></pre></details>
-<aside class="nb-exercise"><span class="nb-ex-tag">Exercise</span><h3>Evolution in 5 years : <em>In class Exercise (Blitz 15 min), Live coding or Assignment</em></h3><p>From our visuals, we observe that a larger number of earthquakes in the dataset were detected automatically. Manually recorded earthquakes were predominantly located in the Middle East and exhibited lower magnitudes compared to those recorded automatically. To gain further insights, we will compare data from 2018 to 2023.</p></aside><div class="nb-code"><pre><span></span><span class="c1"># Filter by date</span>
+<aside class="nb-exercise"><span class="nb-ex-tag">Blitz exercise</span><h3>Evolution in 5 years : <em>In class Exercise (Blitz 15 min), Live coding or Assignment</em></h3><p>From our visuals, we observe that a larger number of earthquakes in the dataset were detected automatically. Manually recorded earthquakes were predominantly located in the Middle East and exhibited lower magnitudes compared to those recorded automatically. To gain further insights, we will compare data from 2018 to 2023.</p></aside><div class="nb-code"><pre><span></span><span class="c1"># Filter by date</span>
 
 <span class="c1"># Display the head</span></pre></div>
 <div class="nb-code"><pre><span></span><span class="c1"># Filter by date</span>
@@ -1792,7 +1792,996 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 <li><strong>Sensitivity Analysis:</strong> Modify constants or assumptions and observe the impact on ROE. Document your findings with visualizations that highlight these changes.</li>
 </ol>
 ` },
-         { slug: "session-5", label: "Session 5", title: "Introduction to time series and Linear Regression using OLS", embedUrl: "" },
+         { slug: "session-5", label: "Session 5", title: "Introduction to time series and Linear Regression using OLS", embedUrl: "", html: `
+<p>The content of this session will establish a foundational understanding of time series and Ordinary Least Squares (OLS), commonly referred to as Linear Regression, as typically addressed in econometrics courses. In this session, you will learn about:</p>
+<ul>
+<li>The definition and characteristics of time series</li>
+<li>The process of converting a Pandas DataFrame into a time series format</li>
+<li>Applications of time series in data analysis, with a particular emphasis on finance</li>
+<li>A refresher on the concepts of Linear Regression</li>
+<li>Implementing Linear Regression in Python using OLS techniques</li>
+</ul>
+<h2 id="I---Time-Series">I - Time Series</h2><p>In econometrics, time series data comprises sequences of data points indexed in a specific order, typically over a temporal dimension. These series often represent repeated measurements taken at regular intervals—such as annually, monthly, daily, hourly, or minutely—and are commonly employed to illustrate the evolution of quantitative measures, including stock prices, revenue, or profit.</p>
+<p>Time series data can be decomposed into four main components:</p>
+<ul>
+<li><code>Trend</code>: This reflects the general direction in which the data moves over the entire measurement period.</li>
+<li><code>Seasonal Variation</code>: These are predictable movements that occur at regular intervals, reflecting patterns that repeat during similar periods (e.g., sales spikes during holidays).</li>
+<li><code>Cyclical Fluctuation</code>: These represent longer-term oscillations that occur at irregular intervals and are influenced by economic or other cycles.</li>
+<li><code>Irregular or Random Movements</code>: These are unpredictable fluctuations resulting from unforeseen events, which cannot be anticipated based on historical data.</li>
+</ul>
+<h2 id="II---Converting-a-dataframe-to-a-time-series">II - Converting a dataframe to a time series</h2><p>Now that you have acquired the skills to read a file and store the data in a DataFrame, you will advance to transforming that data into a time series format. In this context, the data will be indexed by date or time (referred to as a datetime object in Python) rather than by numerical index.</p>
+<p>To illustrate this process, you may download financial data from specialized websites such as Refinitiv Eikon, Bloomberg, Yahoo Finance (or by utilizing the library known as yfinance), Nasdaq, Dow Jones, or S&amp;P 500.</p>
+<p>For this exercise, we will concentrate on gathering data from the five major technology companies commonly referred to as GAFAM: Google, Amazon, Facebook (Meta), Apple, and Microsoft.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Basic configuration </span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">warnings</span> 
+
+<span class="n">MAIN_PATH</span> <span class="o">=</span> <span class="s1">'C:/Users/evche/Documents/Lessons - Audencia BS/Data'</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Storing the data into 5 dataframes, the parse dates function is used to convert strings to a date datatype</span>
+<span class="n">stock_GOOG</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/Session 5/GOOG.csv'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">])</span>
+<span class="n">stock_AAPL</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/Session 5/AAPL.csv'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">])</span>
+<span class="n">stock_MSFT</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/Session 5/MSFT.csv'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">])</span>
+<span class="n">stock_FCBK</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/Session 5/META.csv'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">])</span>
+<span class="n">stock_AMZN</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/Session 5/AMZN.csv'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">])</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># We can see the structure of the data </span>
+<span class="n">stock_GOOG</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Date</th>
+<th>Open</th>
+<th>High</th>
+<th>Low</th>
+<th>Close</th>
+<th>Adj Close</th>
+<th>Volume</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2004-08-19</td>
+<td>2.490664</td>
+<td>2.591785</td>
+<td>2.390042</td>
+<td>2.499133</td>
+<td>2.496292</td>
+<td>897427216</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2004-08-20</td>
+<td>2.515820</td>
+<td>2.716817</td>
+<td>2.503118</td>
+<td>2.697639</td>
+<td>2.694573</td>
+<td>458857488</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2004-08-23</td>
+<td>2.758411</td>
+<td>2.826406</td>
+<td>2.716070</td>
+<td>2.724787</td>
+<td>2.721690</td>
+<td>366857939</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2004-08-24</td>
+<td>2.770615</td>
+<td>2.779581</td>
+<td>2.579581</td>
+<td>2.611960</td>
+<td>2.608991</td>
+<td>306396159</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2004-08-25</td>
+<td>2.614201</td>
+<td>2.689918</td>
+<td>2.587302</td>
+<td>2.640104</td>
+<td>2.637103</td>
+<td>184645512</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Let us do the same with Apple</span>
+<span class="n">stock_AAPL</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Date</th>
+<th>Open</th>
+<th>High</th>
+<th>Low</th>
+<th>Close</th>
+<th>Adj Close</th>
+<th>Volume</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1980-12-12</td>
+<td>0.128348</td>
+<td>0.128906</td>
+<td>0.128348</td>
+<td>0.128348</td>
+<td>0.098943</td>
+<td>469033600</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1980-12-15</td>
+<td>0.122210</td>
+<td>0.122210</td>
+<td>0.121652</td>
+<td>0.121652</td>
+<td>0.093781</td>
+<td>175884800</td>
+</tr>
+<tr>
+<th>2</th>
+<td>1980-12-16</td>
+<td>0.113281</td>
+<td>0.113281</td>
+<td>0.112723</td>
+<td>0.112723</td>
+<td>0.086898</td>
+<td>105728000</td>
+</tr>
+<tr>
+<th>3</th>
+<td>1980-12-17</td>
+<td>0.115513</td>
+<td>0.116071</td>
+<td>0.115513</td>
+<td>0.115513</td>
+<td>0.089049</td>
+<td>86441600</td>
+</tr>
+<tr>
+<th>4</th>
+<td>1980-12-18</td>
+<td>0.118862</td>
+<td>0.119420</td>
+<td>0.118862</td>
+<td>0.118862</td>
+<td>0.091630</td>
+<td>73449600</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>We will refrain from displaying all the DataFrames, as they exhibit the same structural format. Nonetheless, it is essential to highlight that the data in this instance comprises six columns. For our analysis, we will concentrate on two specific columns: Date and Close. This focus will enable us to examine the closing prices over time while effectively utilizing the time series format.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Keeping only the two columns for each dataframe</span>
+<span class="n">stock_GOOG</span> <span class="o">=</span> <span class="n">stock_GOOG</span><span class="p">[[</span><span class="s1">'Date'</span><span class="p">,</span> <span class="s1">'Close'</span><span class="p">]]</span>
+<span class="n">stock_AAPL</span> <span class="o">=</span> <span class="n">stock_AAPL</span><span class="p">[[</span><span class="s1">'Date'</span><span class="p">,</span> <span class="s1">'Close'</span><span class="p">]]</span>
+<span class="n">stock_MSFT</span> <span class="o">=</span> <span class="n">stock_MSFT</span><span class="p">[[</span><span class="s1">'Date'</span><span class="p">,</span> <span class="s1">'Close'</span><span class="p">]]</span>
+<span class="n">stock_FCBK</span> <span class="o">=</span> <span class="n">stock_FCBK</span><span class="p">[[</span><span class="s1">'Date'</span><span class="p">,</span> <span class="s1">'Close'</span><span class="p">]]</span>
+<span class="n">stock_AMZN</span> <span class="o">=</span> <span class="n">stock_AMZN</span><span class="p">[[</span><span class="s1">'Date'</span><span class="p">,</span> <span class="s1">'Close'</span><span class="p">]]</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing one of the 5 dataframes</span>
+<span class="n">stock_MSFT</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Date</th>
+<th>Close</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1986-03-13</td>
+<td>0.097222</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1986-03-14</td>
+<td>0.100694</td>
+</tr>
+<tr>
+<th>2</th>
+<td>1986-03-17</td>
+<td>0.102431</td>
+</tr>
+<tr>
+<th>3</th>
+<td>1986-03-18</td>
+<td>0.099826</td>
+</tr>
+<tr>
+<th>4</th>
+<td>1986-03-19</td>
+<td>0.098090</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>Now that we have removed the unnecessary columns, we can transform the DataFrames into time series by using the first column as the index. Since we have already converted the first column into date format using the <code>parse_dates</code> function, this step will allow us to utilize the date information for time series analysis.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Now we can use the first column as index </span>
+<span class="n">stock_GOOG</span> <span class="o">=</span> <span class="n">stock_GOOG</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="n">stock_AAPL</span> <span class="o">=</span> <span class="n">stock_AAPL</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="n">stock_MSFT</span> <span class="o">=</span> <span class="n">stock_MSFT</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="n">stock_FCBK</span> <span class="o">=</span> <span class="n">stock_FCBK</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="n">stock_AMZN</span> <span class="o">=</span> <span class="n">stock_AMZN</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Date'</span><span class="p">)</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Now we can diplay the time series, let us show an example using Google</span>
+<span class="n">stock_GOOG</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Close</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2004-08-19</th>
+<td>2.499133</td>
+</tr>
+<tr>
+<th>2004-08-20</th>
+<td>2.697639</td>
+</tr>
+<tr>
+<th>2004-08-23</th>
+<td>2.724787</td>
+</tr>
+<tr>
+<th>2004-08-24</th>
+<td>2.611960</td>
+</tr>
+<tr>
+<th>2004-08-25</th>
+<td>2.640104</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>Now that the data is correctly formatted, we will proceed to combine all the time series into a single, comprehensive DataFrame. To maintain the time series structure, we will place each series into its respective column while preserving the dates as the index. To achieve this, it is essential to rename the "Close" column of each series appropriately. This will ensure clarity and facilitate subsequent analysis.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Renaming the series</span>
+<span class="n">stock_GOOG</span> <span class="o">=</span> <span class="n">stock_GOOG</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'Close'</span> <span class="p">:</span> <span class="s1">'GOOGL'</span><span class="p">})</span>
+<span class="n">stock_AAPL</span> <span class="o">=</span> <span class="n">stock_AAPL</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'Close'</span> <span class="p">:</span> <span class="s1">'AAPL'</span><span class="p">})</span>
+<span class="n">stock_MSFT</span> <span class="o">=</span> <span class="n">stock_MSFT</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'Close'</span> <span class="p">:</span> <span class="s1">'MSFT'</span><span class="p">})</span>
+<span class="n">stock_FCBK</span> <span class="o">=</span> <span class="n">stock_FCBK</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'Close'</span> <span class="p">:</span> <span class="s1">'META'</span><span class="p">})</span>
+<span class="n">stock_AMZN</span> <span class="o">=</span> <span class="n">stock_AMZN</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'Close'</span> <span class="p">:</span> <span class="s1">'AMZN'</span><span class="p">})</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the result</span>
+<span class="n">stock_GOOG</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>GOOGL</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2004-08-19</th>
+<td>2.499133</td>
+</tr>
+<tr>
+<th>2004-08-20</th>
+<td>2.697639</td>
+</tr>
+<tr>
+<th>2004-08-23</th>
+<td>2.724787</td>
+</tr>
+<tr>
+<th>2004-08-24</th>
+<td>2.611960</td>
+</tr>
+<tr>
+<th>2004-08-25</th>
+<td>2.640104</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Now we can combine the series into one dataframe</span>
+<span class="n">data_all</span> <span class="o">=</span> <span class="n">stock_GOOG</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">stock_AAPL</span><span class="p">,</span> <span class="n">left_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">data_all</span> <span class="o">=</span> <span class="n">data_all</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">stock_MSFT</span><span class="p">,</span> <span class="n">left_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">data_all</span> <span class="o">=</span> <span class="n">data_all</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">stock_FCBK</span><span class="p">,</span> <span class="n">left_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">data_all</span> <span class="o">=</span> <span class="n">data_all</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">stock_AMZN</span><span class="p">,</span> <span class="n">left_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">data_all</span> <span class="o">=</span> <span class="n">data_all</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">data_all</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>GOOGL</th>
+<th>AAPL</th>
+<th>MSFT</th>
+<th>META</th>
+<th>AMZN</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2012-05-18</th>
+<td>14.953949</td>
+<td>18.942142</td>
+<td>29.270000</td>
+<td>38.230000</td>
+<td>10.6925</td>
+</tr>
+<tr>
+<th>2012-05-21</th>
+<td>15.295419</td>
+<td>20.045713</td>
+<td>29.750000</td>
+<td>34.029999</td>
+<td>10.9055</td>
+</tr>
+<tr>
+<th>2012-05-22</th>
+<td>14.963912</td>
+<td>19.891787</td>
+<td>29.760000</td>
+<td>31.000000</td>
+<td>10.7665</td>
+</tr>
+<tr>
+<th>2012-05-23</th>
+<td>15.179603</td>
+<td>20.377144</td>
+<td>29.110001</td>
+<td>32.000000</td>
+<td>10.8640</td>
+</tr>
+<tr>
+<th>2012-05-24</th>
+<td>15.035145</td>
+<td>20.190001</td>
+<td>29.070000</td>
+<td>33.029999</td>
+<td>10.7620</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># We can represent the time series in a graph </span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_all</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'GOOGL'</span><span class="p">,</span> <span class="s1">'AAPL'</span><span class="p">,</span> <span class="s1">'MSFT'</span><span class="p">,</span> <span class="s1">'META'</span><span class="p">,</span> <span class="s1">'AMZN'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Evolution of the price over time"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 1" data-asset="session-5/fig-1.png" loading="lazy"/></figure></details>
+<p>The utilization of time series data enables us to resample the information into larger time frames. Since the data in this instance is recorded on a daily basis, we have the flexibility to aggregate it into broader time intervals, such as weekly, monthly, quarterly, yearly, or even decadal intervals. This resampling capability allows for more comprehensive analysis and insights over extended periods.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># We use resample function - The "last" method takes the last value, any other aggregation could have been used (sum, mean...)</span>
+<span class="n">data_all_month</span> <span class="o">=</span> <span class="n">data_all</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">'M'</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
+<span class="c1"># M for month</span>
+<span class="n">data_all_month</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>GOOGL</th>
+<th>AAPL</th>
+<th>MSFT</th>
+<th>META</th>
+<th>AMZN</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2012-05-31</th>
+<td>14.467273</td>
+<td>20.633215</td>
+<td>29.190001</td>
+<td>29.600000</td>
+<td>10.6455</td>
+</tr>
+<tr>
+<th>2012-06-30</th>
+<td>14.447597</td>
+<td>20.857143</td>
+<td>30.590000</td>
+<td>31.100000</td>
+<td>11.4175</td>
+</tr>
+<tr>
+<th>2012-07-31</th>
+<td>15.765158</td>
+<td>21.812857</td>
+<td>29.469999</td>
+<td>21.709999</td>
+<td>11.6650</td>
+</tr>
+<tr>
+<th>2012-08-31</th>
+<td>17.063293</td>
+<td>23.758572</td>
+<td>30.820000</td>
+<td>18.059999</td>
+<td>12.4135</td>
+</tr>
+<tr>
+<th>2012-09-30</th>
+<td>18.792063</td>
+<td>23.825001</td>
+<td>29.760000</td>
+<td>21.660000</td>
+<td>12.7160</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># We can represent the time series in a graph </span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_all_month</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'GOOGL'</span><span class="p">,</span> <span class="s1">'AAPL'</span><span class="p">,</span> <span class="s1">'MSFT'</span><span class="p">,</span> <span class="s1">'META'</span><span class="p">,</span> <span class="s1">'AMZN'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Month"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Evolution of the price over the months"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 2" data-asset="session-5/fig-2.png" loading="lazy"/></figure></details>
+<h2 id="III---The-usage-of-Time-Series-in-Finance">III - The usage of Time Series in Finance</h2><p>In financial analysis, the absolute values of stock prices may not provide a clear representation of their evolution, particularly because the scales can vary significantly between different stocks. For instance, comparing the price movements of Microsoft and Amazon may not yield meaningful insights due to these discrepancies. Consequently, it is common practice in finance to utilize returns and cumulative returns as more effective indicators of variations in stock performance.</p>
+<p>Python facilitates the calculation of both returns and cumulative returns efficiently through the use of the Pandas library, which is specifically designed for handling time series data. This approach allows for a more coherent analysis of stock performance over time.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculating the returns</span>
+<span class="n">data_returns</span> <span class="o">=</span> <span class="n">data_all</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
+<span class="n">data_returns</span> <span class="o">=</span> <span class="n">data_returns</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">data_returns</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="c1"># It is important to remember that the returns are percentages</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>GOOGL</th>
+<th>AAPL</th>
+<th>MSFT</th>
+<th>META</th>
+<th>AMZN</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2012-05-21</th>
+<td>0.022835</td>
+<td>0.058260</td>
+<td>0.016399</td>
+<td>-0.109861</td>
+<td>0.019921</td>
+</tr>
+<tr>
+<th>2012-05-22</th>
+<td>-0.021674</td>
+<td>-0.007679</td>
+<td>0.000336</td>
+<td>-0.089039</td>
+<td>-0.012746</td>
+</tr>
+<tr>
+<th>2012-05-23</th>
+<td>0.014414</td>
+<td>0.024400</td>
+<td>-0.021841</td>
+<td>0.032258</td>
+<td>0.009056</td>
+</tr>
+<tr>
+<th>2012-05-24</th>
+<td>-0.009517</td>
+<td>-0.009184</td>
+<td>-0.001374</td>
+<td>0.032187</td>
+<td>-0.009389</td>
+</tr>
+<tr>
+<th>2012-05-25</th>
+<td>-0.020094</td>
+<td>-0.005360</td>
+<td>-0.000344</td>
+<td>-0.033909</td>
+<td>-0.010918</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Let us show the reason why returns can be used but are not the most suitable</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_returns</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'GOOGL'</span><span class="p">,</span> <span class="s1">'AAPL'</span><span class="p">,</span> <span class="s1">'MSFT'</span><span class="p">,</span> <span class="s1">'META'</span><span class="p">,</span> <span class="s1">'AMZN'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Month"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Return"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Evolution of the returns"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 3" data-asset="session-5/fig-3.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculating the cumulative returns </span>
+<span class="n">data_cumulative_returns</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">data_returns</span><span class="p">)</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">data_cumulative_returns</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>GOOGL</th>
+<th>AAPL</th>
+<th>MSFT</th>
+<th>META</th>
+<th>AMZN</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2012-05-21</th>
+<td>0.022835</td>
+<td>0.058260</td>
+<td>0.016399</td>
+<td>-0.109861</td>
+<td>0.019921</td>
+</tr>
+<tr>
+<th>2012-05-22</th>
+<td>0.000666</td>
+<td>0.050134</td>
+<td>0.016741</td>
+<td>-0.189118</td>
+<td>0.006921</td>
+</tr>
+<tr>
+<th>2012-05-23</th>
+<td>0.015090</td>
+<td>0.075757</td>
+<td>-0.005466</td>
+<td>-0.162961</td>
+<td>0.016039</td>
+</tr>
+<tr>
+<th>2012-05-24</th>
+<td>0.005430</td>
+<td>0.065877</td>
+<td>-0.006833</td>
+<td>-0.136019</td>
+<td>0.006500</td>
+</tr>
+<tr>
+<th>2012-05-25</th>
+<td>-0.014773</td>
+<td>0.060164</td>
+<td>-0.007175</td>
+<td>-0.165315</td>
+<td>-0.004489</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Displaying the cumulative returns</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_cumulative_returns</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'GOOGL'</span><span class="p">,</span> <span class="s1">'AAPL'</span><span class="p">,</span> <span class="s1">'MSFT'</span><span class="p">,</span> <span class="s1">'META'</span><span class="p">,</span> <span class="s1">'AMZN'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Month"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Cumulative returns"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Evolution of the stock price in percentage over time"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 4" data-asset="session-5/fig-4.png" loading="lazy"/></figure></details>
+<p>The data presented indicates that the Amazon stock price has experienced significant growth, approximately increasing by a factor of 17.5 since 2012, making it the stock with the highest variation (or return) over the past 12 years. Notably, this considerable return occurs despite Amazon's stock not being the most expensive relative to the other companies in the analysis. As illustrated in the accompanying graph depicting the evolution of stock prices over time, all stocks have seen their prices multiply by at least a factor of 10 since 2012. This underscores the remarkable performance of these stocks in the market.</p>
+<p>In the realm of technical analysis in finance, econometric methods are commonly employed to analyze and predict trends within a time series. One such method is the Moving Average, which involves transforming a series by calculating averages over different segments (or intervals) of the complete dataset. This technique is primarily utilized to identify the directional trend of a stock price's evolution.</p>
+<p>In this example, we will focus solely on the Moving Average for Apple Inc.'s stock price to avoid redundancy, illustrating how this method can provide insights into the stock's performance over time.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># We can either calculate the moving average on the stock price or the cumulative return. We will choose the stock price</span>
+<span class="n">stock_AAPL</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>AAPL</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>1980-12-12</th>
+<td>0.128348</td>
+</tr>
+<tr>
+<th>1980-12-15</th>
+<td>0.121652</td>
+</tr>
+<tr>
+<th>1980-12-16</th>
+<td>0.112723</td>
+</tr>
+<tr>
+<th>1980-12-17</th>
+<td>0.115513</td>
+</tr>
+<tr>
+<th>1980-12-18</th>
+<td>0.118862</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># First of, select a portion of the data, let us keep the data from 2014 to 2024, loc function allows us to do it </span>
+<span class="n">stock_AAPL_MA</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stock_AAPL</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">'2014-01-01'</span><span class="p">:])</span> <span class="c1"># (a : b) =&gt; a from b, (a : ) =&gt; from a to the end</span>
+<span class="n">stock_AAPL_MA</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>AAPL</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2014-01-02</th>
+<td>19.754642</td>
+</tr>
+<tr>
+<th>2014-01-03</th>
+<td>19.320715</td>
+</tr>
+<tr>
+<th>2014-01-06</th>
+<td>19.426071</td>
+</tr>
+<tr>
+<th>2014-01-07</th>
+<td>19.287144</td>
+</tr>
+<tr>
+<th>2014-01-08</th>
+<td>19.409286</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculating the moving average on 30 days </span>
+<span class="n">stock_AAPL_MA</span><span class="p">[</span><span class="s1">'MA_30'</span><span class="p">]</span> <span class="o">=</span>  <span class="n">stock_AAPL_MA</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="c1"># Remove the na</span>
+<span class="n">stock_AAPL_MA</span> <span class="o">=</span> <span class="n">stock_AAPL_MA</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">stock_AAPL_MA</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>AAPL</th>
+<th>MA_30</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2014-02-13</th>
+<td>19.443930</td>
+<td>19.031857</td>
+</tr>
+<tr>
+<th>2014-02-14</th>
+<td>19.428213</td>
+<td>19.020976</td>
+</tr>
+<tr>
+<th>2014-02-18</th>
+<td>19.499643</td>
+<td>19.026940</td>
+</tr>
+<tr>
+<th>2014-02-19</th>
+<td>19.191786</td>
+<td>19.019131</td>
+</tr>
+<tr>
+<th>2014-02-20</th>
+<td>18.969643</td>
+<td>19.008548</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the stock price and the moving average</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">stock_AAPL_MA</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'AAPL'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Showing the stock price and the Moving average"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre><figure 0="" 640x480="" axes="" size="" with=""></figure></pre></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 5" data-asset="session-5/fig-5.png" loading="lazy"/></figure></details>
+<aside class="nb-exercise"><span class="nb-ex-tag">Blitz exercise</span><h3><em>Blitz Exercise (20 min)</em></h3><p>This exercise is structured into several parts to facilitate your understanding of the concepts we have covered:</p><ol>
+<li>Create a DataFrame containing the cumulative return of Microsoft’s stock price.</li>
+<li>Select the data for the last five years.</li>
+<li>Resample the data on a weekly basis.</li>
+<li>Calculate the 3-week moving average of the cumulative return based on the weekly resampled data.</li>
+</ol><p>By completing these tasks, you will gain practical experience in manipulating time series data and applying moving averages in Python.ython.</p></aside><h2 id="IV---Linear-Regression,-using-Ordinary-Least-Squares-Method">IV - Linear Regression, using Ordinary Least Squares Method</h2><p>Moving averages effectively illustrate the trend of a stock price, while the movement of a stock price can also be represented using a Linear Model. This model estimates a linear relationship between a dependent variable (regressand) Y (dependent variable) and one or more explanatory variables (regressors) X1, X2 ... Xn.</p>
+<p>In Python, this is typically accomplished through a linear regression model utilizing the Ordinary Least Squares (OLS) method. This approach automatically identifies the line that minimizes the sum of the squared distances between the line and the observed data points on the graph.</p>
+<p>In our case, given that the only variables available are the closing price and the date, we will use the date as the regressor and the closing price as the regressand. It is common practice to divide the data into two sets: a training set used to fit the model and a test set used to evaluate the model's performance.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Elimination of the data before 2014</span>
+<span class="n">stock_AAPL_2014</span> <span class="o">=</span> <span class="n">stock_AAPL</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">'2014-01-01'</span><span class="p">:]</span>
+<span class="n">stock_AAPL_2014</span> <span class="o">=</span> <span class="n">stock_AAPL_2014</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">stock_AAPL_2014</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="c1"># Using the splitter from the sklearn package</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="c1"># Using 20 % as the test set</span>
+<span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">stock_AAPL_2014</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.20</span><span class="p">)</span>
+
+<span class="c1"># Import package for linear regression</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+
+<span class="c1"># We use the index (date) as the regressor and the close as the regressand</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float64"</span><span class="p">)</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">]</span>
+
+<span class="c1"># Storing the model as an Object</span>
+<span class="n">linear_model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="c1"># Using the fit method to create the model</span>
+<span class="n">linear_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>LinearRegression()</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the results of the regression</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Slope: '</span><span class="p">,</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Intercept: '</span><span class="p">,</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">intercept_</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Slope:  5.892474026648293e-16
+Intercept:  -832.1329169130705</pre></details>
+<p>n this analysis, we observe that the intercept (alpha) is approximately -832.7499401708747 a while the coefficient of the linear regression is approximately 5.898140703014664e-16. This indicates that to predict the closing price for the next day, we multiply the date value by 5.898140703014664e-16.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># We can now try to test the model using the X_test</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float64"</span><span class="p">)</span>
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">]</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">test</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_pred</span>
+<span class="n">test</span><span class="p">[</span><span class="s1">'Error'</span><span class="p">]</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">]</span> <span class="o">-</span> <span class="n">test</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">]</span>
+
+<span class="c1"># Plot predicted vs actual prices</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Actual Prices'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Predicted Prices'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'Predicted vs Actual Price'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 6" data-asset="session-5/fig-6.png" loading="lazy"/></figure></details>
+<p>This graph illustrates the comparison between the predicted prices (represented by the red line) and the actual prices (depicted by the blue points). The proximity of the blue points to the red line indicates the accuracy of the predictions; the closer the points are to the line, the more reliable the model's predictions are. This visual representation allows for an immediate assessment of the model's performance in forecasting stock prices.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Trying with the whole data</span>
+<span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float64"</span><span class="p">))</span>
+<span class="n">stock_AAPL_2014</span> <span class="o">=</span> <span class="n">stock_AAPL_2014</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="n">stock_AAPL_2014</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>AAPL</th>
+<th>Pred</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2014-01-02</th>
+<td>19.754642</td>
+<td>-13.891717</td>
+</tr>
+<tr>
+<th>2014-01-03</th>
+<td>19.320715</td>
+<td>-13.840806</td>
+</tr>
+<tr>
+<th>2014-01-06</th>
+<td>19.426071</td>
+<td>-13.688073</td>
+</tr>
+<tr>
+<th>2014-01-07</th>
+<td>19.287144</td>
+<td>-13.637162</td>
+</tr>
+<tr>
+<th>2014-01-08</th>
+<td>19.409286</td>
+<td>-13.586251</td>
+</tr>
+<tr>
+<th>2014-01-09</th>
+<td>19.161428</td>
+<td>-13.535340</td>
+</tr>
+<tr>
+<th>2014-01-10</th>
+<td>19.033571</td>
+<td>-13.484429</td>
+</tr>
+<tr>
+<th>2014-01-13</th>
+<td>19.133215</td>
+<td>-13.331696</td>
+</tr>
+<tr>
+<th>2014-01-14</th>
+<td>19.513929</td>
+<td>-13.280786</td>
+</tr>
+<tr>
+<th>2014-01-15</th>
+<td>19.905714</td>
+<td>-13.229875</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">stock_AAPL_2014</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Stock price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Comparison linear regression vs real"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre><figure 0="" 640x480="" axes="" size="" with=""></figure></pre></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 7" data-asset="session-5/fig-7.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculating the error</span>
+<span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Error'</span><span class="p">]</span> <span class="o">=</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">]</span> <span class="o">-</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">]</span>
+
+<span class="c1"># Plotting the error</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">stock_AAPL_2014</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Error'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Error"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Displaying the stock price error by date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 8" data-asset="session-5/fig-8.png" loading="lazy"/></figure></details>
+<p>Analyzing the residuals, we observe that the predictions are not highly accurate, suggesting that a simple linear model may not be the most appropriate choice for forecasting Apple's stock price. This indicates that the relationship between the variables may be more complex and that other modeling techniques or additional variables might be needed to improve prediction accuracy.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Import norm package to plot normal distribution</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
+
+<span class="c1"># Fit a normal distribution to the data:</span>
+<span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">]</span> <span class="o">-</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">])</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">((</span><span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">]</span> <span class="o">-</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">]),</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Residual Histogram &amp; Distribution'</span><span class="p">)</span>
+
+<span class="c1"># Calculate the pdf over a range of values         </span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">]</span> <span class="o">-</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">]</span> <span class="o">-</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">]),</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+
+<span class="c1"># And plot on the same axes that seaborn put the histogram</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Normal Distribution'</span><span class="p">)</span> 
+
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 9" data-asset="session-5/fig-9.png" loading="lazy"/></figure></details>
+<p>A suitable model would exhibit a normal distribution, characterized by lower amplitude for higher residuals. However, this graph does not display a normal distribution, indicating that the model is not appropriate for predicting Apple’s stock price.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Import metrics package from sklearn for statistical analysis</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Mean Absolute Error:'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">],</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">]))</span>  
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Mean Squared Error:'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">],</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">]))</span>  
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Root Mean Squared Error:'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'AAPL'</span><span class="p">],</span> <span class="n">stock_AAPL_2014</span><span class="p">[</span><span class="s1">'Pred'</span><span class="p">])))</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Mean Absolute Error: 18.459360273635824
+Mean Squared Error: 465.73969384840933
+Root Mean Squared Error: 21.581003077901855</pre></details>
+<aside class="nb-exercise"><span class="nb-ex-tag">Exercise</span><h3>V - Multiple Linear Regression (<em>In class exercise or assignment</em>)</h3><p>In this section, rather than relying on a single regressor to construct a linear model, we can incorporate multiple explanatory variables. Thus, the equation can be expressed as Y = a + X1 * b1 + X2 * b2 + ... + Xn * bn. We will continue to use Apple’s stock price and develop a linear regression model based on the other variables to estimate the closing price.</p></aside><div class="nb-code"><pre><span></span><span class="c1"># Defining the data</span>
+<span class="n">data_multiple_regression</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/Session 5/AAPL.csv'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">])</span>
+<span class="n">data_multiple_regression</span> <span class="o">=</span> <span class="n">data_multiple_regression</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="n">data_multiple_regression</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Open</th>
+<th>High</th>
+<th>Low</th>
+<th>Close</th>
+<th>Adj Close</th>
+<th>Volume</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>1980-12-12</th>
+<td>0.128348</td>
+<td>0.128906</td>
+<td>0.128348</td>
+<td>0.128348</td>
+<td>0.098943</td>
+<td>469033600</td>
+</tr>
+<tr>
+<th>1980-12-15</th>
+<td>0.122210</td>
+<td>0.122210</td>
+<td>0.121652</td>
+<td>0.121652</td>
+<td>0.093781</td>
+<td>175884800</td>
+</tr>
+<tr>
+<th>1980-12-16</th>
+<td>0.113281</td>
+<td>0.113281</td>
+<td>0.112723</td>
+<td>0.112723</td>
+<td>0.086898</td>
+<td>105728000</td>
+</tr>
+<tr>
+<th>1980-12-17</th>
+<td>0.115513</td>
+<td>0.116071</td>
+<td>0.115513</td>
+<td>0.115513</td>
+<td>0.089049</td>
+<td>86441600</td>
+</tr>
+<tr>
+<th>1980-12-18</th>
+<td>0.118862</td>
+<td>0.119420</td>
+<td>0.118862</td>
+<td>0.118862</td>
+<td>0.091630</td>
+<td>73449600</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Exercise using Multiple Linear Regression</span></pre></div>
+<p>The low values of the Mean Absolute Error (MAE), Mean Squared Error (MSE), and Root Mean Squared Error (RMSE) further confirm the model's accuracy:</p>
+<ul>
+<li><code>MAE</code>: This represents the average absolute difference between the predicted and actual values. The MAE is preferred for its ease of interpretation, its resistance to outliers, and the fact that it is expressed in the same units as the target variable.</li>
+<li><code>MSE</code>: This metric calculates the average of the squared errors. It is often favored over MAE because it places greater emphasis on larger errors, thus providing a better measure of error variability.</li>
+<li><code>RMSE</code>: The square root of the MSE, this value also penalizes large errors and is expressed in the same units as the target variable.</li>
+<li><code>R2</code>: Also known as the "coefficient of determination," it is calculated (1 - RSS / TSS), where RSS is the sum of squared residuals and TSS is the total sum of squares (the variation between the average and actual values). R² indicates the proportion of the variability in Y that can be explained by the explanatory variables.</li>
+</ul>
+` },
          { slug: "session-6", label: "Session 6", title: "Building a portfolio and valuing different types of assets", embedUrl: "" },
          { slug: "session-7", label: "Session 7", title: "Quantitative methods and simulations for Finance", embedUrl: "" },
          { slug: "session-8", label: "Session 8", title: "Financial risk assessment", embedUrl: "" },
