@@ -2695,7 +2695,7 @@ Intercept:  -832.1329169130705</pre></details>
 <details class="nb-output"><summary>Output</summary><pre>Mean Absolute Error: 18.459360273635824
 Mean Squared Error: 465.73969384840933
 Root Mean Squared Error: 21.581003077901855</pre></details>
-<aside class="nb-exercise"><span class="nb-ex-tag">Exercise</span><h3>V - Multiple Linear Regression (<em>In class exercise or assignment</em>)</h3><p>In this section, rather than relying on a single regressor to construct a linear model, we can incorporate multiple explanatory variables. Thus, the equation can be expressed as Y = a + X1 * b1 + X2 * b2 + ... + Xn * bn. We will continue to use Apple’s stock price and develop a linear regression model based on the other variables to estimate the closing price.</p></aside><div class="nb-code"><pre><span></span><span class="c1"># Defining the data</span>
+<aside class="nb-exercise"><span class="nb-ex-tag">Exercise</span><h3>V - Multiple Linear Regression (<em>In class exercise or assignment</em>)</h3><p>In this section, rather than relying on a single regressor to construct a linear model, we can incorporate multiple explanatory variables. Thus, the equation can be expressed as <span class="nb-math">Y = a + X<sub>1</sub> · b<sub>1</sub> + X<sub>2</sub> · b<sub>2</sub> + ... + X<sub>n</sub> · b<sub>n</sub></span>. We will continue to use Apple’s stock price and develop a linear regression model based on the other variables to estimate the closing price.</p></aside><div class="nb-code"><pre><span></span><span class="c1"># Defining the data</span>
 <span class="n">data_multiple_regression</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/Session 5/AAPL.csv'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">])</span>
 <span class="n">data_multiple_regression</span> <span class="o">=</span> <span class="n">data_multiple_regression</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Date'</span><span class="p">)</span>
 <span class="n">data_multiple_regression</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
@@ -2785,15 +2785,14 @@ Root Mean Squared Error: 21.581003077901855</pre></details>
 <li>Constructing an Equity Portfolio</li>
 <li>Basic Trading Strategies</li>
 <li>Understanding Derivatives</li>
-</ul>
+</ul></div>
 <div class="nb-code"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">MAIN_PATH</span> <span class="o">=</span> <span class="s1">'C:/Users/evche/Documents/Lessons - Audencia BS/Data/Session 6'</span>
 <span class="c1"># Eliminating the waring messages </span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div></div>
-<h2 id="I---Bonds-:-The-(assumedly)-fixed-income">I - Bonds : The (assumedly) fixed income</h2>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div><h2 id="I---Bonds-:-The-(assumedly)-fixed-income">I - Bonds : The (assumedly) fixed income</h2>
 <p><code>Bonds</code> are financial instruments issued by corporations or governments to raise capital, typically treated as liabilities or debt. These instruments offer investors fixed periodic interest payments (referred to as coupons, wwhich may be <strong>fixed or variable depending on the bond type</strong>) and return the principal (or face value) at maturity. A bond that does not provide periodic interest payments is known as a zero-coupon bond. The following terms are crucial in understanding bond valuation:</p>
 <ul>
 <li>Face Value: The original value of the bond when issued.</li>
@@ -3406,23 +3405,23 @@ A plausible fair value considering the previous parameters would be  116.18 with
 <h3 id="b)-Calculate-the-payoffs-of-an-option">b) Calculate the payoffs of an option</h3><p>Options are generally sold for a premium, and the potential payoffs depend on whether the investor is buying or selling the option, as well as the type of option (call or put). Here are the common strategies and potential payoffs:</p>
 <ul>
 <li>Selling a Call: The seller expects the asset's price to stay below the strike price at maturity.<ul>
-<li>Best case: Profit = premium.</li>
-<li>Worst case: Profit = premium - (future price - strike price).</li>
+<li>Best case: <span class="nb-math">Profit = premium</span>.</li>
+<li>Worst case: <span class="nb-math">Profit = premium - (future price - strike price)</span>.</li>
 </ul>
 </li>
 <li>Selling a Put: The seller expects the asset's price to stay above the strike price at maturity.<ul>
-<li>Best case: Profit = premium.</li>
-<li>Worst case: Profit = premium - (strike price - future price).</li>
+<li>Best case: <span class="nb-math">Profit = premium</span>.</li>
+<li>Worst case: <span class="nb-math">Profit = premium - (strike price - future price)</span>.</li>
 </ul>
 </li>
 <li>Buying a Call: The buyer expects the asset's price to rise above the strike price at maturity.<ul>
-<li>Best case: Profit = (future price - strike price) - premium.</li>
-<li>Worst case: Profit = -premium (loss limited to the premium paid).</li>
+<li>Best case: <span class="nb-math">Profit = (future price - strike price) - premium</span>.</li>
+<li>Worst case: <span class="nb-math">Profit = -premium</span> (loss limited to the premium paid).</li>
 </ul>
 </li>
 <li>Buying a Put: The buyer expects the asset's price to fall below the strike price at maturity.<ul>
-<li>Best case: Profit = (strike price - future price) - premium.</li>
-<li>Worst case: Profit = -premium (loss limited to the premium paid).</li>
+<li>Best case: <span class="nb-math">Profit = (strike price - future price) - premium</span>.</li>
+<li>Worst case: <span class="nb-math">Profit = -premium</span> (loss limited to the premium paid).</li>
 </ul>
 </li>
 </ul>
@@ -3686,8 +3685,8 @@ AR.1            1.0153           +0.0000j            1.0153            0.0000
 <p>The standardized ARIMA model is defined as ARIMA (p, d, q). In the scope of the class, we will only consider a model using d = 0. When both the ACF and PACF show a tail-off pattern, an ARIMA(p, 0, q) model, which combines both AR and MA models, is appropriate. The parameters p (AR part) and q (MA part) are determined based on the respective ACF and PACF patterns.</p>
 <p>If both the ACF and PACF do not show a clear tail-off or cutoff pattern, this is a signal that an ARMA model, a combination of AR and MA, could be more suitable. The ARMA model is particularly flexible and useful when neither the ACF nor PACF provide clear information about which model (AR or MA) to choose. In such cases, the order of the AR (p) and MA (q) components can be selected based on a combination of ACF and PACF characteristics, or using model selection criteria like AIC (the ability to fit the data, while penalizing complexity) or BIC (similar but the penalty becomes stronger as the number of observation increases).</p>
 <ul>
-<li>AIC = - 2 ln(Likelihood) + 2k =&gt; Not used here</li>
-<li>BIC = - 2 ln(Likelihood) + kln(n) =&gt; Not used here</li>
+<li><span class="nb-math">AIC = - 2 ln(Likelihood) + 2k</span> ⇒ Not used here</li>
+<li><span class="nb-math">BIC = - 2 ln(Likelihood) + k ln(n)</span> ⇒ Not used here</li>
 </ul>
 <p>With :</p>
 <ol>
@@ -3829,7 +3828,7 @@ ARIMA models are commonly employed for predicting stock prices in market finance
 <li>dX : Random component, where X,follows a standard normal distribution, denoted as ~ <em>N(0,1)</em></li>
 <li>S : the stock price</li>
 </ul>
-<p>For standard Brownian motion, we typically assume (µ, σ²) = (0, σ²), However, stock price evolution can also be modeled using Geometric Brownian Motion (GBM), which incorporates a drift and a scale (or volatility, in our application to finance).</p>
+<p>For standard Brownian motion, we typically assume <span class="nb-math">(µ, σ²) = (0, σ²)</span>, However, stock price evolution can also be modeled using Geometric Brownian Motion (GBM), which incorporates a drift and a scale (or volatility, in our application to finance).</p>
 <ul>
 <li>Growth Rate: The average of daily returns can simplify the model.</li>
 <li>Volatility: This can be approximated by the standard deviation of stock price changes over a defined period. For GBM, we may also utilize the average log return and the standard deviation of log returns.</li>
@@ -3958,25 +3957,25 @@ Scale : 0.016481181640191255</pre></details>
 <p>Let us show a first example of the next day stock price, using the price of the last day. We will use the priciples that have been used for the Brownian motion to calculate the stock price variation, using the log returns here instead of the returns. (We will note that the returns can nevertheless be used as well)</p>
 <p>From the previous formula (dt = 1), we can say <code>Not expected to be known in the scope of this class</code>:</p>
 <ul>
-<li>dS = µ * 1 + σ * dX</li>
-<li>S(t) = dS + S(t-1)<ul>
+<li><span class="nb-math">dS = µ · 1 + σ · dX</span></li>
+<li><span class="nb-math">S(t) = dS + S(t-1)</span><ul>
 <li>S(t-1) is the previous price</li>
-<li>With Îto's formula (assumed in the scope of this class) : ln(S(t)/S(t-1)) = (µ * 1 + σ * dX)</li>
-<li>So ln(S(t)) = (µ + σ * dX) + ln(S(t-1))</li>
-<li>Then S(t) = exp((µ + σ * dX) + ln(S(t-1)))</li>
-<li>So S(t) = exp((µ + σ * dX)) * S(t-1)</li>
+<li>With Îto's formula (assumed in the scope of this class) : <span class="nb-math">ln(S(t)/S(t-1)) = (µ · 1 + σ · dX)</span></li>
+<li>So <span class="nb-math">ln(S(t)) = (µ + σ · dX) + ln(S(t-1))</span></li>
+<li>Then <span class="nb-math">S(t) = exp((µ + σ · dX) + ln(S(t-1)))</span></li>
+<li>So <span class="nb-math">S(t) = exp((µ + σ · dX)) · S(t-1)</span></li>
 </ul>
 </li>
 <li>With µ and σ calculated on the log returns, we can use :<ul>
-<li>The drift, or µ = Avg(ln(Days's Price / Previous Days Price)) - Var(ln(Days's Price / Previous Days Price))/2, under the risk neutral probability measure (present value is equal to the expected value of its future payoffs, discounted at the risk-free rate, and all assets grow at the risk-free rate)</li>
+<li>The drift, or <span class="nb-math">µ = Avg(ln(Days's Price / Previous Days Price)) - Var(ln(Days's Price / Previous Days Price))/2</span>, under the risk neutral probability measure (present value is equal to the expected value of its future payoffs, discounted at the risk-free rate, and all assets grow at the risk-free rate)</li>
 <li>The scale, or the variable σ = The standard deviation of the log returns  log volatility</li>
 </ul>
 </li>
 </ul>
 <p>Therefore, we can, by the the Îto's formula and the previous demonstration say that we can calculate the next day's price using :</p>
 <ul>
-<li>S(t) = exp((µ + σ * dX)) * S(t-1)</li>
-<li>µ = Average(ln(Days's Price / Previous Days Price)) - Var(ln(Days's Price / Previous Days Price))/2</li>
+<li><span class="nb-math">S(t) = exp((µ + σ · dX)) · S(t-1)</span></li>
+<li><span class="nb-math">µ = Average(ln(Days's Price / Previous Days Price)) - Var(ln(Days's Price / Previous Days Price))/2</span></li>
 <li>σ = The standard deviation of the log returns</li>
 <li>dX a standard normally distributed random variable</li>
 </ul>
@@ -4774,7 +4773,7 @@ HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
 <li>Value at Risk (VaR)</li>
 <li>Expected Shortfall (ES)</li>
 </ul>
-<p>It is important to note that risk measures are not absolute; they serve informational purposes. Evaluating the level of risk involves various widely-used metrics.</p>
+<p>It is important to note that risk measures are not absolute; they serve informational purposes. Evaluating the level of risk involves various widely-used metrics.</p></div>
 <div class="nb-code"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -4782,8 +4781,7 @@ HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
 <span class="n">MAIN_PATH</span> <span class="o">=</span> <span class="s1">'C:/Users/evche/Documents/Lessons - Audencia BS/Data/Session 8'</span>
 <span class="c1"># Eliminating the waring messages </span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div></div>
-<h2 id="I---Excess-Return">I - Excess Return</h2>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div><h2 id="I---Excess-Return">I - Excess Return</h2>
 <p>The Excess Return of a stock represents the portion of return that exceeds the return of a benchmark, typically represented by a market index (e.g., CAC 40, S&amp;P 500, DAX, NASDAQ). Mathematically, it is defined as the difference between the stock's return and the benchmark's return.</p>
 <div class="nb-code"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s2">"/CAC 40.xlsx"</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s2">"Date"</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="s2">"Date"</span><span class="p">)</span>
 <span class="c1"># Excluding the time in days</span>

@@ -1296,6 +1296,7 @@ details.nb-output .nb-table-wrap { overflow-x: auto; padding: 4px 18px 14px; }
 /* --- typeset math --- */
 .nb-math { font-style: italic; letter-spacing: 0.01em; white-space: normal; }
 .nb-math sup { font-size: 0.7em; font-style: italic; }
+.nb-math sub { font-size: 0.7em; font-style: italic; }
 .nb-math-block {
   display: block; width: fit-content; max-width: 100%;
   margin: 14px auto; padding: 10px 24px;
