@@ -4768,7 +4768,529 @@ HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
 <details class="nb-output"><summary>Output</summary><pre>Call price :  16.324689210822992</pre></details>
 <aside class="nb-exercise"><span class="nb-ex-tag">Blitz exercise</span><h3>Blitz Exercise : Price of a PUT &amp; a CALL (15 minutes)</h3><p>Using the aforementioned formulas and applications, create a program that allows the user to <strong>input parameters</strong> each time the program is executed. The program should enable the calculation of both the price of a call option and a put option based on the same parameters.</p></aside><h3 id="Next-session-:-Quizz"><em>Next session : Quizz</em></h3>
 ` },
-         { slug: "session-8", label: "Session 8", title: "Financial risk assessment", embedUrl: "" },
+         { slug: "session-8", label: "Session 8", title: "Financial risk assessment", embedUrl: "", html: `
+<p>When dealing with financial assets, particularly stocks, the concepts of risk aversion and risk preference become crucial. Investors who are willing to accept a higher risk of losses often seek the potential for substantial returns. Therefore, assessing an investor's risk tolerance before investing in a financial asset is essential. Various methods exist to evaluate risk, and this session will cover:</p>
+<ul>
+<li>Excess Return</li>
+<li>Alpha and the Beta</li>
+<li>Volatility</li>
+<li>Value at Risk (VaR)</li>
+<li>Expected Shortfall (ES)</li>
+</ul>
+<p>It is important to note that risk measures are not absolute; they serve informational purposes. Evaluating the level of risk involves various widely-used metrics.</p>
+<div class="nb-code"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
+<span class="n">MAIN_PATH</span> <span class="o">=</span> <span class="s1">'C:/Users/evche/Documents/Lessons - Audencia BS/Data/Session 8'</span>
+<span class="c1"># Eliminating the waring messages </span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div>
+<h2 id="I---Excess-Return">I - Excess Return</h2>
+<p>The Excess Return of a stock represents the portion of return that exceeds the return of a benchmark, typically represented by a market index (e.g., CAC 40, S&amp;P 500, DAX, NASDAQ). Mathematically, it is defined as the difference between the stock's return and the benchmark's return.</p>
+<div class="nb-code"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s2">"/CAC 40.xlsx"</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s2">"Date"</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="s2">"Date"</span><span class="p">)</span>
+<span class="c1"># Excluding the time in days</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+<span class="c1"># Calculating the returns</span>
+<span class="n">data_return</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">data_return</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>AIRP.PA</th>
+<th>AXAF.PA</th>
+<th>BOUY.PA</th>
+<th>BNPP.PA</th>
+<th>TCFP.PA</th>
+<th>CAPP.PA</th>
+<th>ESLX.PA</th>
+<th>OREP.PA</th>
+<th>LVMH.PA</th>
+<th>MICP.PA</th>
+<th>...</th>
+<th>VIE.PA</th>
+<th>VIV.PA</th>
+<th>EUFI.PA</th>
+<th>CAGR.PA</th>
+<th>MT.AS</th>
+<th>ENGIE.PA</th>
+<th>LEGD.PA</th>
+<th>WLN.PA</th>
+<th>STLA.PA</th>
+<th>CAC40</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2014-06-27</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>...</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<th>2014-06-30</th>
+<td>0.012009</td>
+<td>-0.003141</td>
+<td>-0.000329</td>
+<td>0.002732</td>
+<td>-0.004731</td>
+<td>-0.007241</td>
+<td>-0.005394</td>
+<td>-0.000397</td>
+<td>0.003206</td>
+<td>-0.008522</td>
+<td>...</td>
+<td>-0.023166</td>
+<td>-0.008049</td>
+<td>0.007175</td>
+<td>-0.028302</td>
+<td>-0.001843</td>
+<td>-0.007406</td>
+<td>-0.006006</td>
+<td>0.012195</td>
+<td>-0.019528</td>
+<td>-0.003189</td>
+</tr>
+<tr>
+<th>2014-07-01</th>
+<td>0.010953</td>
+<td>0.006875</td>
+<td>-0.001481</td>
+<td>0.036028</td>
+<td>0.004188</td>
+<td>0.010557</td>
+<td>0.008005</td>
+<td>0.000397</td>
+<td>0.001420</td>
+<td>0.011804</td>
+<td>...</td>
+<td>0.015092</td>
+<td>0.014829</td>
+<td>-0.009795</td>
+<td>0.029612</td>
+<td>0.009234</td>
+<td>0.002736</td>
+<td>0.004588</td>
+<td>-0.012048</td>
+<td>0.030570</td>
+<td>0.008655</td>
+</tr>
+<tr>
+<th>2014-07-02</th>
+<td>-0.000803</td>
+<td>0.000853</td>
+<td>-0.019608</td>
+<td>-0.006234</td>
+<td>-0.009130</td>
+<td>0.004368</td>
+<td>-0.010247</td>
+<td>-0.002383</td>
+<td>-0.007447</td>
+<td>0.003511</td>
+<td>...</td>
+<td>-0.029027</td>
+<td>-0.010201</td>
+<td>0.017311</td>
+<td>-0.004243</td>
+<td>0.016011</td>
+<td>-0.001240</td>
+<td>-0.002896</td>
+<td>-0.006098</td>
+<td>0.007640</td>
+<td>-0.003676</td>
+</tr>
+<tr>
+<th>2014-07-03</th>
+<td>0.015060</td>
+<td>0.031836</td>
+<td>0.018824</td>
+<td>0.004705</td>
+<td>0.007849</td>
+<td>0.054085</td>
+<td>0.004659</td>
+<td>0.013137</td>
+<td>0.013576</td>
+<td>0.005192</td>
+<td>...</td>
+<td>-0.001094</td>
+<td>0.017827</td>
+<td>0.015691</td>
+<td>0.013731</td>
+<td>0.016659</td>
+<td>0.003725</td>
+<td>0.014634</td>
+<td>0.006135</td>
+<td>0.017395</td>
+<td>0.010160</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>For this session, we will focus on the stock price of Crédit Agricole, identified by the ticker CAGR.PA, and compare it to the CAC 40 index. We will create a dataframe containing these two columns and calculate the excess return.</p><aside class="nb-exercise"><span class="nb-ex-tag">Exercise</span><h3>Exercise : Computing the excess return of Crédit Agricole</h3><p>Create a dataframe containing the returns of the Crédit Agricole stock (CAGR.PA) and of the CAC 40 index, then add a column computing the excess return of the stock over the index. Finally, compute the cumulative excess return and plot its evolution over the period.</p></aside>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculate the average excess return</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The average excess return of Credit Agricole is :"</span><span class="p">,</span> <span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'Excess Return'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The average excess return of Credit Agricole is : -1.634681079629759e-05</pre></details>
+<p>To estimate the relative return against the benchmark, we can compute the average or moving average. Although excess returns alone do not estimate the risk of a stock, they help neutralize the impact of macroeconomic factors and overall market influences on the stock price. Excess returns are most informative when combined with other methods for evaluating investments. Given that excess returns can fluctuate, they depend on various factors.</p>
+<h2 id="II---The-Alpha-and-the-Beta">II - The Alpha and the Beta</h2>
+<p>The Alpha α (or commonly referred to as the Jensen Alpha α) quantifies an investment strategy's ability to outperform the market. It is calculated using the formula: <code>α = rp - rf - β(rb - rf)</code> where :</p>
+<ul>
+<li>rp represents the portfolio return</li>
+<li>rf denotes the risk-free rate (typically the theoretical return on long-term bonds, such as the 10-Year Treasury Rate)</li>
+<li>rb signifies the benchmark return</li>
+<li>β represents the portfolio's beta</li>
+</ul>
+<p>The alpha can be simplified to: <code>α = rp - rb</code> if we assume the risk-free rate is 0 and beta = 1. Alternatively, it can also be expressed as: <code>α = Excess return of the portfolio - β x Excess return of the market</code>.</p>
+<p>The Beta β compares a portfolio's volatility to that of the market and is calculated using the formula: <code>β = Cov(rp, rb)/Var(rb)</code>, where :</p>
+<ul>
+<li>rb is the return of the benchmark</li>
+<li>rp is the return of the portfolio</li>
+</ul>
+<div class="nb-code"><pre><span></span><span class="c1"># Define the functions</span>
+<span class="c1"># Beta</span>
+<span class="k">def</span> <span class="nf">calculate_beta</span><span class="p">(</span><span class="n">portfolio_return</span><span class="p">,</span> <span class="n">market_return</span><span class="p">):</span>
+    <span class="c1"># Cov(rp, rb), first element of the second column of the covariance matrix</span>
+    <span class="n">covMatrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">portfolio_return</span><span class="p">,</span> <span class="n">market_return</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># Variance of the return of the market</span>
+    <span class="n">varRb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">market_return</span><span class="p">)</span>
+    <span class="c1"># Error check</span>
+    <span class="k">if</span> <span class="n">varRb</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">covMatrix</span> <span class="o">/</span> <span class="n">varRb</span>
+
+<span class="c1"># It is also possible to calculate the rolling beta</span>
+<span class="k">def</span> <span class="nf">calculate_rolling_beta</span><span class="p">(</span><span class="n">portfolio_return</span><span class="p">,</span> <span class="n">market_return</span><span class="p">,</span> <span class="n">rolling_window</span><span class="p">):</span>
+    <span class="n">rolling_cov</span> <span class="o">=</span> <span class="n">portfolio_return</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">rolling_window</span><span class="p">)</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">market_return</span><span class="p">)</span>
+    <span class="n">rolling_var</span> <span class="o">=</span> <span class="n">market_return</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">rolling_window</span><span class="p">)</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+    <span class="n">rolling_beta</span> <span class="o">=</span> <span class="n">rolling_cov</span> <span class="o">/</span> <span class="n">rolling_var</span>
+    <span class="k">return</span> <span class="n">rolling_beta</span>
+
+<span class="c1"># Calculate the alpha</span>
+<span class="k">def</span> <span class="nf">calculate_jensen_alpha</span><span class="p">(</span><span class="n">portfolio_return</span><span class="p">,</span> <span class="n">market_return</span><span class="p">,</span> <span class="n">rf_rate</span><span class="p">,</span> <span class="n">beta</span><span class="p">):</span>
+    <span class="c1"># Calculating the excess returns compared to risk free rate </span>
+    <span class="n">excess_return_portfolio</span> <span class="o">=</span> <span class="n">portfolio_return</span> <span class="o">-</span> <span class="n">rf_rate</span>
+    <span class="n">excess_return_market</span> <span class="o">=</span> <span class="n">market_return</span> <span class="o">-</span> <span class="n">rf_rate</span>
+    <span class="c1"># Calculating the alpha</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">excess_return_portfolio</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">excess_return_market</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>  
+    <span class="k">return</span> <span class="n">alpha</span>
+
+<span class="c1"># Rolling Jensen Alpha, </span>
+<span class="k">def</span> <span class="nf">calculate_rolling_alpha</span><span class="p">(</span><span class="n">portfolio_return</span><span class="p">,</span> <span class="n">market_return</span><span class="p">,</span> <span class="n">rf_rate</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">rolling_window</span><span class="p">):</span>
+    <span class="c1"># Calculating the excess returns compared to risk free rate (as expressed in the explanations)</span>
+    <span class="n">excess_return_portfolio</span> <span class="o">=</span> <span class="n">portfolio_return</span> <span class="o">-</span> <span class="n">rf_rate</span>
+    <span class="n">excess_return_market</span> <span class="o">=</span> <span class="n">market_return</span> <span class="o">-</span> <span class="n">rf_rate</span>
+    
+    <span class="c1"># We can either use rolling beta or beta, but if beta is constant we create a Series with the constant (integer or float)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">beta</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">portfolio_return</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">portfolio_return</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="c1"># Calculating the rolling alpha</span>
+    <span class="n">rolling_alpha</span> <span class="o">=</span> <span class="n">excess_return_portfolio</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">rolling_window</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">beta</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">rolling_window</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> 
+                                                                  <span class="o">*</span> <span class="n">excess_return_market</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">rolling_window</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">rolling_alpha</span></pre></div>
+<p>Once the functions are defined, we can run tests to estimate the alpha and beta for the data. It's crucial to understand the implications of these measures:</p>
+<ul>
+<li>For alpha α :<ul>
+<li>A positive alpha indicates outperformance (returns exceed expected risk-adjusted returns).</li>
+<li>A negative alpha suggests underperformance (returns fall below expected risk-adjusted returns).</li>
+<li>A higher alpha signifies better performance relative to risk and the benchmark.</li>
+</ul>
+</li>
+<li>For beta β :<ul>
+<li>A beta greater than 1 implies the portfolio has higher volatility than the market (more risky).</li>
+<li>A beta equal to 1 indicates alignment with the market.</li>
+<li>A beta less than 1 suggests the portfolio is less volatile than the market.</li>
+<li>A beta of 0 implies no correlation between market variations and portfolio returns.</li>
+<li>A negative beta indicates that portfolio returns move in the opposite direction of market fluctuations.</li>
+</ul>
+</li>
+</ul>
+<div class="nb-code"><pre><span></span><span class="c1"># Testing the hypothesis using credit_agricole_return</span>
+
+<span class="c1"># In france, the average risk free rate is 3%</span>
+<span class="n">risk_free_rate</span> <span class="o">=</span> <span class="mf">0.03</span>
+<span class="n">constant_beta_credit_agricole</span> <span class="o">=</span> <span class="n">calculate_beta</span><span class="p">(</span><span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">],</span> <span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAC40'</span><span class="p">])</span>
+<span class="n">constant_alpha_credit_agricole</span> <span class="o">=</span> <span class="n">calculate_jensen_alpha</span><span class="p">(</span><span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">],</span> <span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAC40'</span><span class="p">],</span> 
+                                                        <span class="n">risk_free_rate</span><span class="p">,</span> <span class="n">constant_beta_credit_agricole</span><span class="p">)</span>
+<span class="c1"># Displaying the results</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The overall beta of Credit Agricole is "</span><span class="p">,</span> <span class="n">constant_beta_credit_agricole</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"While the overall alpha of Credit Agricole is "</span><span class="p">,</span> <span class="n">constant_alpha_credit_agricole</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The overall beta of Credit Agricole is  1.2741281897813295
+While the overall alpha of Credit Agricole is  0.008119931298623609</pre></details>
+<p>The risk measures indicate that the portfolio (comprising only one stock) exhibits greater volatility than the market. However, it does not outperform the market, suggesting that while the investment carries higher risk, it does not offer commensurate performance. Consequently, the alpha and beta methods may not support this investment strategy. Nevertheless, using rolling alpha and beta might provide more relevant insights.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Resampling the data by months, we will calculate the rolling alpha and beta by semester</span>
+<span class="n">credit_agricole_data_month</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">'CAGR.PA'</span><span class="p">,</span> <span class="s1">'CAC40'</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">credit_agricole_data_month</span> <span class="o">=</span> <span class="n">credit_agricole_data_month</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">'M'</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
+<span class="n">credit_agricole_return_month</span> <span class="o">=</span> <span class="n">credit_agricole_data_month</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Then calculating the rolling beta and rolling alpha with a rolling window of 6</span>
+<span class="n">window_months</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">roll_beta_cagr</span> <span class="o">=</span> <span class="n">calculate_rolling_beta</span><span class="p">(</span><span class="n">credit_agricole_return_month</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">],</span> 
+                                                      <span class="n">credit_agricole_return_month</span><span class="p">[</span><span class="s1">'CAC40'</span><span class="p">],</span> <span class="n">window_months</span><span class="p">)</span>
+<span class="n">roll_alpha_cagr</span> <span class="o">=</span> <span class="n">calculate_rolling_alpha</span><span class="p">(</span><span class="n">credit_agricole_return_month</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">],</span><span class="n">credit_agricole_return_month</span><span class="p">[</span><span class="s1">'CAC40'</span><span class="p">],</span>
+                                                               <span class="n">risk_free_rate</span><span class="p">,</span> <span class="n">roll_beta_cagr</span><span class="p">,</span> <span class="n">window_months</span><span class="p">)</span></pre></div>
+<p>After calculating the rolling alpha and beta, we can display graphs to illustrate their evolution over time.</p>
+<div class="nb-code"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">roll_beta_cagr</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Evolution of the beta of Credit Agricole in time"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Beta value"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 1" data-asset="session-8/fig-1.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">roll_alpha_cagr</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Evolution of the alpha of Credit Agricole in time"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Alpha value"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 2" data-asset="session-8/fig-2.png" loading="lazy"/></figure></details>
+<p>From the preceding graphs, we conclude that, although the stock price of Crédit Agricole has become more volatile over the years, it has not outperformed the market. Therefore, it may not be a suitable investment for individuals relying on alpha and beta to assess performance. However, it is worth noting that the alpha method is contested by some economists, who argue that most managers using alpha as a performance indicator often fail to consistently beat the market in the long run.</p>
+<h2 id="III---The-Volatility">III - The Volatility</h2>
+<p>Volatility serves as a fundamental measure of risk, reflecting the tendency of an asset's price to fluctuate. It quantifies the magnitude of price variations: the higher the volatility, the sharper the price fluctuations, whether in an upward or downward direction. Volatility is typically calculated by estimating the standard deviation of returns.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Displaying the volatility</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The volatility of Credit Agricole in terms of return is "</span><span class="p">,</span> <span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">())</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The volatility of Credit Agricole in terms of return is  0.02079693550016387</pre></details>
+<p>In addition to static volatility measurements, it is also possible to calculate rolling volatility. This method allows us to observe how risk varies over time, helping to identify periods of higher and lower risk.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Define the window size </span>
+<span class="n">window_size</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">rolling_volatility</span> <span class="o">=</span> <span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window_size</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+<span class="c1"># Displaying</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">rolling_volatility</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Evolution of the volatility of the Credit Agricole stock price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Volatility"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 3" data-asset="session-8/fig-3.png" loading="lazy"/></figure></details>
+<p>Volatility (σ) represents the variations around the average return, illustrating the range within which returns fluctuate relative to the mean. If we assume a normal distribution of returns, volatility helps us determine the intervals in which most values are located:</p>
+<ul>
+<li>The interval [µ - σ ; µ + σ] contains approximately 68.26% of the values of the returns.</li>
+<li>The interval [µ - 2σ ; µ + 2σ] encompasses about 95.44% of the values of the returns.</li>
+<li>The interval [µ - 3σ ; µ + 3σ] includes roughly 99.73% of the values of the returns.</li>
+</ul>
+<h2 id="IV---The-Value-At-Risk">IV - The Value At Risk</h2>
+<p>Value at Risk (VaR) is a widely used metric for assessing portfolio risk. It quantifies the maximum potential loss that an investment portfolio might incur within a specified probability over a defined time frame (e.g., hour, day, month, year).</p>
+<p>Several methods exist for estimating Value at Risk:</p>
+<ul>
+<li>Historical Method: This approach involves analyzing historical return data to assess potential losses based on past performance.</li>
+<li>Parametric Method: This method assumes that returns follow a Gaussian distribution and uses statistical parameters (mean and standard deviation) to estimate potential losses.</li>
+<li>Non-Parametric Method: Also utilizing a Gaussian distribution, this approach employs Monte Carlo simulations to generate potential future returns based on random sampling from historical data.</li>
+</ul>
+<h3 id="a)-Historical-Value-at-Risk">a) Historical Value at Risk</h3><p>The historical method estimates potential losses based on past returns. It assumes that the loss experienced on the next day will be similar to those observed in previous periods. The method involves sorting historical returns and identifying the percentile that corresponds to the desired level of confidence.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># If we consider the returns of Credit Agricole (we have to eliminate the first value) and removing the dates</span>
+<span class="n">CAGR_sorted_returns</span> <span class="o">=</span> <span class="n">credit_agricole_return</span><span class="p">[[</span><span class="s1">'CAGR.PA'</span><span class="p">]]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:,:]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'CAGR.PA'</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>CAGR.PA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>-0.168638</td>
+</tr>
+<tr>
+<th>1</th>
+<td>-0.164894</td>
+</tr>
+<tr>
+<th>2</th>
+<td>-0.140047</td>
+</tr>
+<tr>
+<th>3</th>
+<td>-0.114252</td>
+</tr>
+<tr>
+<th>4</th>
+<td>-0.101701</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Now we are trying to get the percentiles (Let us try with 1, 5 and 10)</span>
+<span class="n">percentile_1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">percentile_5</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">percentile_10</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+
+<span class="c1"># Printing the Value at Risk</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The 10 % VaR is : "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">percentile_10</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The 5 % VaR is : "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">percentile_5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The 1 % VaR is : "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">percentile_1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The 10 % VaR is :  -2.08 %
+The 5 % VaR is :  -2.95 %
+The 1 % VaR is :  -5.36 %</pre></details>
+<p>The Value at Risk (VaR) at a confidence level of 1 − α quantifies the potential loss of a portfolio. The interpretation of the VaR values is as follows:</p>
+<ul>
+<li>At 90% Confidence Level: The expected maximum loss is 2.08%. This indicates a 10% chance that the stock value may decline by more than 2.08% in one day.</li>
+<li>At 95% Confidence Level: The expected maximum loss is 2.95%, meaning there is a 5% chance that the stock may drop by more than 2.95% in one day.</li>
+<li>At 99% Confidence Level: The expected maximum loss is 5.36%, signifying a 1% chance that the stock could fall by more than 5.36% in one day.</li>
+</ul>
+<p>This calculation method requires a substantial amount of data and can be biased, as it does not account for extreme losses beyond the observed values.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># It is possible to show the distribution of the returns to illustrate the previous example</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="c1"># Histograms are the best to show a distribution</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">percentile_10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'yellow'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> 
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'VaR (10%): </span><span class="si">{</span><span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">percentile_10</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">percentile_5</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'orange'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> 
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'VaR (5%): </span><span class="si">{</span><span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">percentile_5</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">percentile_1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> 
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'VaR (1%): </span><span class="si">{</span><span class="n">CAGR_sorted_returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">percentile_1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'Historical Returns of Credit Agricole'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Returns'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Frequency'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 4" data-asset="session-8/fig-4.png" loading="lazy"/></figure></details>
+<h3 id="b)-Parametric-Value-at-Risk-using-Gaussian-Distribution-(non-historical)">b) Parametric Value at Risk using Gaussian Distribution (non historical)</h3>
+<p>The historical method operates under the assumption that returns are normally distributed. By using the mean of the returns and the standard deviation, one can estimate VaR through an inverted normal distribution. The standardization of a normal distribution is achieved using the formula: <code>Z = (X - µ)/ σ</code>.
+By obtaining the Z-score from the inverted normal distribution, we can compute the corresponding value X with the formula: <code>X = Z * σ + µ</code></p>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculating the parameters </span>
+<span class="n">avg_return</span> <span class="o">=</span> <span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">std_return</span> <span class="o">=</span> <span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+<span class="c1"># Z-scores using inverted normal distribution</span>
+<span class="n">zscore_10</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">zscore_5</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">zscore_1</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="c1"># Calculating the parametric Value at Risk</span>
+<span class="n">VaR_10_parametric</span> <span class="o">=</span> <span class="n">zscore_10</span> <span class="o">*</span> <span class="n">std_return</span> <span class="o">+</span> <span class="n">avg_return</span>
+<span class="n">VaR_5_parametric</span> <span class="o">=</span> <span class="n">zscore_5</span> <span class="o">*</span> <span class="n">std_return</span> <span class="o">+</span> <span class="n">avg_return</span>
+<span class="n">VaR_1_parametric</span> <span class="o">=</span> <span class="n">zscore_1</span> <span class="o">*</span> <span class="n">std_return</span> <span class="o">+</span> <span class="n">avg_return</span>
+
+<span class="c1"># Displaying the Value at Risk</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The Parametric 10 % VaR is : "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">VaR_10_parametric</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The Parametric 5 % VaR is : "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">VaR_5_parametric</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The Parametric 1 % VaR is : "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">VaR_1_parametric</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The Parametric 10 % VaR is :  -2.63 %
+The Parametric 5 % VaR is :  -3.39 %
+The Parametric 1 % VaR is :  -4.81 %</pre></details>
+<p>Using the parametric method, which also assumes normal distribution, we can determine the following expected maximum losses:</p>
+<ul>
+<li>At 90% Confidence Level: The expected maximum loss is 2.63%, indicating a 10% chance of exceeding this loss in one day.</li>
+<li>At 95% Confidence Level: The expected maximum loss is 3.39%, implying a 5% chance of a decline greater than this amount.</li>
+<li>At 99% Confidence Level: The expected maximum loss is 4.81%, representing a 1% chance of falling below this threshold.</li>
+</ul>
+<p>However, it is crucial to note that actual returns often do not conform to a perfect normal distribution, and the parametric method may overlook outliers</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Displaying the normal distribution</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="c1"># Showing a normal distribution using the parameters, 99.7% of the values</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">avg_return</span> <span class="o">-</span> <span class="mi">3</span><span class="o">*</span><span class="n">std_return</span><span class="p">,</span> <span class="n">avg_return</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">std_return</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="c1"># Normal distribution with the parameters</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">avg_return</span><span class="p">,</span> <span class="n">std_return</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Normal Distribution with µ and σ'</span><span class="p">)</span>
+<span class="c1"># Showing the different value at risk and the space </span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">VaR_10_parametric</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'yellow'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'VaR (10%): </span><span class="si">{</span><span class="n">VaR_10_parametric</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">VaR_10_parametric</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">'yellow'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">VaR_5_parametric</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'orange'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'VaR (5%): </span><span class="si">{</span><span class="n">VaR_5_parametric</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">VaR_5_parametric</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">'orange'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">VaR_1_parametric</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'VaR (1%): </span><span class="si">{</span><span class="n">VaR_1_parametric</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">VaR_1_parametric</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'Normal Distribution of Returns with VaR Limit'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Returns'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Probability Density'</span><span class="p">)</span>
+<span class="c1"># Adding the legend</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 5" data-asset="session-8/fig-5.png" loading="lazy"/></figure></details>
+<h3 id="c)-Non-parametric-method-using-Monte-Carlo-and-normal-distribution-(non-historical)">c) Non parametric method using Monte Carlo and normal distribution (non historical)</h3>
+<p>As introduced in the previous session, Monte Carlo simulations can be employed to simulate potential outcomes based on historical data parameters. This involves generating a large number of "simulated portfolios" and calculating VaR similarly to the historical method to determine the relevant percentile for the chosen confidence level.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Defining the parameters of Monte Carlo simulation</span>
+<span class="n">simulations</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="c1"># Number of trading days in a year</span>
+<span class="n">horizon</span> <span class="o">=</span> <span class="mi">252</span>  
+<span class="c1"># Generate random returns with a normal distribution</span>
+<span class="n">simulated_returns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">avg_return</span><span class="p">,</span> <span class="n">std_return</span><span class="p">,</span> <span class="p">(</span><span class="n">horizon</span><span class="p">,</span> <span class="n">simulations</span><span class="p">)))</span>
+<span class="c1"># Create a simulated portfolio</span>
+<span class="n">initial_investment</span> <span class="o">=</span> <span class="mi">1000</span> 
+<span class="c1"># Initial value * Cumulative return of each day (Initial investment + cumulative return = new value)</span>
+<span class="n">portfolio_values</span> <span class="o">=</span> <span class="n">initial_investment</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">simulated_returns</span><span class="p">)</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+<span class="c1"># Calculate the returns </span>
+<span class="n">portfolio_returns</span> <span class="o">=</span> <span class="n">portfolio_values</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="c1"># Creating a Series out of all columns combined into one column </span>
+<span class="n">simulated_returns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">portfolio_returns</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span> <span class="o">=</span> <span class="kc">True</span><span class="p">))</span>
+<span class="n">simulated_returns</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Daily return'</span><span class="p">]</span>
+
+<span class="c1"># VaR</span>
+<span class="n">VaR_monte_carlo_10</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">simulated_returns</span><span class="p">[</span><span class="s1">'Daily return'</span><span class="p">],</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">VaR_monte_carlo_5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">simulated_returns</span><span class="p">[</span><span class="s1">'Daily return'</span><span class="p">],</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">VaR_monte_carlo_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">simulated_returns</span><span class="p">[</span><span class="s1">'Daily return'</span><span class="p">],</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># Displaying the value at risk using the percentiles</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The Monte Carlo 10 % VaR is : "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">VaR_monte_carlo_10</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The Monte Carlo 5 % VaR is : "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">VaR_monte_carlo_5</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The Monte Carlo 1 % VaR is : "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">VaR_monte_carlo_1</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The Monte Carlo 10 % VaR is :  -2.65 %
+The Monte Carlo 5 % VaR is :  -3.42 %
+The Monte Carlo 1 % VaR is :  -4.81 %</pre></details>
+<p>The VaR obtained from simulated returns is generally very close to that calculated using the parametric method, which is logical since a higher number of simulations leads to a distribution that more closely approximates normality.</p>
+<div class="nb-code"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">simulated_returns</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">VaR_monte_carlo_10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'yellow'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'VaR (10%): </span><span class="si">{</span><span class="n">VaR_monte_carlo_10</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">VaR_monte_carlo_5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'orange'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'VaR (5%): </span><span class="si">{</span><span class="n">VaR_monte_carlo_5</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">VaR_monte_carlo_1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'VaR (1%): </span><span class="si">{</span><span class="n">VaR_monte_carlo_1</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'Simulated Portfolio Returns Distribution'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Returns'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Frequency'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 6" data-asset="session-8/fig-6.png" loading="lazy"/></figure></details>
+<h2 id="V---The-Expected-Shortfall">V - The Expected Shortfall</h2>
+<p>Expected Shortfall (ES), also known as Conditional Value at Risk (CVaR), represents the average loss that exceeds the Value at Risk threshold. For example, if the VaR is calculated at a 95% confidence level, the Expected Shortfall would be the average loss within the worst 5% of cases where the loss surpasses the VaR.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Function to calculate the expected shortfall</span>
+<span class="k">def</span> <span class="nf">calculate_expected_shortfall</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">value_at_risk</span><span class="p">):</span>
+    <span class="c1"># Extreme losses</span>
+    <span class="n">tail_losses</span> <span class="o">=</span> <span class="n">returns</span><span class="p">[</span><span class="n">returns</span> <span class="o">&lt;=</span> <span class="n">value_at_risk</span><span class="p">]</span>
+    <span class="n">expected_shortfall</span> <span class="o">=</span> <span class="n">tail_losses</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">expected_shortfall</span>
+
+<span class="c1"># for example if we use the parametric VaR 5%</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The Expected shortfall for the param VaR 5</span><span class="si">% i</span><span class="s2">s "</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">calculate_expected_shortfall</span><span class="p">(</span><span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">],</span> 
+                                                                                          <span class="n">VaR_5_parametric</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">"%"</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The Expected shortfall for the param VaR 5% is  -5.38 %</pre></details>
+<p>By employing both Value at Risk and Expected Shortfall, investors can effectively assess the risk of potential financial losses in a portfolio. Although other powerful methods exist that have not been covered in this session, VaR and ES remain essential tools in risk management.</p>
+` },
          { slug: "final-project", label: "Final Project", title: "Portfolio diversification, risk management, and strategy development", embedUrl: "", html: `
    <p>Create a comprehensive financial analysis project in a Jupyter Notebook that focuses on portfolio diversification, risk management, and strategy development. The project should solve a real-world financial problem, integrate multiple sources of data, and incorporate external factors like company news, market sentiment, and broader economic trends. You will be required to demonstrate the ability to build a diversified portfolio, assess its risk, and reflect on the impact of external factors on performance. Your Jupyter Notebook should include six sections, with flexibility in the methods and techniques you choose to apply. The project should require significant effort in data handling, analysis, and strategy development, and you should reflect on your choices, assumptions, and trade-offs.</p>
    <h2>1. Data Collection, Preprocessing, and Feature Engineering</h2>
