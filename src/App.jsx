@@ -1668,7 +1668,7 @@ details.nb-output .nb-table-wrap { overflow-x: auto; padding: 4px 18px 14px; }
   .theme-toggle { margin-left: 8px; }
   .header-inner { gap: 10px; }
   .hero-grid { grid-template-columns: 1fr; gap: 24px; }
-  .hero-side { order: -1; }
+  .hero-side { order: -1; justify-content: center; }
   .portrait, .portrait-fallback { width: 132px; height: 132px; }
   .hero-name { font-size: clamp(2.1rem, 9vw, 2.6rem); }
   .page-title { font-size: clamp(1.6rem, 6.5vw, 2rem); }
