@@ -1067,6 +1067,18 @@ a { color: var(--green); text-decoration: none; }
 a:hover { color: var(--green-deep); }
 :focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 4px; }
 
+/* Default alignment for running text: proper justification with hyphenation */
+.prose, .prose p,
+.hero-lede, .page-sub, .notice,
+.pub-abstract, .cv-details, .footer-aff, .gate-sub,
+.nav-card p, .index-item p,
+.session-content p, .session-content ul > li, .session-content ol > li {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto; -webkit-hyphens: auto; -ms-hyphens: auto;
+  overflow-wrap: break-word;
+}
+
 .wrap { max-width: 1560px; margin: 0 auto; padding-left: clamp(20px, 3vw, 44px); padding-right: clamp(20px, 3vw, 44px); }
 
 .mt { margin-top: 22px; }
