@@ -332,7 +332,7 @@
          "For intellectual property reasons, course content is not available for copying, pasting, or text selection. If you require a version that allows text selection and copying, please contact me by email.",
        sessions: [
          { slug: "session-1", label: "Session 1", title: "Introduction to Python for Finance", embedUrl: "", html: `
-<p>This class aims to help you understand how Python can enhance your efficiency in finance-related activities. The course will present various use cases in Corporate Finance and Market Finance. You will learn about:</p>
+<div class="nb-objectives"><p class="nb-obj-label">Learning objectives</p><p>This class aims to help you understand how Python can enhance your efficiency in finance-related activities. The course will present various use cases in Corporate Finance and Market Finance. You will learn about:</p>
 <ul>
 <li>The basics of Python programming</li>
 <li>Data analytics and visualization</li>
@@ -345,7 +345,7 @@
 <li>How to use conditional statements</li>
 <li>How to display results</li>
 <li>How to utilize loops and functions</li>
-</ul>
+</ul></div>
 <h2 id="I---What-is-Python-?">I - What is Python ?</h2>
 <p>Python is an<code>object-oriented</code> programming language deveopped by Guido van Rossum and released in 1991. It is widely used in finance due to its:</p>
 <ul>
@@ -595,12 +595,12 @@ The number after the function :  15</pre></details>
 4) Short strategy on a stock initially priced 100  for which the market price is  130  which threshold profit  11.0 % and threshold loss  3.0 %, has a profit of  -20</pre></details>
 <aside class="nb-exercise"><span class="nb-ex-tag">Assignment</span><h3>Assignment : Writing functions used in financial analysis</h3><p>Write a program in Jupyter that calculates the current ratio, return on assets (ROA), and internal rate of return (IRR) using a list of cash flows. Include three examples to illustrate the formulas. Please send the code to the email: eva.cheng@audencia.com</p></aside>` },
          { slug: "session-2", label: "Session 2", title: "Advanced basics of Python for Finance", embedUrl: "", html: `
-<p>This session aims to make you as autonomous as possible while writing programs in Python. It will help you understand:</p>
+<div class="nb-objectives"><p class="nb-obj-label">Learning objectives</p><p>This session aims to make you as autonomous as possible while writing programs in Python. It will help you understand:</p>
 <ul>
 <li>The principles of object-oriented programming</li>
 <li>How to identify recurring errors and debug code</li>
 <li>How to install packages and libraries</li>
-</ul>
+</ul></div>
 <h2 id="I---Principles-of-object-oriented-programming">I - Principles of object oriented programming</h2><p>To store information, a computer can use either variables or objects. Variables can include integers, strings, floats, and complex numbers, while objects encompass data structures such as dataframes and lists. In this section, you will learn about the specifics of objects and how to create them.</p>
 <p>An object is an instance (or element) of a specific class. A class is a particular data structure that can be user-defined or pre-defined through Python packages. The class defines the nature of an object with:</p>
 <ul>
@@ -783,13 +783,13 @@ Value of speed of first Tesla : 80 & Value of speed of second Tesla : 80</pre></
 <span class="ansi-red-intense-fg ansi-bold">SyntaxError</span><span class="ansi-red-intense-fg ansi-bold">:</span> invalid syntax</pre></details>
 ` },
          { slug: "session-3", label: "Session 3", title: "Basics of Data Analysis in Python", embedUrl: "", html: `
-<p>This session aims to equip you with essential skills for preparing data and creating visualizations for data analysis. We will cover the following key topics:</p>
+<div class="nb-objectives"><p class="nb-obj-label">Learning objectives</p><p>This session aims to equip you with essential skills for preparing data and creating visualizations for data analysis. We will cover the following key topics:</p>
 <ul>
 <li>Data collection and file reading</li>
 <li>Data processing and cleaning</li>
 <li>Basic operations and aggregations</li>
 <li>Graph creation</li>
-</ul>
+</ul></div>
 <h2 id="I---Data-collection">I - Data collection</h2>
 <p>In this class, we will focus on utilizing structured data for analysis in Python, excluding unstructured data from our scope. Structured data can be organized into tables and includes various types such as numbers, strings, text, dates, and booleans. A convenient method for collecting structured data is by reusing Excel tables.</p>
 <p>To illustrate this, we will download datasets available online, specifically from Kaggle, which offers a vast collection of datasets. For our next class, we will use a dataset representing seismic activity around the world, accessible via the following link: <a href="https://www.kaggle.com/datasets/stealthtechnologies/earthquakes-dataset?resource=download">https://www.kaggle.com/datasets/stealthtechnologies/earthquakes-dataset?resource=download</a></p>
@@ -1298,7 +1298,7 @@ Long        -0.024570   -0.049223  0.004581  1.000000</pre></details>
 <details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 1" data-asset="session-3/fig-1.png" loading="lazy"/></figure></details>
 <p>To improve the readability of visual representations, it is essential to exclude outliers, label axes, and set appropriate limits. In quantitative methods, several approaches can be used to identify and exclude outliers:</p>
 <ul>
-<li>In <code>normal distribution</code>, points below <code>µ - 3σ</code> or above <code>µ + 3σ</code> are typically excluded.</li>
+<li>In <code>normal distribution</code>, points below <span class="nb-math">µ - 3σ</span> or above <span class="nb-math">µ + 3σ</span> are typically excluded.</li>
 <li>In <code>skewed distribution</code>, points below Q1 - 1.5IQR and above Q3 + 1.5IQR are excluded where (Q1 is the first quartile and IQR is the interquartile range)</li>
 <li>In <code>any other distribution</code>, a percentile approach can be adopted; for instance, excluding data above the 95th percentile and below the 5th percentile.</li>
 </ul>
@@ -1698,13 +1698,13 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 </ul><p>Make sure to apply the data cleaning techniques and visualization methods we discussed to ensure that your graphs are clear and meaningful.</p></aside>
 ` },
          { slug: "session-4", label: "Session 4", title: "Financial Analysis Using Python: Application with the Dupont Analysis", embedUrl: "", html: `
-<p>The content of this session will guide you through the analysis of financial data using both Excel and Jupyter Notebook. You will classify, clean, visualize, and analyze key financial statements to gain insights into the financial performance of a company. The assignment emphasizes both technical skills in data processing and interpretation of financial metrics. Follow the instructions carefully, and ensure that your work is well-documented and neatly presented.</p>
+<div class="nb-objectives"><p class="nb-obj-label">Learning objectives</p><p>The content of this session will guide you through the analysis of financial data using both Excel and Jupyter Notebook. You will classify, clean, visualize, and analyze key financial statements to gain insights into the financial performance of a company. The assignment emphasizes both technical skills in data processing and interpretation of financial metrics. Follow the instructions carefully, and ensure that your work is well-documented and neatly presented.</p>
 <p>It is a guided assginment that requires :</p>
 <ul>
 <li>Excel </li>
 <li>Jupyter Notebook</li>
 <li>Python libraries : pandas, numpy, matplotlib and seaborn</li>
-</ul>
+</ul></div>
 <h2 id="Step-1-:-Preparing-Data-in-Excel">Step 1 : Preparing Data in Excel</h2><ol>
 <li><p><strong>Classify Balance Sheet Items:</strong> Open the balance sheet in Excel and add a new column classifying each item as current asset, non-current asset, current liability, non-current liability, or equity.</p>
 </li>
@@ -1790,14 +1790,14 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 </ol>
 ` },
          { slug: "session-5", label: "Session 5", title: "Introduction to time series and Linear Regression using OLS", embedUrl: "", html: `
-<p>The content of this session will establish a foundational understanding of time series and Ordinary Least Squares (OLS), commonly referred to as Linear Regression, as typically addressed in econometrics courses. In this session, you will learn about:</p>
+<div class="nb-objectives"><p class="nb-obj-label">Learning objectives</p><p>The content of this session will establish a foundational understanding of time series and Ordinary Least Squares (OLS), commonly referred to as Linear Regression, as typically addressed in econometrics courses. In this session, you will learn about:</p>
 <ul>
 <li>The definition and characteristics of time series</li>
 <li>The process of converting a Pandas DataFrame into a time series format</li>
 <li>Applications of time series in data analysis, with a particular emphasis on finance</li>
 <li>A refresher on the concepts of Linear Regression</li>
 <li>Implementing Linear Regression in Python using OLS techniques</li>
-</ul>
+</ul></div>
 <h2 id="I---Time-Series">I - Time Series</h2><p>In econometrics, time series data comprises sequences of data points indexed in a specific order, typically over a temporal dimension. These series often represent repeated measurements taken at regular intervals—such as annually, monthly, daily, hourly, or minutely—and are commonly employed to illustrate the evolution of quantitative measures, including stock prices, revenue, or profit.</p>
 <p>Time series data can be decomposed into four main components:</p>
 <ul>
@@ -2778,7 +2778,7 @@ Root Mean Squared Error: 21.581003077901855</pre></details>
 </ul>
 ` },
          { slug: "session-6", label: "Session 6", title: "Building a portfolio and valuing different types of assets", embedUrl: "", html: `
-<p>This session aims to provide you with methodologies for valuing various types of financial securities and for building an equity portfolio. The session’s content will cover the following key topics:</p>
+<div class="nb-objectives"><p class="nb-obj-label">Learning objectives</p><p>This session aims to provide you with methodologies for valuing various types of financial securities and for building an equity portfolio. The session’s content will cover the following key topics:</p>
 <ul>
 <li>Bond Pricing and Valuation</li>
 <li>Stock Pricing</li>
@@ -2792,7 +2792,7 @@ Root Mean Squared Error: 21.581003077901855</pre></details>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">MAIN_PATH</span> <span class="o">=</span> <span class="s1">'C:/Users/evche/Documents/Lessons - Audencia BS/Data/Session 6'</span>
 <span class="c1"># Eliminating the waring messages </span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div></div>
 <h2 id="I---Bonds-:-The-(assumedly)-fixed-income">I - Bonds : The (assumedly) fixed income</h2>
 <p><code>Bonds</code> are financial instruments issued by corporations or governments to raise capital, typically treated as liabilities or debt. These instruments offer investors fixed periodic interest payments (referred to as coupons, wwhich may be <strong>fixed or variable depending on the bond type</strong>) and return the principal (or face value) at maturity. A bond that does not provide periodic interest payments is known as a zero-coupon bond. The following terms are crucial in understanding bond valuation:</p>
 <ul>
@@ -2800,7 +2800,7 @@ Root Mean Squared Error: 21.581003077901855</pre></details>
 <li>Par Value: The amount the issuer agrees to repay the bondholder at maturity (usually equivalent to the face value).</li>
 <li>Coupons: The fixed periodic interest payments made to the bondholder, not to be confused with the market interest rate.</li>
 <li>Market Interest Rate (r): The prevailing rate of interest in the market. In the scope of the class the yield curve will be assumedly flat for simplicity purposes, <em>in real-world valuation uses the term structure of rates</em>)</li>
-<li>Present Value (PV): The sum of the discounted future cash flows from both coupon payments and the face value. It reflects the price an investor should be willing to pay for the bond. The formula for present value is: <code>PV = Sum (Coupons/(1 + r)^t) + FV /(1 + r)^T</code></li>
+<li>Present Value (PV): The sum of the discounted future cash flows from both coupon payments and the face value. It reflects the price an investor should be willing to pay for the bond. The formula for present value is: <span class="nb-math nb-math-block">PV = ∑ (Coupons/(1 + r)<sup>t</sup>) + FV /(1 + r)<sup>T</sup></span></li>
 </ul>
 <p>There are typically three main scenarios in bond valuation:</p>
 <ul>
@@ -3503,7 +3503,7 @@ Payoff of the PUT Seller :  5</pre></details>
 <p><em>This rule is purely practical and is not derived from rigorous portfolio theory</em></p>
 ` },
          { slug: "session-7", label: "Session 7", title: "Quantitative methods and simulations for Finance", embedUrl: "", html: `
-<p>This session will introduce you to quantitative simulations commonly used in finance to estimate prices, returns, or risk measures. The topics covered include:</p>
+<div class="nb-objectives"><p class="nb-obj-label">Learning objectives</p><p>This session will introduce you to quantitative simulations commonly used in finance to estimate prices, returns, or risk measures. The topics covered include:</p>
 <ul>
 <li>Autoregressive Model (AR)</li>
 <li>ARIMA Model (AutoRegressive Integrated Moving Average)</li>
@@ -3523,9 +3523,9 @@ Payoff of the PUT Seller :  5</pre></details>
 <li>Previous stock values: Models like the Autoregressive or ARIMA assume that future prices are influenced by past prices.</li>
 <li>Statistical parameters: Variables such as averages, variances, and standard deviations, derived from historical data, are also used to estimate future prices.</li>
 </ul>
-<p>By leveraging these techniques, this session aims to provide a solid foundation in the econometric and quantitative tools used to model stock prices and predict market behavior</p>
+<p>By leveraging these techniques, this session aims to provide a solid foundation in the econometric and quantitative tools used to model stock prices and predict market behavior</p></div>
 <h2 id="I---The-Autoregressive-Model-(AR)">I - The Autoregressive Model (AR)</h2><p>Autoregression is a statistical technique utilized in time-series analysis, which posits that the current value of a time series is a function of its preceding values. Similar to linear regression, the Autoregressive Model (AR) employs linear regression on the lagged outputs from previous observations. In essence, it is a linear function that incorporates past values of Y as input variables instead of utilizing independent variables.</p>
-<p>The AR model can be expressed mathematically as follows: <code>Y(t) = c + ϕ_1 * Y(t - 1) + ϕ_2 * Y(t - 2) + ... + ϕ_n * Y(t - n) + ε_t</code>, for AR(n) ε representing the shock</p>
+<p>The AR model can be expressed mathematically as follows: <span class="nb-math nb-math-block">Y(t) = c + ϕ_1 · Y(t - 1) + ϕ_2 · Y(t - 2) + ... + ϕ_n · Y(t - n) + ε_t</span>, for AR(n) ε representing the shock</p>
 <p>However, it is crucial to note that in the scope of the class, the Autoregressive Model will only be applied to covariance stationary or strict stationary time series data. This implies that the statistical properties of the time series, such as mean, standard deviation, and covariance, must remain constant over time, a property known as <strong>covariance stationary</strong>.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># Basic configuration </span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -3673,7 +3673,6 @@ AR.1            1.0153           +0.0000j            1.0153            0.0000
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Variation of the return in points"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Week"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span></pre></div>
-<details class="nb-output"><summary>Output</summary><pre><matplotlib.legend.legend 0x1ee23d353a0="" at=""></matplotlib.legend.legend></pre></details>
 <details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 5" data-asset="session-7/fig-5.png" loading="lazy"/></figure></details>
 <p>While the model does capture some price variations, it struggles to accurately represent the amplitude of these fluctuations. The predictions generated by the model are generally flatter than the actual variations. Although the Autoregressive Model is useful, it has its limitations, particularly for series with high volatility, and may present challenges in interpretation.</p>
 <p>The AR model captures some price variations but often fails to represent the full amplitude of fluctuations, especially in volatile series. The ARIMA model, combining AR and MA, can better capture such variations.</p>
@@ -3815,14 +3814,13 @@ Warnings:
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Price in USD"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Week"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span></pre></div>
-<details class="nb-output"><summary>Output</summary><pre><matplotlib.legend.legend 0x1ee23cc4aa0="" at=""></matplotlib.legend.legend></pre></details>
 <details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 9" data-asset="session-7/fig-9.png" loading="lazy"/></figure></details>
 <p>The resulting graph suggests that while the variations are not perfectly aligned, the model successfully identifies the overall trend, and the scale remains accurate. The model can be further refined by adjusting the parameters p, d &amp; q to achieve a better fit. In this instance, we might consider using returns to illustrate that the predicted variations align closely with the actual values.
 ARIMA models are commonly employed for predicting stock prices in market finance and can also be adapted for corporate finance applications, such as forecasting seasonal sales trends.</p>
 <h2 id="III---The-theory-of-the-Brownian-Motion-in-Finance">III - The theory of the Brownian Motion in Finance</h2>
 <p>Brownian motion, in the context of finance, is characterized by random fluctuations that begin from a specific position and are followed by successive relocations of that position. Each relocation is accompanied by additional random fluctuations. Technically, it is defined as a continuous stochastic process with normally distributed fluctuations.</p>
 <p>A stochastic process is a mathematical framework consisting of a sequence of random variables indexed typically by time, modeling systems that evolve over time and space according to probabilistic laws.</p>
-<p>The standard Brownian motion can be represented using Wiener notation as follows:<code>dS/S = µdt + σdX</code>, where :</p>
+<p>The standard Brownian motion can be represented using Wiener notation as follows:<span class="nb-math">dS/S = µdt + σdX</span>, where :</p>
 <ul>
 <li>dS : Instantaneous change in the stock price S</li>
 <li>dt : Instantaneous change in time t</li>
@@ -3857,7 +3855,7 @@ ARIMA models are commonly employed for predicting stock prices in market finance
     <span class="c1"># This illustrate the time component in with the path is followed</span>
     <span class="n">time_component</span> <span class="o">=</span> <span class="p">[</span> <span class="n">t</span><span class="o">*</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_steps</span><span class="p">)</span> <span class="p">]</span>
     <span class="k">return</span> <span class="n">path</span><span class="p">,</span> <span class="n">time_component</span></pre></div>
-<h3 id="a---The-standardized-Brownian-Motion-(No-drift-and-no-scale-/-volatility)">a - The standardized Brownian Motion (No drift and no scale / volatility)</h3><p>When discussing standardized Brownian motion, we assume that the drift μ is 0 and the scale σ is 1. Thus, the formula for each variation in stock price simplifies t <code>dS = dX</code>, where X follows a normal distribution. However, this simplified model may not be suitable for our stock analysis, as it lacks scaling and constant drift considerations.</p>
+<h3 id="a---The-standardized-Brownian-Motion-(No-drift-and-no-scale-/-volatility)">a - The standardized Brownian Motion (No drift and no scale / volatility)</h3><p>When discussing standardized Brownian motion, we assume that the drift μ is 0 and the scale σ is 1. Thus, the formula for each variation in stock price simplifies t <span class="nb-math">dS = dX</span>, where X follows a normal distribution. However, this simplified model may not be suitable for our stock analysis, as it lacks scaling and constant drift considerations.</p>
 <div class="nb-code"><pre><span></span><span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
 
 <span class="c1"># We can try to use a short time frame that is equal to 0.01, the time is expressed in day here</span>
@@ -4688,7 +4686,6 @@ HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
 <span class="n">data_weights</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">area</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Portfolio allocation"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span></pre></div>
-<details class="nb-output"><summary>Output</summary><pre><matplotlib.legend.legend 0x254ea8353d0="" at=""></matplotlib.legend.legend></pre></details>
 <details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 16" data-asset="session-7/fig-16.png" loading="lazy"/></figure></details>
 <p>The preceding graph illustrates the weight distribution of each stock within the portfolio over time, generated through quadratic programming. We can compare the returns of this optimized portfolio against those of an equally weighted portfolio by calculating the cumulative returns of each, with a recalibration of weights occurring every 35 days.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># Let's create the dataframe that contains the returns</span>
@@ -4726,13 +4723,13 @@ HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
 <details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 17" data-asset="session-7/fig-17.png" loading="lazy"/></figure></details>
 <p>From this analysis, it is evident that the selected stocks have consistently outperformed the CAC 40 index. Furthermore, the Markowitz optimized portfolio exhibits performance that is comparable to the equally weighted portfolio while demonstrating superior outcomes in specific instances.</p>
-<aside class="nb-exercise"><span class="nb-ex-tag">Assignment</span><h3>Assignment : Application of the Quantitative Methods</h3><p>Download data from Refinitiv Eikon, Bloomberg, Yahoo Finance, or any financial data provider for three or four stocks, allocating weights at your discretion (please refrain from performing a Markowitz optimization if you are unfamiliar with the concept). Construct a diversified portfolio that showcases strong performance. Utilizing the concepts covered in this course, along with relevant online resources or methodologies from other courses, conduct a backtest prior to forecasting future prices.</p></aside><h2 id="To-go-further---Option-Pricing-using-Monte-Carlo">To go further - Option Pricing using Monte Carlo</h2><p>The price of an option (here, we will only consider European Options) can be succinctly represented by the following formula: <code>Estimated price = Intrinsic Value + Time Value</code>, where :</p>
+<aside class="nb-exercise"><span class="nb-ex-tag">Assignment</span><h3>Assignment : Application of the Quantitative Methods</h3><p>Download data from Refinitiv Eikon, Bloomberg, Yahoo Finance, or any financial data provider for three or four stocks, allocating weights at your discretion (please refrain from performing a Markowitz optimization if you are unfamiliar with the concept). Construct a diversified portfolio that showcases strong performance. Utilizing the concepts covered in this course, along with relevant online resources or methodologies from other courses, conduct a backtest prior to forecasting future prices.</p></aside><h2 id="To-go-further---Option-Pricing-using-Monte-Carlo">To go further - Option Pricing using Monte Carlo</h2><p>The price of an option (here, we will only consider European Options) can be succinctly represented by the following formula: <span class="nb-math nb-math-block">Estimated price = Intrinsic Value + Time Value</span>, where :</p>
 <ul>
 <li>Intrinsic Value is defined as the difference between the current market price of the underlying asset and the strike price of the option.</li>
 <li>Time Value reflects the potential for the underlying asset’s price to increase or decrease, capturing the randomness of future price movements.</li>
 <li>There is no early exercise as we are considering European Options.</li>
 </ul>
-<p>To estimate the price of an option more accurately, we can utilize the Black-Scholes formula, which is expressed as: <code>ST = principal * exp((rate - 0.5 * σ²) * T + σ * sqrt(T) * X)</code> where :</p>
+<p>To estimate the price of an option more accurately, we can utilize the Black-Scholes formula, which is expressed as: <span class="nb-math nb-math-block">ST = principal · exp((rate - 0.5 · σ²) · T + σ · √(T) · X)</span> where :</p>
 <ul>
 <li>Principal refers to the current price of the underlying asset (also known as the spot price).</li>
 <li>Rate denotes the interest rate.</li>
@@ -4745,7 +4742,7 @@ HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
 <li>K represents the strike price</li>
 <li>S the final price which can be decomposed as S0 + Variations</li>
 </ul>
-<p>The price of the option can then be expressed as: <code>exp(-rate * T) * payoff</code>. These estimations can be performed using Monte Carlo simulations to capture the stochastic nature of the underlying asset's price.</p>
+<p>The price of the option can then be expressed as: <span class="nb-math">exp(-rate · T) · payoff</span>. These estimations can be performed using Monte Carlo simulations to capture the stochastic nature of the underlying asset's price.</p>
 <div class="nb-code"><pre><span></span><span class="c1"># Definition of the Monte Carlo pricer</span>
 <span class="k">def</span> <span class="nf">black_scholes_MonteCarlo_call</span><span class="p">(</span><span class="n">spot</span><span class="p">,</span> <span class="n">strike</span><span class="p">,</span> <span class="n">volatility</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">maturity</span><span class="p">,</span> <span class="n">simulations</span><span class="p">):</span>
     <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">simulations</span><span class="p">)</span>  <span class="c1"># Generating a wide volume of random inputs</span>
@@ -4769,7 +4766,7 @@ HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
 <aside class="nb-exercise"><span class="nb-ex-tag">Blitz exercise</span><h3>Blitz Exercise : Price of a PUT &amp; a CALL (15 minutes)</h3><p>Using the aforementioned formulas and applications, create a program that allows the user to <strong>input parameters</strong> each time the program is executed. The program should enable the calculation of both the price of a call option and a put option based on the same parameters.</p></aside><h3 id="Next-session-:-Quizz"><em>Next session : Quizz</em></h3>
 ` },
          { slug: "session-8", label: "Session 8", title: "Financial risk assessment", embedUrl: "", html: `
-<p>When dealing with financial assets, particularly stocks, the concepts of risk aversion and risk preference become crucial. Investors who are willing to accept a higher risk of losses often seek the potential for substantial returns. Therefore, assessing an investor's risk tolerance before investing in a financial asset is essential. Various methods exist to evaluate risk, and this session will cover:</p>
+<div class="nb-objectives"><p class="nb-obj-label">Learning objectives</p><p>When dealing with financial assets, particularly stocks, the concepts of risk aversion and risk preference become crucial. Investors who are willing to accept a higher risk of losses often seek the potential for substantial returns. Therefore, assessing an investor's risk tolerance before investing in a financial asset is essential. Various methods exist to evaluate risk, and this session will cover:</p>
 <ul>
 <li>Excess Return</li>
 <li>Alpha and the Beta</li>
@@ -4785,7 +4782,7 @@ HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
 <span class="n">MAIN_PATH</span> <span class="o">=</span> <span class="s1">'C:/Users/evche/Documents/Lessons - Audencia BS/Data/Session 8'</span>
 <span class="c1"># Eliminating the waring messages </span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span></pre></div></div>
 <h2 id="I---Excess-Return">I - Excess Return</h2>
 <p>The Excess Return of a stock represents the portion of return that exceeds the return of a benchmark, typically represented by a market index (e.g., CAC 40, S&amp;P 500, DAX, NASDAQ). Mathematically, it is defined as the difference between the stock's return and the benchmark's return.</p>
 <div class="nb-code"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s2">"/CAC 40.xlsx"</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s2">"Date"</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="s2">"Date"</span><span class="p">)</span>
@@ -4974,15 +4971,15 @@ HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
 <details class="nb-output"><summary>Output</summary><pre>The average excess return of Credit Agricole is : -1.634681079629759e-05</pre></details>
 <p>To estimate the relative return against the benchmark, we can compute the average or moving average. Although excess returns alone do not estimate the risk of a stock, they help neutralize the impact of macroeconomic factors and overall market influences on the stock price. Excess returns are most informative when combined with other methods for evaluating investments. Given that excess returns can fluctuate, they depend on various factors.</p>
 <h2 id="II---The-Alpha-and-the-Beta">II - The Alpha and the Beta</h2>
-<p>The Alpha α (or commonly referred to as the Jensen Alpha α) quantifies an investment strategy's ability to outperform the market. It is calculated using the formula: <code>α = rp - rf - β(rb - rf)</code> where :</p>
+<p>The Alpha α (or commonly referred to as the Jensen Alpha α) quantifies an investment strategy's ability to outperform the market. It is calculated using the formula: <span class="nb-math">α = rp - rf - β(rb - rf)</span> where :</p>
 <ul>
 <li>rp represents the portfolio return</li>
 <li>rf denotes the risk-free rate (typically the theoretical return on long-term bonds, such as the 10-Year Treasury Rate)</li>
 <li>rb signifies the benchmark return</li>
 <li>β represents the portfolio's beta</li>
 </ul>
-<p>The alpha can be simplified to: <code>α = rp - rb</code> if we assume the risk-free rate is 0 and beta = 1. Alternatively, it can also be expressed as: <code>α = Excess return of the portfolio - β x Excess return of the market</code>.</p>
-<p>The Beta β compares a portfolio's volatility to that of the market and is calculated using the formula: <code>β = Cov(rp, rb)/Var(rb)</code>, where :</p>
+<p>The alpha can be simplified to: <span class="nb-math">α = rp - rb</span> if we assume the risk-free rate is 0 and beta = 1. Alternatively, it can also be expressed as: <span class="nb-math nb-math-block">α = Excess return of the portfolio - β × Excess return of the market</span>.</p>
+<p>The Beta β compares a portfolio's volatility to that of the market and is calculated using the formula: <span class="nb-math">β = Cov(rp, rb)/Var(rb)</span>, where :</p>
 <ul>
 <li>rb is the return of the benchmark</li>
 <li>rp is the return of the portfolio</li>
@@ -5183,8 +5180,8 @@ The 1 % VaR is :  -5.36 %</pre></details>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
 <details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 4" data-asset="session-8/fig-4.png" loading="lazy"/></figure></details>
 <h3 id="b)-Parametric-Value-at-Risk-using-Gaussian-Distribution-(non-historical)">b) Parametric Value at Risk using Gaussian Distribution (non historical)</h3>
-<p>The historical method operates under the assumption that returns are normally distributed. By using the mean of the returns and the standard deviation, one can estimate VaR through an inverted normal distribution. The standardization of a normal distribution is achieved using the formula: <code>Z = (X - µ)/ σ</code>.
-By obtaining the Z-score from the inverted normal distribution, we can compute the corresponding value X with the formula: <code>X = Z * σ + µ</code></p>
+<p>The historical method operates under the assumption that returns are normally distributed. By using the mean of the returns and the standard deviation, one can estimate VaR through an inverted normal distribution. The standardization of a normal distribution is achieved using the formula: <span class="nb-math">Z = (X - µ)/ σ</span>.
+By obtaining the Z-score from the inverted normal distribution, we can compute the corresponding value X with the formula: <span class="nb-math">X = Z · σ + µ</span></p>
 <div class="nb-code"><pre><span></span><span class="c1"># Calculating the parameters </span>
 <span class="n">avg_return</span> <span class="o">=</span> <span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="n">std_return</span> <span class="o">=</span> <span class="n">credit_agricole_return</span><span class="p">[</span><span class="s1">'CAGR.PA'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>

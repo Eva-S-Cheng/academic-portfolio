@@ -1275,6 +1275,34 @@ details.nb-output .nb-table-wrap { overflow-x: auto; padding: 4px 18px 14px; }
 .nb-table-wrap thead th { color: var(--green-deep); font-weight: 600; }
 .nb-table-wrap tbody th { color: var(--green-deep); font-weight: 600; text-align: left; }
 
+/* --- learning objectives card (session intro) --- */
+.session-content .nb-objectives {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: var(--shadow); padding: 20px 26px 14px; margin: 0 0 26px;
+}
+.session-content .nb-obj-label {
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--soft); margin: 0 0 10px;
+}
+.session-content .nb-objectives ul { margin: 6px 0 8px; }
+.session-content .nb-objectives ul > li { padding: 4px 0 4px 27px; }
+.session-content .nb-objectives ul > li::before {
+  content: "✓"; left: 0; top: 6px; width: 17px; height: 17px;
+  display: grid; place-items: center; border-radius: 50%;
+  font-size: 0.6rem; font-weight: 700;
+  background: var(--wash); color: var(--green-deep);
+}
+
+/* --- typeset math --- */
+.nb-math { font-style: italic; letter-spacing: 0.01em; white-space: normal; }
+.nb-math sup { font-size: 0.7em; font-style: italic; }
+.nb-math-block {
+  display: block; width: fit-content; max-width: 100%;
+  margin: 14px auto; padding: 10px 24px;
+  background: var(--wash); border-radius: 10px;
+  font-size: 1.06rem; text-align: center;
+}
+
 /* --- exercises & assignments: visibly not course content --- */
 :root { --ex: #9a6b1f; }
 [data-theme="dark"] { --ex: #e0b070; }
