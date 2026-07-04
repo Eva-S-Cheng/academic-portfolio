@@ -1700,7 +1700,98 @@ Upper limit of Depth :  576.0 &amp; Lower limit of Depth :  5.0</pre></details>
 <li>Create 2 to 3 visuals that might be relevant for the analysis.</li>
 </ul><p>Make sure to apply the data cleaning techniques and visualization methods we discussed to ensure that your graphs are clear and meaningful.</p></aside>
 ` },
-         { slug: "session-4", label: "Session 4", title: "Financial Analysis Using Python: Application with the Dupont Analysis", embedUrl: "" },
+         { slug: "session-4", label: "Session 4", title: "Financial Analysis Using Python: Application with the Dupont Analysis", embedUrl: "", html: `
+<p>The content of this session will guide you through the analysis of financial data using both Excel and Jupyter Notebook. You will classify, clean, visualize, and analyze key financial statements to gain insights into the financial performance of a company. The assignment emphasizes both technical skills in data processing and interpretation of financial metrics. Follow the instructions carefully, and ensure that your work is well-documented and neatly presented.</p>
+<p>It is a guided assginment that requires :</p>
+<ul>
+<li>Excel </li>
+<li>Jupyter Notebook</li>
+<li>Python libraries : pandas, numpy, matplotlib and seaborn</li>
+</ul>
+<h2 id="Step-1-:-Preparing-Data-in-Excel">Step 1 : Preparing Data in Excel</h2><ol>
+<li><p><strong>Classify Balance Sheet Items:</strong> Open the balance sheet in Excel and add a new column classifying each item as current asset, non-current asset, current liability, non-current liability, or equity.</p>
+</li>
+<li><p><strong>Operating and Non-Operating Items:</strong> Add a second column indicating whether each item is an operating asset/liability, non-operating asset/liability, or cash.</p>
+</li>
+<li><p><strong>Save the File:</strong> Double-check your classifications for accuracy before proceeding to Jupyter Notebook.</p>
+</li>
+</ol>
+<h2 id="Step-2:-Setting-Up-Jupyter-Notebook">Step 2: Setting Up Jupyter Notebook</h2><ol>
+<li><strong>Title and Introduction:</strong> Begin your Jupyter Notebook with a clear title and a brief introduction to your analysis.</li>
+<li><strong>Documentation:</strong> For each block of code, include a short description of its purpose. Use Markdown cells to provide explanations for key outputs.</li>
+</ol>
+<h2 id="Step-3:-Data-Preparation-and-Cleaning">Step 3: Data Preparation and Cleaning</h2><ol>
+<li><strong>Define Constants:</strong> Set the following constants:<ul>
+<li><code>TAX_RATE_2022</code> = 20.90%</li>
+<li><code>TAX_RATE_2023</code> = 19.30%</li>
+<li><code>OPERATIONAL_CASH_PROPORTION</code> = 20%</li>
+</ul>
+</li>
+<li><strong>Ignore Warnings:</strong> Include code to suppress warning messages to keep your output clean and readable.</li>
+<li><strong>Load Data:</strong> Read all sheets from your Excel file into six separate Pandas DataFrames.</li>
+<li><strong>Clean Data:</strong> Remove rows with missing titles and those without relevant data.</li>
+<li><strong>Compute Averages:</strong> Calculate the average for each DataFrame, using the end-of-year values for 2022 and 2023.</li>
+<li><strong>Set Index:</strong> Use item labels as the index for each DataFrame for easier reference and analysis.</li>
+</ol>
+<h2 id="Step-4:-Visualization">Step 4: Visualization</h2><ol>
+<li><strong>Balance Sheet Comparison:</strong> Create a visualization comparing assets to liabilities. Provide a brief analysis of the results in a Markdown cell.</li>
+<li><strong>Proportion Analysis:</strong> Visualize the proportion of current vs. non-current assets and liabilities, as well as operating vs. non-operating items.</li>
+<li><strong>Income Statement Insights:</strong> Create a visualization for the income statement and summarize key trends or insights.</li>
+</ol>
+<h2 id="Step-5:-Financial-Ratio-Calculations">Step 5: Financial Ratio Calculations</h2><ol>
+<li><strong>Create Functions for Financial Analysis</strong> For each of the following calculations, <strong>implement both methods</strong>:</li>
+</ol>
+<ul>
+<li>Working Capital Turnover Ratio: Measures how efficiently a company uses its working capital to generate sales. A higher ratio indicates better efficiency.<ul>
+<li>Method 1: Direct calculation using operating working capital.</li>
+<li>Method 2: Breakdown into elements like operating cash, accounts receivable, inventories, and accounts payable.</li>
+</ul>
+</li>
+<li>Invested Capital Turnover: Reflects how effectively a company uses invested capital to generate revenue.<ul>
+<li>Method 1: Use the formula directly.</li>
+<li>Method 2: Decompose into components such as property, plant &amp; equipment (P,P&amp;E), goodwill, intangible assets, and other non-current operating assets.</li>
+</ul>
+</li>
+<li>EBIT Margin (Earnings Before Interest and Taxes): Indicates operational profitability before interest and taxes.<ul>
+<li>Method 1: Use the EBIT value directly.</li>
+<li>Method 2: Break down into gross profit and SG&amp;A expenses (selling, general, and administrative).</li>
+</ul>
+</li>
+<li>NOPAT Margin (Net Operating Profit After Tax): Measures profitability after taxes from core operations.<ul>
+<li>Method 1: Use EBIT Margin and tax rate.</li>
+<li>Method 2: Use a detailed breakdown of operating components.</li>
+</ul>
+</li>
+<li>Return on Invested Capital (ROIC): Shows how well a company generates returns relative to its invested capital.<ul>
+<li>Method 1: Use a direct formula.</li>
+<li>Method 2: Combine NOPAT margin and invested capital turnover.</li>
+</ul>
+</li>
+<li>Return on Non-Operating Assets After Tax: Evaluates returns from assets outside of core operations.<ul>
+<li>Method 1: Use interest income directly.</li>
+<li>Method 2: Decompose returns by type of non-operating income.</li>
+</ul>
+</li>
+<li>Cost of Debt After Tax: The effective rate a company pays on its debt after tax deductions.<ul>
+<li>Method 1: Use interest expenses and tax rate.</li>
+<li>Method 2: Break down into detailed interest and debt-related costs.</li>
+</ul>
+</li>
+<li>Return on Equity (ROE): Measures how effectively a company uses shareholder equity to generate profit.<ul>
+<li>Method 1: Use the formula (Net Income / Shareholders' Equity).</li>
+<li>Method 2: Decompose into return on assets, cost of debt, and financial leverage.</li>
+</ul>
+</li>
+</ul>
+<h2 id="Step-6:-Analysis-of-ROE-for-2022-and-2023">Step 6: Analysis of ROE for 2022 and 2023</h2><ol>
+<li><strong>Calculate and Analyze ROE for 2023:</strong> Use iloc or loc to extract specific values and calculate ROE. Include comments on what the results indicate.</li>
+<li><strong>Compare ROE for 2022:</strong> Repeat the calculation for 2022, compare with 2023 results, and discuss any changes or trends.</li>
+</ol>
+<h2 id="Step-7:-Advanced-Analysis-(Optional)">Step 7: Advanced Analysis (Optional)</h2><ol>
+<li><strong>Develop a Comprehensive calculate_ROE Function:</strong> Create a single function that calls each of the other functions to compute ROE.</li>
+<li><strong>Sensitivity Analysis:</strong> Modify constants or assumptions and observe the impact on ROE. Document your findings with visualizations that highlight these changes.</li>
+</ol>
+` },
          { slug: "session-5", label: "Session 5", title: "Introduction to time series and Linear Regression using OLS", embedUrl: "" },
          { slug: "session-6", label: "Session 6", title: "Building a portfolio and valuing different types of assets", embedUrl: "" },
          { slug: "session-7", label: "Session 7", title: "Quantitative methods and simulations for Finance", embedUrl: "" },
