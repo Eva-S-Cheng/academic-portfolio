@@ -3499,10 +3499,1275 @@ Payoff of the CALL Seller :  -10
 Payoff of the PUT Purchaser :  -5
 Payoff of the PUT Seller :  5</pre></details>
 <p>Although this session does not cover option pricing, the pricing methods will be explored in Session 7. In that session, we will use Monte Carlo simulations to estimate the fair price of a call or put option—i.e., the amount an investor should be willing to pay for the option.</p>
-<p>Heuristic investment rule : When building an investment portfolio consisting of high-risk (high-yield) and low-risk (bonds) assets, it is essential to consider an individual’s age as a guiding factor for asset allocation. A general rule, endorsed by economists, is to allocate a percentage of the portfolio to low-risk assets based on your age. For instance, if you are 25 years old, 25% of your portfolio should be invested in low-risk assets, while the remaining 75% can be allocated to high-yield (riskier) investments.</p>
+<p><strong>Heuristic investment rule :</strong> When building an investment portfolio consisting of high-risk (high-yield) and low-risk (bonds) assets, it is essential to consider an individual’s age as a guiding factor for asset allocation. A general rule, endorsed by economists, is to allocate a percentage of the portfolio to low-risk assets based on your age. For instance, if you are 25 years old, 25% of your portfolio should be invested in low-risk assets, while the remaining 75% can be allocated to high-yield (riskier) investments.</p>
 <p><em>This rule is purely practical and is not derived from rigorous portfolio theory</em></p>
 ` },
-         { slug: "session-7", label: "Session 7", title: "Quantitative methods and simulations for Finance", embedUrl: "" },
+         { slug: "session-7", label: "Session 7", title: "Quantitative methods and simulations for Finance", embedUrl: "", html: `
+<p>This session will introduce you to quantitative simulations commonly used in finance to estimate prices, returns, or risk measures. The topics covered include:</p>
+<ul>
+<li>Autoregressive Model (AR)</li>
+<li>ARIMA Model (AutoRegressive Integrated Moving Average)</li>
+<li>Brownian Motion</li>
+<li>Monte Carlo Simulations</li>
+<li>Markowitz Portfolio Theory</li>
+</ul>
+<p>In finance, statistical and econometric methods are widely used to estimate stock prices. The underlying concept is that financial markets are driven by divergent opinions among market participants. Markets bring together buyers and sellers who trade financial instruments based on their differing views of a security’s value:</p>
+<ul>
+<li>Sellers typically believe that the value of a security will decrease.</li>
+<li>Buyers generally believe that the value of a security will increase.</li>
+</ul>
+<p>Accurately predicting the future price of a financial instrument is a key advantage. To achieve this, we can apply various methods, including statistical models, econometrics, quantitative techniques, or artificial intelligence (AI).</p>
+<p>While this class will focus on advanced econometric and statistical approaches, the use of AI will not be covered here. There will be a separate module dedicated to Machine Learning in Finance during the second semester of the program. For now, the emphasis is on learning how to calculate theoretical stock prices based on model-driven predictions.</p>
+<p>It is important to remember that all models used to estimate current or future stock prices rely on historical data. The predictions are typically based on either:</p>
+<ul>
+<li>Previous stock values: Models like the Autoregressive or ARIMA assume that future prices are influenced by past prices.</li>
+<li>Statistical parameters: Variables such as averages, variances, and standard deviations, derived from historical data, are also used to estimate future prices.</li>
+</ul>
+<p>By leveraging these techniques, this session aims to provide a solid foundation in the econometric and quantitative tools used to model stock prices and predict market behavior</p>
+<h2 id="I---The-Autoregressive-Model-(AR)">I - The Autoregressive Model (AR)</h2><p>Autoregression is a statistical technique utilized in time-series analysis, which posits that the current value of a time series is a function of its preceding values. Similar to linear regression, the Autoregressive Model (AR) employs linear regression on the lagged outputs from previous observations. In essence, it is a linear function that incorporates past values of Y as input variables instead of utilizing independent variables.</p>
+<p>The AR model can be expressed mathematically as follows: <code>Y(t) = c + ϕ_1 * Y(t - 1) + ϕ_2 * Y(t - 2) + ... + ϕ_n * Y(t - n) + ε_t</code>, for AR(n) ε representing the shock</p>
+<p>However, it is crucial to note that in the scope of the class, the Autoregressive Model will only be applied to covariance stationary or strict stationary time series data. This implies that the statistical properties of the time series, such as mean, standard deviation, and covariance, must remain constant over time, a property known as <strong>covariance stationary</strong>.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Basic configuration </span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.stattools</span> <span class="kn">import</span> <span class="n">adfuller</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">yfinance</span> <span class="k">as</span> <span class="nn">yf</span>
+<span class="n">MAIN_PATH</span> <span class="o">=</span> <span class="s1">'C:/Users/evche/Documents/Lessons - Audencia BS/Data/Session 7'</span>
+<span class="c1"># Eliminating the waring messages </span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
+
+<span class="c1"># Fetch WTI Crude Oil futures data (for AR)</span>
+<span class="n">crude_oil_ticker</span> <span class="o">=</span> <span class="s2">"CL=F"</span>
+<span class="n">crude_oil</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">crude_oil_ticker</span><span class="p">)</span>
+<span class="n">oil_data</span> <span class="o">=</span> <span class="n">crude_oil</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">"4y"</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s2">"1d"</span><span class="p">)</span>
+
+<span class="c1"># Keeping the close only</span>
+<span class="n">oil_data_close</span> <span class="o">=</span> <span class="n">oil_data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">]</span>
+<span class="n">oil_data_close</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">oil_data_close</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">date</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># We will only use the close for the analysis</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="n">figure</span>
+<span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Variation of the price of Crude oil"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Return"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">oil_data_close</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 1" data-asset="session-7/fig-1.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Let us check the stationarity of the model by using the ADF (Augmented Dickey–Fuller test) test </span>
+<span class="n">adf_result</span> <span class="o">=</span> <span class="n">adfuller</span><span class="p">(</span><span class="n">oil_data_close</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">adf_result</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>0.16322052416223937</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># We can use the describe method to show the parameters</span>
+<span class="n">oil_data_close</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">T</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>count    1007.000000
+mean       79.530368
+std        11.989240
+min        57.759998
+25%        71.510002
+50%        77.419998
+75%        83.790001
+max       123.699997
+Name: Close, dtype: float64</pre></details>
+<p>The Augmented Dickey-Fuller (ADF) test is a statistical test used to assess the hypothesis that a time series is stationary. The null hypothesis states that "the series is non-stationary," while the alternative hypothesis posits that "the series is stationary." Based on the results obtained, we may reject the null hypothesis at a 85% confidence level. While the ADF test shows good results, it is also possible to elevate the level of our analysis by making sure the residuals are stationary.</p>
+<div class="nb-code"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.tsa.seasonal</span> <span class="kn">import</span> <span class="n">seasonal_decompose</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Decomposing the time series</span>
+<span class="n">oil_data_close_all_interpolated</span> <span class="o">=</span> <span class="n">oil_data_close</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="s1">'D'</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()</span>
+<span class="n">decomposition</span> <span class="o">=</span> <span class="n">seasonal_decompose</span><span class="p">(</span><span class="n">oil_data_close_all_interpolated</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">'additive'</span><span class="p">)</span>
+
+<span class="c1"># Extracting the components</span>
+<span class="n">trend</span> <span class="o">=</span> <span class="n">decomposition</span><span class="o">.</span><span class="n">trend</span>
+<span class="n">seasonal</span> <span class="o">=</span> <span class="n">decomposition</span><span class="o">.</span><span class="n">seasonal</span>
+<span class="n">residual</span> <span class="o">=</span> <span class="n">decomposition</span><span class="o">.</span><span class="n">resid</span>
+
+<span class="c1"># Plotting the components</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Decomposition of the time series of crude oil"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">411</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">oil_data_close_all_interpolated</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Original'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'best'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">412</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">trend</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Trend'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'best'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">413</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">seasonal</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Seasonality'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'best'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">414</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">residual</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Residuals'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'best'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 2" data-asset="session-7/fig-2.png" loading="lazy"/></figure></details>
+<p>At first sight, residuals seem stationary and ADF test reveals favorable results when applied to the differenced data, suggesting that we should consider using this data to construct an Autoregressive Model. Nonetheless, we must also evaluate the ACF &amp; PACF to determine whether a linear relationship exists between the current stock price and its past values, and what model to use.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Drop na to check stationarity</span>
+<span class="n">residual</span> <span class="o">=</span> <span class="n">residual</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">adf_result</span> <span class="o">=</span> <span class="n">adfuller</span><span class="p">(</span><span class="n">residual</span><span class="p">,</span> <span class="n">autolag</span><span class="o">=</span><span class="s1">'AIC'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">adf_result</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>1.6831097694951178e-25</pre></details>
+<p>The ADF test show relevant result regarding the residuals. The residuals seem stationary so the variation are well represented in the trends, and seasonality of the decomposition, therefore, we can consider that we can use AR / MA / ARIMA to model the series.</p>
+<p>In the case of a AR model, there are 2 major characteristics regarding the ACF and the PACF :</p>
+<ul>
+<li>The ACF diminishes gradually in a geometric pattern (<code>Tail-off</code>)</li>
+<li>The PACF will show significance only at a limited number of initial lags (<code>Cut off</code>)</li>
+</ul>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the ACF</span>
+<span class="kn">from</span> <span class="nn">statsmodels.graphics.tsaplots</span> <span class="kn">import</span> <span class="n">plot_acf</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plot_acf</span><span class="p">(</span><span class="n">oil_data_close</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 3" data-asset="session-7/fig-3.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Showing the PACF</span>
+<span class="kn">from</span> <span class="nn">statsmodels.graphics.tsaplots</span> <span class="kn">import</span> <span class="n">plot_pacf</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plot_pacf</span><span class="p">(</span><span class="n">oil_data_close</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 4" data-asset="session-7/fig-4.png" loading="lazy"/></figure></details>
+<p>To effectively use the Autoregressive Model (here, AR(1)), the following conditions should be met:</p>
+<ul>
+<li>The Autocorrelation Function (ACF) should exhibit a decay toward zero.</li>
+<li>The PACF should cut off quickly toward zero.</li>
+<li>A significant spike should be observed at Lag 1 for on the PACF</li>
+</ul>
+<p>Analysis indicates that the ACF is indeed decaying toward zero progressively and exhibits strong PACF for Lag 1, remaining significant. Here, we will use AR(1), as the spikes are significant only Lag 0 and Lag 1.</p>
+<p>Despite the relevant result on the ADF test, the current dataset does not exhibit the required conditions for the Autoregressive model, therefore, we will remain using the first series. To create the model, we can split the data into a train set and a test set to show the reliability of our model.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># We can try to do prediction on past data to test whether the model is suitable, try for the last 6 days</span>
+<span class="n">train</span> <span class="o">=</span> <span class="n">oil_data_close</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">oil_data_close</span><span class="p">)</span><span class="o">-</span><span class="mi">10</span><span class="p">]</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">oil_data_close</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">oil_data_close</span><span class="p">)</span><span class="o">-</span><span class="mi">10</span><span class="p">:]</span>
+
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.ar_model</span> <span class="kn">import</span> <span class="n">AutoReg</span>
+<span class="c1"># Creating the model using the Lags 1</span>
+<span class="n">ar_model</span> <span class="o">=</span> <span class="n">AutoReg</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ar_model</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>AutoReg Model Results                             
+==============================================================================
+Dep. Variable:                  Close   No. Observations:                  997
+Model:                     AutoReg(1)   Log Likelihood               -2105.344
+Method:               Conditional MLE   S.D. of innovations              2.003
+Date:                Wed, 19 Feb 2025   AIC                           4216.687
+Time:                        02:02:59   BIC                           4231.398
+Sample:                             1   HQIC                          4222.279
+                                  997                                         
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          1.2150      0.425      2.857      0.004       0.381       2.048
+Close.L1       0.9849      0.005    186.484      0.000       0.975       0.995
+                                    Roots                                    
+=============================================================================
+                  Real          Imaginary           Modulus         Frequency
+-----------------------------------------------------------------------------
+AR.1            1.0153           +0.0000j            1.0153            0.0000
+-----------------------------------------------------------------------------</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Creating the predictions using the AR model</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">ar_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">train</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">oil_data_close</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">pred</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">index</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">'blue'</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span><span class="s1">'Prediction'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">oil_data_close</span><span class="p">[</span><span class="s2">"2024"</span><span class="p">:],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">'Actual'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Comparing the AR Model prediction vs the actual variation of the week to week return (in points)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Variation of the return in points"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Week"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre><matplotlib.legend.legend 0x1ee23d353a0="" at=""></matplotlib.legend.legend></pre></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 5" data-asset="session-7/fig-5.png" loading="lazy"/></figure></details>
+<p>While the model does capture some price variations, it struggles to accurately represent the amplitude of these fluctuations. The predictions generated by the model are generally flatter than the actual variations. Although the Autoregressive Model is useful, it has its limitations, particularly for series with high volatility, and may present challenges in interpretation.</p>
+<p>The AR model captures some price variations but often fails to represent the full amplitude of fluctuations, especially in volatile series. The ARIMA model, combining AR and MA, can better capture such variations.</p>
+<p>Rules for AR, MA, and ARIMA Models:</p>
+<ul>
+<li>AR model (p): If the ACF shows a tail-off, use AR. The PACF will show significant lags initially, then taper off.</li>
+<li>MA model (q): If the PACF shows a tail-off, use MA. The ACF will show significant lags initially, then taper off.</li>
+<li>ARIMA (p, q): If both ACF and PACF tail off, use ARIMA. It combines AR and MA components, with d for differencing if non-stationary. If neither ACF nor PACF clearly tail off, use ARMA, which combines AR and MA.).).</li>
+</ul>
+<h2 id="II---The-Autoregressive-Integrated-Moving-Average-(ARIMA-Model)">II - The Autoregressive Integrated Moving Average (ARIMA Model)</h2>
+<p>The standardized ARIMA model is defined as ARIMA (p, d, q). In the scope of the class, we will only consider a model using d = 0. When both the ACF and PACF show a tail-off pattern, an ARIMA(p, 0, q) model, which combines both AR and MA models, is appropriate. The parameters p (AR part) and q (MA part) are determined based on the respective ACF and PACF patterns.</p>
+<p>If both the ACF and PACF do not show a clear tail-off or cutoff pattern, this is a signal that an ARMA model, a combination of AR and MA, could be more suitable. The ARMA model is particularly flexible and useful when neither the ACF nor PACF provide clear information about which model (AR or MA) to choose. In such cases, the order of the AR (p) and MA (q) components can be selected based on a combination of ACF and PACF characteristics, or using model selection criteria like AIC (the ability to fit the data, while penalizing complexity) or BIC (similar but the penalty becomes stronger as the number of observation increases).</p>
+<ul>
+<li>AIC = - 2 ln(Likelihood) + 2k =&gt; Not used here</li>
+<li>BIC = - 2 ln(Likelihood) + kln(n) =&gt; Not used here</li>
+</ul>
+<p>With :</p>
+<ol>
+<li>Likehood indicates how well the model represents the actual data</li>
+<li>k is the number of parameters</li>
+<li>n is the size of the sample</li>
+</ol>
+<div class="nb-code"><pre><span></span><span class="c1"># use crude dataù</span>
+<span class="n">arima_crude</span> <span class="o">=</span> <span class="n">oil_data</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">"M"</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
+<span class="n">arima_crude</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">arima_crude</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">date</span>
+<span class="n">arima_crude</span> <span class="o">=</span> <span class="n">arima_crude</span><span class="p">[[</span><span class="s1">'Close'</span><span class="p">]]</span>
+<span class="n">arima_crude</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Close</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2021-02-28</th>
+<td>61.500000</td>
+</tr>
+<tr>
+<th>2021-03-31</th>
+<td>59.160000</td>
+</tr>
+<tr>
+<th>2021-04-30</th>
+<td>63.580002</td>
+</tr>
+<tr>
+<th>2021-05-31</th>
+<td>66.320000</td>
+</tr>
+<tr>
+<th>2021-06-30</th>
+<td>73.470001</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Displaying the Graph</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="n">figure</span>
+<span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Price of crude oil per month"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Price in USD"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arima_crude</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 6" data-asset="session-7/fig-6.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Check stationarity</span>
+<span class="n">adf_result</span> <span class="o">=</span> <span class="n">adfuller</span><span class="p">(</span><span class="n">arima_crude</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">adf_result</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>0.1492486511719502</pre></details>
+<p>Series is stationary at confidence level 85 %.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Let us show the PACF</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plot_pacf</span><span class="p">(</span><span class="n">arima_crude</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Autocorrelation of the google stock price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 7" data-asset="session-7/fig-7.png" loading="lazy"/></figure></details>
+<p>We can see here a significant spike at lag 1 and lag 1°, so we can already say that we could use 10 for parameter p, we can then determine parameter q using the same principle.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># PACF</span>
+<span class="n">plot_acf</span><span class="p">(</span><span class="n">arima_crude</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Autocorrelation of the google stock price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 8" data-asset="session-7/fig-8.png" loading="lazy"/></figure></details>
+<p>Upon re-evaluation, we can ascertain that a significant autocorrelation exists between the current point and the previous 35 observations, with an even stronger correlation noted for the first 25 points. As a result, we will consider utilizing between 1 and 10 lags for p for optimal performance in the ARIMA model. Notably, the ARIMA model incorporates three parameters, unlike the AR model:</p>
+<ul>
+<li>p: The lag order of the PACF</li>
+<li>d:  The degree of differencing, as the model is already stationary we can put 0.</li>
+<li>q: The lag order of the ACF</li>
+</ul>
+<p>For this analysis, we will set p = 10, d = 0 and q = 0</p>
+<div class="nb-code"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.tsa.arima.model</span> <span class="kn">import</span> <span class="n">ARIMA</span>
+<span class="c1"># Fitting the ARIMA model </span>
+<span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">arima_crude</span><span class="p">[:</span><span class="o">-</span><span class="mi">15</span><span class="p">],</span> <span class="n">arima_crude</span><span class="p">[</span><span class="o">-</span><span class="mi">15</span><span class="p">:]</span>
+<span class="n">model_arima</span> <span class="o">=</span> <span class="n">ARIMA</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_arima</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>SARIMAX Results                                
+==============================================================================
+Dep. Variable:                  Close   No. Observations:                   34
+Model:                ARIMA(10, 0, 0)   Log Likelihood                -110.772
+Date:                Wed, 19 Feb 2025   AIC                            245.543
+Time:                        02:03:00   BIC                            263.859
+Sample:                    02-28-2021   HQIC                           251.789
+                         - 11-30-2023                                         
+Covariance Type:                  opg                                         
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const         82.3280      3.189     25.816      0.000      76.078      88.578
+ar.L1          0.8723      0.212      4.114      0.000       0.457       1.288
+ar.L2         -0.1760      0.386     -0.456      0.648      -0.933       0.581
+ar.L3          0.3335      0.338      0.986      0.324      -0.329       0.996
+ar.L4         -0.4050      0.334     -1.211      0.226      -1.061       0.251
+ar.L5          0.1381      0.351      0.394      0.694      -0.550       0.826
+ar.L6         -0.3108      0.267     -1.166      0.244      -0.833       0.212
+ar.L7          0.2390      0.247      0.967      0.333      -0.245       0.723
+ar.L8         -0.0158      0.388     -0.041      0.968      -0.776       0.744
+ar.L9          0.2993      0.507      0.591      0.555      -0.694       1.292
+ar.L10        -0.4751      0.262     -1.810      0.070      -0.989       0.039
+sigma2        34.8179     15.097      2.306      0.021       5.228      64.408
+===================================================================================
+Ljung-Box (L1) (Q):                   0.16   Jarque-Bera (JB):                 1.95
+Prob(Q):                              0.69   Prob(JB):                         0.38
+Heteroskedasticity (H):               0.73   Skew:                            -0.59
+Prob(H) (two-sided):                  0.62   Kurtosis:                         2.93
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculation for the predictions</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">model_arima</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">train</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arima_crude</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">pred</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">index</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">'blue'</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span><span class="s1">'Prediction'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arima_crude</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">'Actual'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Comparing the AR Model prediction vs the actual value of the crude oil"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Price in USD"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Week"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre><matplotlib.legend.legend 0x1ee23cc4aa0="" at=""></matplotlib.legend.legend></pre></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 9" data-asset="session-7/fig-9.png" loading="lazy"/></figure></details>
+<p>The resulting graph suggests that while the variations are not perfectly aligned, the model successfully identifies the overall trend, and the scale remains accurate. The model can be further refined by adjusting the parameters p, d &amp; q to achieve a better fit. In this instance, we might consider using returns to illustrate that the predicted variations align closely with the actual values.
+ARIMA models are commonly employed for predicting stock prices in market finance and can also be adapted for corporate finance applications, such as forecasting seasonal sales trends.</p>
+<h2 id="III---The-theory-of-the-Brownian-Motion-in-Finance">III - The theory of the Brownian Motion in Finance</h2>
+<p>Brownian motion, in the context of finance, is characterized by random fluctuations that begin from a specific position and are followed by successive relocations of that position. Each relocation is accompanied by additional random fluctuations. Technically, it is defined as a continuous stochastic process with normally distributed fluctuations.</p>
+<p>A stochastic process is a mathematical framework consisting of a sequence of random variables indexed typically by time, modeling systems that evolve over time and space according to probabilistic laws.</p>
+<p>The standard Brownian motion can be represented using Wiener notation as follows:<code>dS/S = µdt + σdX</code>, where :</p>
+<ul>
+<li>dS : Instantaneous change in the stock price S</li>
+<li>dt : Instantaneous change in time t</li>
+<li>µ : Average growth rate of the asset price (drift).</li>
+<li>σ : Volatility of the asset price.</li>
+<li>dX : Random component, where X,follows a standard normal distribution, denoted as ~ <em>N(0,1)</em></li>
+<li>S : the stock price</li>
+</ul>
+<p>For standard Brownian motion, we typically assume (µ, σ²) = (0, σ²), However, stock price evolution can also be modeled using Geometric Brownian Motion (GBM), which incorporates a drift and a scale (or volatility, in our application to finance).</p>
+<ul>
+<li>Growth Rate: The average of daily returns can simplify the model.</li>
+<li>Volatility: This can be approximated by the standard deviation of stock price changes over a defined period. For GBM, we may also utilize the average log return and the standard deviation of log returns.</li>
+</ul>
+<p>Using the aforementioned random fluctuations, we can generate simulations for future stock prices, allowing us to forecast potential outcomes. It is vital to utilize a normal distribution for the random variable because smaller variations are more probable in the short term compared to larger fluctuations.</p>
+<p>For our analysis, we will assume that the stock returns can be modeled as Brownian motions, though we will not provide a formal proof. In finance, Brownian motion is commonly employed to create various “random walks,” illustrating potential paths that the stock price might take.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Rereading the data again (Even though the data is already stored)</span>
+<span class="n">google_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/GOOG.csv'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="n">google_data</span> <span class="o">=</span> <span class="n">google_data</span><span class="p">[[</span><span class="s1">'Close'</span><span class="p">]]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">google_data</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"The evolution of the google stock price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Price in USD"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 10" data-asset="session-7/fig-10.png" loading="lazy"/></figure></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Defining the function that will be used for the creation of the points</span>
+<span class="k">def</span> <span class="nf">simulate_bm</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">number_of_steps</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">initial_value</span><span class="p">):</span>
+    <span class="c1"># Repeat n times (number of steps) : calculate the dS = µ * dt + σ * dX, with dX following a standard normal distribution</span>
+    <span class="n">dS</span> <span class="o">=</span> <span class="p">[</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">number_of_steps</span><span class="p">)]</span>
+    <span class="c1"># The total path is for each step, the sum of the previous one + the variation (added to the initial value)</span>
+    <span class="n">dS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">initial_value</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dS</span><span class="p">)</span>
+    <span class="c1"># This illustrate the time component in with the path is followed</span>
+    <span class="n">time_component</span> <span class="o">=</span> <span class="p">[</span> <span class="n">t</span><span class="o">*</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_steps</span><span class="p">)</span> <span class="p">]</span>
+    <span class="k">return</span> <span class="n">path</span><span class="p">,</span> <span class="n">time_component</span></pre></div>
+<h3 id="a---The-standardized-Brownian-Motion-(No-drift-and-no-scale-/-volatility)">a - The standardized Brownian Motion (No drift and no scale / volatility)</h3><p>When discussing standardized Brownian motion, we assume that the drift μ is 0 and the scale σ is 1. Thus, the formula for each variation in stock price simplifies t <code>dS = dX</code>, where X follows a normal distribution. However, this simplified model may not be suitable for our stock analysis, as it lacks scaling and constant drift considerations.</p>
+<div class="nb-code"><pre><span></span><span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+
+<span class="c1"># We can try to use a short time frame that is equal to 0.01, the time is expressed in day here</span>
+<span class="n">std_mu</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">std_sigma</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">t</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="c1"># Let us generate 10000 steps, which will represent 100 days</span>
+<span class="n">steps</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="c1"># We can do 10 simulations</span>
+<span class="n">simulations</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="c1"># Storing the brownian motion data</span>
+<span class="n">simulation_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+<span class="c1"># Generating the simulations</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">simulations</span><span class="p">):</span>
+    <span class="n">prices</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">simulate_bm</span><span class="p">(</span><span class="n">std_mu</span><span class="p">,</span> <span class="n">std_sigma</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">simulation_data</span><span class="p">[</span><span class="s1">'prices (in USD) - simulation '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">prices</span>
+    <span class="n">simulation_data</span><span class="p">[</span><span class="s1">'Time (in days)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+
+<span class="n">simulation_data</span> <span class="o">=</span> <span class="n">simulation_data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Time (in days)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<p>The previous graph illustrates how Brownian motion can represent various scenarios for the future evolution of an asset's price. However, it is important to note that standardized Brownian motion may not be suitable for the stock we are analyzing for the following reasons:</p>
+<ul>
+<li>Lack of Scaling: Standardized Brownian motion assumes a constant variance (scale) of 1, which may not accurately reflect the actual volatility of the stock. This simplification can lead to predictions that do not capture the true range of price fluctuations.</li>
+<li>Absence of Constant Drift: Standardized Brownian motion also ignores the concept of drift, which represents the average expected change in price over time. Without incorporating a drift, the model fails to account for the inherent upward or downward trend in the asset's price, leading to unrealistic forecasts.</li>
+</ul>
+<p>To enhance the accuracy of our price predictions, it is essential to incorporate both drift and scale:</p>
+<ul>
+<li>Drift (μ): This represents the constant expected variation in the stock price, independent of time. By estimating drift as the average return or log return of the asset, we can better model the general direction in which the stock is likely to move over time.</li>
+<li>Scale (σ): This parameter allows us to define the range within which the asset's price is expected to fluctuate around the drift. The scale is typically represented by the standard deviation of the stock price changes, providing a more realistic measure of volatility.</li>
+</ul>
+<h3 id="b---The-Brownian-Motion-considering-a-drift-and-a-scale-/-Volatility">b - The Brownian Motion considering a drift and a scale / Volatility</h3><p>To conduct our simulation, we will utilize data from the beginning of the dataset up to the 50th measurement before the last value of the Carrefour stock price. This approach enables a comparison of the simulations against actual price movements.</p>
+<div class="nb-code"><pre><span></span><span class="n">carrefour_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/CA.PA.csv'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="n">carrefour_data</span> <span class="o">=</span> <span class="n">carrefour_data</span><span class="p">[[</span><span class="s1">'Close'</span><span class="p">]]</span>
+
+<span class="c1"># Showing</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">carrefour_data</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'The Carrefour stock price in USD'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Price in USD"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 11" data-asset="session-7/fig-11.png" loading="lazy"/></figure></details>
+<p>To mitigate volatility that could skew predictions, we will exclude data prior to 2012. Notably, there was a significant drop in stock prices around 2008 due to the financial crisis (the Great Recession), which could introduce bias in our analysis.</p>
+<div class="nb-code"><pre><span></span><span class="n">carrefour_data</span> <span class="o">=</span> <span class="n">carrefour_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">'2014-01-01'</span><span class="p">:]</span>
+<span class="c1"># Calculating the changes in the prices</span>
+<span class="n">carrefour_data_train</span> <span class="o">=</span> <span class="n">carrefour_data</span><span class="p">[:</span><span class="o">-</span><span class="mi">50</span><span class="p">]</span>
+<span class="n">carrefour_data_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">carrefour_data_train</span><span class="p">)</span>
+<span class="c1"># Calculating the difference to the previous value</span>
+<span class="n">carrefour_variation_ref</span> <span class="o">=</span> <span class="n">carrefour_data_ref</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculating the drift and the scale volatility</span>
+<span class="n">drift_carrefour</span> <span class="o">=</span> <span class="n">carrefour_variation_ref</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">scale_carrefour</span> <span class="o">=</span> <span class="n">carrefour_variation_ref</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+<span class="c1"># We use the log returns because, it reduces the volatility. It does not exist a specific rule regarding the scale and the drift</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Drift :"</span><span class="p">,</span> <span class="n">drift_carrefour</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Scale :"</span><span class="p">,</span> <span class="n">scale_carrefour</span><span class="p">)</span>
+<span class="c1"># Some test have to be done to define a good drift and a good scale, however, it is possible to use the log returns too</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Drift : -0.0002761841155139823
+Scale : 0.016481181640191255</pre></details>
+<p>Once we calculate the drift and scale / volatility, we can proceed to generate multiple simulations of Brownian motion. For our analysis, we will create five simulations spanning 50 days.</p>
+<div class="nb-code"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="mf">0.02</span>
+<span class="n">steps</span> <span class="o">=</span> <span class="mi">2500</span>
+<span class="c1"># We can do 5 simulations</span>
+<span class="n">simulations</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># Storing the brownian motion data</span>
+<span class="n">simulation_carrefour</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">last_value_carrefour</span> <span class="o">=</span> <span class="n">carrefour_data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">][</span><span class="o">-</span><span class="mi">50</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">simulations</span><span class="p">):</span>
+    <span class="n">prices</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">simulate_bm</span><span class="p">(</span><span class="n">drift_carrefour</span><span class="p">,</span> <span class="n">scale_carrefour</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">last_value_carrefour</span><span class="p">)</span>
+    <span class="n">simulation_carrefour</span><span class="p">[</span><span class="s1">'Carrefour stock price - simulation '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">prices</span><span class="p">)</span>
+    <span class="n">simulation_carrefour</span><span class="p">[</span><span class="s1">'Time (in days)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+
+<span class="n">carrefour_data_test</span> <span class="o">=</span> <span class="n">carrefour_data</span><span class="p">[</span><span class="o">-</span><span class="mi">50</span><span class="p">:]</span>
+<span class="n">carrefour_data_test</span> <span class="o">=</span> <span class="n">carrefour_data_test</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">simulation_carrefour</span> <span class="o">=</span> <span class="n">simulation_carrefour</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'Time (in days)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">simulation_carrefour</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">simulation_carrefour</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Real data vs 5 simulations using Brownian Motion"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">carrefour_data_test</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s2">"Actual Price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Price in USD"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Time in days"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 12" data-asset="session-7/fig-12.png" loading="lazy"/></figure></details>
+<p>The generated drifted and scaled Brownian motions produce various scenarios for potential price evolution. This approach allows us to explore several possibilities, including best- and worst-case scenarios, based on statistical measures. For predictive purposes, rather than commencing from 50 steps before the end, we can initiate our simulations directly from the final data point of the series.</p>
+<p>This framework provides a robust method for utilizing Brownian motion in finance, allowing for the generation of potential future stock prices and enhancing our understanding of the inherent risks and rewards associated with stock market investments. The analysis of drift and scale plays a crucial role in creating accurate simulations that reflect realistic market behavior.</p>
+<h2 id="IV---Approximation-with-Monte-Carlo">IV - Approximation with Monte Carlo</h2><p>We define a Monte Carlo simulation a model that uses randomness to solve problem that can either be deterministic or stochastic. It allows one to solve optimization problems, calculation of integrals problems and problems with random outcomes; by generating random inputs and applying a specific function to the inputs to generate deterministic outputs.</p>
+<p>A Monte Carlo simulation takes a variable that has uncertainty and assigns it random values, repeats the process again again with a wide number of different values, once done, the result is aggregated to arrive to a certain estimate.</p>
+<p>In a nutshell, a Monte Carlo simulation always follow the same procedure :</p>
+<ul>
+<li>Definition a domain of possible inputs</li>
+<li>Generate input randomly from probability distribution (Randomness, inside the domain)</li>
+<li>Perform a deterministic computation of the outputs (apply a function to the random inputs to generate the outputs)</li>
+<li>Aggregate the results (Can be an average in case of estimation of a possible outcome, can be a sum in case of integrals, or other aggregate functions)</li>
+</ul>
+<p>Let us show a first example of the next day stock price, using the price of the last day. We will use the priciples that have been used for the Brownian motion to calculate the stock price variation, using the log returns here instead of the returns. (We will note that the returns can nevertheless be used as well)</p>
+<p>From the previous formula (dt = 1), we can say <code>Not expected to be known in the scope of this class</code>:</p>
+<ul>
+<li>dS = µ * 1 + σ * dX</li>
+<li>S(t) = dS + S(t-1)<ul>
+<li>S(t-1) is the previous price</li>
+<li>With Îto's formula (assumed in the scope of this class) : ln(S(t)/S(t-1)) = (µ * 1 + σ * dX)</li>
+<li>So ln(S(t)) = (µ + σ * dX) + ln(S(t-1))</li>
+<li>Then S(t) = exp((µ + σ * dX) + ln(S(t-1)))</li>
+<li>So S(t) = exp((µ + σ * dX)) * S(t-1)</li>
+</ul>
+</li>
+<li>With µ and σ calculated on the log returns, we can use :<ul>
+<li>The drift, or µ = Avg(ln(Days's Price / Previous Days Price)) - Var(ln(Days's Price / Previous Days Price))/2, under the risk neutral probability measure (present value is equal to the expected value of its future payoffs, discounted at the risk-free rate, and all assets grow at the risk-free rate)</li>
+<li>The scale, or the variable σ = The standard deviation of the log returns  log volatility</li>
+</ul>
+</li>
+</ul>
+<p>Therefore, we can, by the the Îto's formula and the previous demonstration say that we can calculate the next day's price using :</p>
+<ul>
+<li>S(t) = exp((µ + σ * dX)) * S(t-1)</li>
+<li>µ = Average(ln(Days's Price / Previous Days Price)) - Var(ln(Days's Price / Previous Days Price))/2</li>
+<li>σ = The standard deviation of the log returns</li>
+<li>dX a standard normally distributed random variable</li>
+</ul>
+<div class="nb-code"><pre><span></span><span class="c1"># We will first try to predict the stock price of the next day using this formula</span>
+<span class="c1"># Input variables</span>
+<span class="n">last_price</span> <span class="o">=</span> <span class="n">carrefour_data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">log_prices_carrefour</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">carrefour_data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">])</span>
+
+<span class="c1"># Calculate log returns, dropping NaN values</span>
+<span class="n">log_returns_carrefour</span> <span class="o">=</span> <span class="n">log_prices_carrefour</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+<span class="c1"># Parameters</span>
+<span class="n">avg_log_return</span> <span class="o">=</span> <span class="n">log_returns_carrefour</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">variance_log_return</span> <span class="o">=</span> <span class="n">log_returns_carrefour</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+<span class="n">std_log_return</span> <span class="o">=</span> <span class="n">log_returns_carrefour</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+<span class="c1"># Drift and scale</span>
+<span class="n">drift_log_carrefour</span> <span class="o">=</span> <span class="n">avg_log_return</span> <span class="o">-</span> <span class="n">variance_log_return</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">scale_log_carrefour</span> <span class="o">=</span> <span class="n">std_log_return</span>
+
+<span class="c1"># Number of repetitions</span>
+<span class="n">repetitions</span> <span class="o">=</span> <span class="mi">5000</span>
+
+<span class="c1"># Generating random variations</span>
+<span class="n">random_numbers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">repetitions</span><span class="p">)</span>
+
+<span class="c1"># Vectorized calculation of next price</span>
+<span class="n">deterministic_output</span> <span class="o">=</span> <span class="n">last_price</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">drift_log_carrefour</span> <span class="o">+</span> <span class="n">scale_log_carrefour</span> <span class="o">*</span> <span class="n">random_numbers</span><span class="p">)</span>
+
+<span class="c1"># Aggregation: Calculate the average</span>
+<span class="n">calculated_next_price</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">deterministic_output</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The next day's price is expected to be </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">calculated_next_price</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2"> according to the Monte Carlo simulation"</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>The next day's price is expected to be 14.79 according to the Monte Carlo simulation</pre></details>
+<p>To test whether the model is efficient, we can perform a back test by running the monte carlo simulation on the previous prices and by trying to predict the previous prices. It can be, for example, on the last 20 days.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Use the same process by calculating the drift and the scale on the data</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Number of predictions</span>
+<span class="n">nb_of_predictions</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Backtest log returns (excluding the last nb_of_predictions days)</span>
+<span class="n">log_returns_backtest</span> <span class="o">=</span> <span class="n">log_returns_carrefour</span><span class="p">[:</span><span class="o">-</span><span class="n">nb_of_predictions</span><span class="p">]</span>
+
+<span class="c1"># Parameters calculation</span>
+<span class="n">avg_log_return_backtest</span> <span class="o">=</span> <span class="n">log_returns_backtest</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">variance_log_return_backtest</span> <span class="o">=</span> <span class="n">log_returns_backtest</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+<span class="n">std_log_return_backtest</span> <span class="o">=</span> <span class="n">log_returns_backtest</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+<span class="c1"># Scale and drift</span>
+<span class="n">drift_log</span> <span class="o">=</span> <span class="n">avg_log_return_backtest</span> <span class="o">-</span> <span class="n">variance_log_return_backtest</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">scale_log</span> <span class="o">=</span> <span class="n">std_log_return_backtest</span>
+
+<span class="c1"># Initial price for predictions</span>
+<span class="n">last_price</span> <span class="o">=</span> <span class="n">carrefour_data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="n">nb_of_predictions</span><span class="p">]</span>
+
+<span class="c1"># Repetitions for Monte Carlo simulation (large number =&gt; Might fail to capture variability because the Law of large number says it will converge </span>
+<span class="c1"># toward the average so Price + Drift</span>
+<span class="n">repetitions</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Lists to store actual and predicted prices</span>
+<span class="n">real_prices</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">calculated_prices</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Loop over each prediction step</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_of_predictions</span><span class="p">):</span>
+    <span class="c1"># Extract the actual price for this step</span>
+    <span class="n">actual_price</span> <span class="o">=</span> <span class="n">carrefour_data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="n">nb_of_predictions</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>
+    <span class="n">real_prices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actual_price</span><span class="p">)</span>
+    
+    <span class="c1"># Generate random normal variations</span>
+    <span class="n">random_numbers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">repetitions</span><span class="p">)</span>
+    
+    <span class="c1"># Calculate simulated prices using cumulative product for more realistic variability</span>
+    <span class="n">simulated_prices</span> <span class="o">=</span> <span class="n">last_price</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">drift_log</span> <span class="o">+</span> <span class="n">scale_log</span> <span class="o">*</span> <span class="n">random_numbers</span><span class="p">)</span>
+    
+    <span class="c1"># Aggregate to obtain the predicted price (use median for more variability)</span>
+    <span class="n">predicted_price</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">simulated_prices</span><span class="p">)</span>
+    <span class="n">calculated_prices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predicted_price</span><span class="p">)</span>
+    
+    <span class="c1"># Update last_price for the next iteration</span>
+    <span class="n">last_price</span> <span class="o">=</span> <span class="n">predicted_price</span>
+
+<span class="c1"># Plotting the actual and predicted prices</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">real_prices</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Actual Prices"</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'-'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">calculated_prices</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Calculated Prices"</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Prediction Step"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Price"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Actual vs Calculated Prices using Monte Carlo Simulation (Enhanced Variability)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 13" data-asset="session-7/fig-13.png" loading="lazy"/></figure></details>
+<p>As you may notice, it might be very complicated to use Monte Carlo struggles to capture the variation of the stocks that are volatile. Monte Carlo might not be a good option for all financial assets or all estimations. The method :</p>
+<ul>
+<li>Relies on good quality input (Here, the price data is polluted by the macroeconomic events)</li>
+<li>Is sensitive to change in volatility and average</li>
+<li>Might oversimplify complex problems</li>
+<li>For mathematical reasons (Law of large number, in these kind of problem, Monte Carlo might fail to capture the variability effectively)</li>
+</ul>
+<p>However, it might be a good solution for computation of integrals or optimization problems (such as Markowitz weighted portfolio, for example)</p>
+<h2 id="V---Markowitz-and-efficient-market-theory">V - Markowitz and efficient market theory</h2>
+<p>The Markowitz portfolio model is a sophisticated optimization technique that explores the intricate relationship between risk and return. Its primary objective is to maximize returns while simultaneously minimizing risk. This model operates under the premise of market efficiency, implying that investors have access to all pertinent information necessary for making well-informed investment decisions.</p>
+<p>This methodology is particularly valuable when constructing a diversified portfolio of stocks. It allocates varying weights to each stock, aiming to enhance returns and mitigate volatility. To accomplish this, it is imperative to calculate both the returns and the volatility associated with individual stocks, thus enabling a comprehensive evaluation of the overall risk and return of the weighted portfolio.</p>
+<p>We can employ Monte Carlo simulations to illustrate diverse scenarios for the portfolio, showcasing the potential returns and risks associated with different allocations.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># We use the average yearly return and the yearly volatility </span>
+<span class="k">def</span> <span class="nf">compute_CAGR</span><span class="p">(</span><span class="n">prices</span><span class="p">,</span> <span class="n">annual_days</span> <span class="o">=</span> <span class="mi">256</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">((</span><span class="n">prices</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">prices</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="p">(</span><span class="n">annual_days</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compute_volatility</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">annual_days</span> <span class="o">=</span> <span class="mi">256</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">centered_ret_sq</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">sum_sq</span> <span class="o">=</span> <span class="n">centered_ret_sq</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">annual_days</span><span class="o">**</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sum_sq</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span><span class="mi">3</span><span class="p">)</span></pre></div>
+<p>In this analysis, we will utilize stocks from the CAC 40 index to exemplify the principles of the Markowitz model. It is crucial to select a diverse array of high-performing stocks while minimizing correlation among them to avoid concentration risk.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Reading the stock prices </span>
+<span class="n">cac_data_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">MAIN_PATH</span> <span class="o">+</span> <span class="s1">'/CAC 40.xlsx'</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'Date'</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">'Date'</span><span class="p">)</span>
+<span class="n">cac_data_prices</span> <span class="o">=</span> <span class="n">cac_data_prices</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">'2015-01-01'</span><span class="p">:]</span>
+<span class="n">cac_data_return</span> <span class="o">=</span> <span class="n">cac_data_prices</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">cac_data_return</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Time in days</th>
+<th>AIRP.PA</th>
+<th>AXAF.PA</th>
+<th>BOUY.PA</th>
+<th>BNPP.PA</th>
+<th>TCFP.PA</th>
+<th>CAPP.PA</th>
+<th>ESLX.PA</th>
+<th>OREP.PA</th>
+<th>LVMH.PA</th>
+<th>...</th>
+<th>VIE.PA</th>
+<th>VIV.PA</th>
+<th>EUFI.PA</th>
+<th>CAGR.PA</th>
+<th>MT.AS</th>
+<th>ENGIE.PA</th>
+<th>LEGD.PA</th>
+<th>WLN.PA</th>
+<th>STLA.PA</th>
+<th>CAC40</th>
+</tr>
+<tr>
+<th>Date</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2015-01-02</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>...</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<th>2015-01-05</th>
+<td>0.007576</td>
+<td>-0.030966</td>
+<td>-0.037173</td>
+<td>-0.036969</td>
+<td>-0.048554</td>
+<td>-0.010993</td>
+<td>-0.013307</td>
+<td>-0.012637</td>
+<td>-0.023654</td>
+<td>-0.029041</td>
+<td>...</td>
+<td>-0.024855</td>
+<td>-0.020433</td>
+<td>-0.015078</td>
+<td>-0.045872</td>
+<td>-0.038359</td>
+<td>-0.042465</td>
+<td>-0.032214</td>
+<td>-0.012422</td>
+<td>-0.037059</td>
+<td>-0.033142</td>
+</tr>
+<tr>
+<th>2015-01-06</th>
+<td>0.007519</td>
+<td>-0.008345</td>
+<td>-0.010875</td>
+<td>-0.007609</td>
+<td>-0.026154</td>
+<td>0.002919</td>
+<td>-0.038604</td>
+<td>-0.012577</td>
+<td>0.000000</td>
+<td>-0.011413</td>
+<td>...</td>
+<td>-0.013966</td>
+<td>-0.016638</td>
+<td>-0.020961</td>
+<td>-0.019231</td>
+<td>-0.000231</td>
+<td>-0.010005</td>
+<td>-0.018545</td>
+<td>0.005031</td>
+<td>-0.002749</td>
+<td>-0.006776</td>
+</tr>
+<tr>
+<th>2015-01-07</th>
+<td>0.007463</td>
+<td>0.004516</td>
+<td>0.010720</td>
+<td>0.011675</td>
+<td>-0.016703</td>
+<td>0.011978</td>
+<td>0.004208</td>
+<td>0.014427</td>
+<td>0.005591</td>
+<td>0.000796</td>
+<td>...</td>
+<td>0.007790</td>
+<td>0.002020</td>
+<td>0.016117</td>
+<td>-0.014216</td>
+<td>-0.001614</td>
+<td>-0.009287</td>
+<td>-0.007267</td>
+<td>-0.001877</td>
+<td>-0.002348</td>
+<td>0.007158</td>
+</tr>
+<tr>
+<th>2015-01-08</th>
+<td>0.007407</td>
+<td>0.042092</td>
+<td>0.041338</td>
+<td>0.029969</td>
+<td>0.032419</td>
+<td>0.018695</td>
+<td>0.028462</td>
+<td>0.037444</td>
+<td>0.036323</td>
+<td>0.031424</td>
+<td>...</td>
+<td>0.018623</td>
+<td>0.023185</td>
+<td>0.010417</td>
+<td>0.024366</td>
+<td>0.036614</td>
+<td>0.036118</td>
+<td>0.022694</td>
+<td>0.006270</td>
+<td>0.038682</td>
+<td>0.035855</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="n">corrCAC</span> <span class="o">=</span> <span class="n">cac_data_return</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+<span class="c1"># Show</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">rc</span><span class="o">=</span><span class="p">{</span><span class="s1">'figure.figsize'</span><span class="p">:(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">)})</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">diverging_palette</span><span class="p">(</span><span class="mi">230</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">as_cmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corrCAC</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span><span class="mi">1</span><span class="p">:],</span> <span class="n">annot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 14" data-asset="session-7/fig-14.png" loading="lazy"/></figure></details>
+<p>From the preceding graph, we can identify three or four stocks exhibiting low correlation (indicated by lighter color intensities). High correlation typically arises among companies within the same industry; hence, selecting stocks with strong performance is essential. To facilitate this selection, we will calculate the Compound Annual Growth Rate (CAGR) for each stock and subsequently rank them accordingly.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Calculating the CAGR</span>
+<span class="n">CAGRs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cac_data_prices</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
+    <span class="n">CAGRs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">compute_CAGR</span><span class="p">(</span><span class="n">cac_data_prices</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="n">i</span><span class="p">]))</span>
+<span class="n">data_cagr</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">'Stock'</span><span class="p">:</span><span class="n">cac_data_prices</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s1">'CAGR'</span> <span class="p">:</span> <span class="n">CAGRs</span><span class="p">})</span>
+<span class="n">data_cagr</span> <span class="o">=</span> <span class="n">data_cagr</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">'CAGR'</span><span class="p">)</span>
+<span class="n">data_cagr</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Stock</th>
+<th>CAGR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>22</th>
+<td>URW.AS</td>
+<td>-0.165</td>
+</tr>
+<tr>
+<th>14</th>
+<td>RENA.PA</td>
+<td>-0.095</td>
+</tr>
+<tr>
+<th>27</th>
+<td>CARR.PA</td>
+<td>-0.065</td>
+</tr>
+<tr>
+<th>23</th>
+<td>ORAN.PA</td>
+<td>-0.056</td>
+</tr>
+<tr>
+<th>37</th>
+<td>ENGIE.PA</td>
+<td>-0.053</td>
+</tr>
+<tr>
+<th>18</th>
+<td>SOGN.PA</td>
+<td>-0.024</td>
+</tr>
+<tr>
+<th>30</th>
+<td>DANO.PA</td>
+<td>-0.001</td>
+</tr>
+<tr>
+<th>13</th>
+<td>PUBP.PA</td>
+<td>-0.001</td>
+</tr>
+<tr>
+<th>3</th>
+<td>BOUY.PA</td>
+<td>0.005</td>
+</tr>
+<tr>
+<th>21</th>
+<td>TTEF.PA</td>
+<td>0.007</td>
+</tr>
+<tr>
+<th>35</th>
+<td>CAGR.PA</td>
+<td>0.020</td>
+</tr>
+<tr>
+<th>28</th>
+<td>SASY.PA</td>
+<td>0.022</td>
+</tr>
+<tr>
+<th>4</th>
+<td>BNPP.PA</td>
+<td>0.028</td>
+</tr>
+<tr>
+<th>36</th>
+<td>MT.AS</td>
+<td>0.044</td>
+</tr>
+<tr>
+<th>2</th>
+<td>AXAF.PA</td>
+<td>0.045</td>
+</tr>
+<tr>
+<th>26</th>
+<td>ALSO.PA</td>
+<td>0.050</td>
+</tr>
+<tr>
+<th>33</th>
+<td>VIV.PA</td>
+<td>0.050</td>
+</tr>
+<tr>
+<th>5</th>
+<td>TCFP.PA</td>
+<td>0.075</td>
+</tr>
+<tr>
+<th>41</th>
+<td>CAC40</td>
+<td>0.076</td>
+</tr>
+<tr>
+<th>16</th>
+<td>SGOB.PA</td>
+<td>0.081</td>
+</tr>
+<tr>
+<th>1</th>
+<td>AIRP.PA</td>
+<td>0.092</td>
+</tr>
+<tr>
+<th>10</th>
+<td>MICP.PA</td>
+<td>0.099</td>
+</tr>
+<tr>
+<th>19</th>
+<td>SGEF.PA</td>
+<td>0.103</td>
+</tr>
+<tr>
+<th>7</th>
+<td>ESLX.PA</td>
+<td>0.107</td>
+</tr>
+<tr>
+<th>29</th>
+<td>SAF.PA</td>
+<td>0.111</td>
+</tr>
+<tr>
+<th>32</th>
+<td>VIE.PA</td>
+<td>0.123</td>
+</tr>
+<tr>
+<th>11</th>
+<td>PERP.PA</td>
+<td>0.128</td>
+</tr>
+<tr>
+<th>38</th>
+<td>LEGD.PA</td>
+<td>0.129</td>
+</tr>
+<tr>
+<th>31</th>
+<td>AIR.PA</td>
+<td>0.152</td>
+</tr>
+<tr>
+<th>20</th>
+<td>SCHN.PA</td>
+<td>0.162</td>
+</tr>
+<tr>
+<th>40</th>
+<td>STLA.PA</td>
+<td>0.173</td>
+</tr>
+<tr>
+<th>39</th>
+<td>WLN.PA</td>
+<td>0.174</td>
+</tr>
+<tr>
+<th>8</th>
+<td>OREP.PA</td>
+<td>0.175</td>
+</tr>
+<tr>
+<th>6</th>
+<td>CAPP.PA</td>
+<td>0.198</td>
+</tr>
+<tr>
+<th>12</th>
+<td>PRTP.PA</td>
+<td>0.248</td>
+</tr>
+<tr>
+<th>34</th>
+<td>EUFI.PA</td>
+<td>0.261</td>
+</tr>
+<tr>
+<th>24</th>
+<td>HRMS.PA</td>
+<td>0.265</td>
+</tr>
+<tr>
+<th>25</th>
+<td>DAST.PA</td>
+<td>0.265</td>
+</tr>
+<tr>
+<th>9</th>
+<td>LVMH.PA</td>
+<td>0.276</td>
+</tr>
+<tr>
+<th>15</th>
+<td>TEPRF.PA</td>
+<td>0.311</td>
+</tr>
+<tr>
+<th>17</th>
+<td>STM.PA</td>
+<td>0.321</td>
+</tr>
+</tbody>
+</table></div></details>
+<p>Using the previous dataset, we will initially select STM.PA, and based on the correlation heatmap, we will include DAST.PA, PERP.PA, and HRMS.PA. Please note that this can't really be used as an investment strategy because the at this stage the CAGR is already known, but this methodology could be used as a way to evaluate a past investment and a different scenario.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Selected stocks </span>
+<span class="n">list_stock_cac</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'STM.PA'</span><span class="p">,</span> <span class="s1">'DAST.PA'</span><span class="p">,</span> <span class="s1">'PERP.PA'</span><span class="p">,</span> <span class="s1">'HRMS.PA'</span><span class="p">]</span>
+<span class="n">selected_stocks_return</span> <span class="o">=</span> <span class="n">cac_data_return</span><span class="p">[</span><span class="n">list_stock_cac</span><span class="p">]</span>
+<span class="n">selected_stocks_prices</span> <span class="o">=</span> <span class="n">cac_data_prices</span><span class="p">[</span><span class="n">list_stock_cac</span><span class="p">]</span>
+
+
+<span class="c1"># We can create an equally weighted portfolio, so we can compare it to the Markowitz portfolio equally weighted portfolio</span>
+<span class="n">selected_stocks_return</span><span class="p">[</span><span class="s1">'Return port.'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">)):</span>
+    <span class="n">selected_stocks_return</span><span class="p">[</span><span class="s1">'Return port.'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">'Return port.'</span><span class="p">]</span> <span class="o">+</span> 
+                                              <span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">list_stock_cac</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+<span class="n">selected_stocks_return</span><span class="p">[</span><span class="s1">'Return port.'</span><span class="p">]</span> <span class="o">=</span> <span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">'Return port.'</span><span class="p">]</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">)</span>
+
+<span class="c1"># Displaying the dataframe</span>
+<span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="n">list_cagr</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">list_vol</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Calculating the cagr and the volatility of each stock</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">)):</span>
+    <span class="n">list_cagr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">compute_CAGR</span><span class="p">(</span><span class="n">selected_stocks_prices</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="n">i</span><span class="p">]))</span>
+    <span class="n">list_vol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">compute_volatility</span><span class="p">(</span><span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="n">i</span><span class="p">]))</span>
+
+<span class="c1"># Markowitz method uses CAGR and Volatility and covariance</span>
+<span class="n">data_markowitz</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">'Stock'</span><span class="p">:</span><span class="n">list_stock_cac</span><span class="p">,</span> <span class="s1">'CAGR'</span> <span class="p">:</span> <span class="n">list_cagr</span><span class="p">,</span> <span class="s1">'Volatility'</span><span class="p">:</span><span class="n">list_vol</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_markowitz</span><span class="p">)</span>
+<span class="c1"># Covariance matrix of the returns multiplied by 1 year</span>
+<span class="n">covMatrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span> <span class="o">*</span> <span class="mi">256</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">covMatrix</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Stock   CAGR  Volatility
+0   STM.PA  0.321       0.398
+1  DAST.PA  0.265       0.256
+2  PERP.PA  0.128       0.203
+3  HRMS.PA  0.265       0.223
+           STM.PA   DAST.PA   PERP.PA   HRMS.PA
+STM.PA   0.158496  0.048068  0.026900  0.040508
+DAST.PA  0.048068  0.065489  0.022301  0.026366
+PERP.PA  0.026900  0.022301  0.041401  0.021797
+HRMS.PA  0.040508  0.026366  0.021797  0.049591</pre></details>
+<div class="nb-code"><pre><span></span><span class="c1"># Monte Carlo Method for the Markowitz portfolio</span>
+<span class="n">nb_portfolio</span> <span class="o">=</span> <span class="mi">60000</span>
+<span class="n">list_ret</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">list_risk</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Converting to the matrices</span>
+<span class="n">covMatrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asmatrix</span><span class="p">(</span><span class="n">covMatrix</span><span class="p">)</span>
+<span class="n">matrix_cagr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asmatrix</span><span class="p">(</span><span class="n">list_cagr</span><span class="p">)</span>
+
+<span class="c1"># Creating the portofolios and allocating random weights to the stocks</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_portfolio</span><span class="p">):</span>
+    <span class="c1"># Storing the weights</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">)):</span>
+        <span class="c1"># Choosing random weights</span>
+        <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+    <span class="c1"># Calculating the total weights</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">allocation</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">)):</span>
+        <span class="c1"># Allocating the weights in %</span>
+        <span class="n">allocation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">total</span><span class="p">)</span>
+    <span class="c1"># Converting the allocation to a matrix</span>
+    <span class="n">allocation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asmatrix</span><span class="p">(</span><span class="n">allocation</span><span class="p">)</span>
+    <span class="c1"># Return according to the Weights (weighted return)</span>
+    <span class="n">return_port</span> <span class="o">=</span> <span class="n">matrix_cagr</span><span class="o">*</span><span class="n">allocation</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="c1"># Calculating the volatility of the portfolio </span>
+    <span class="n">risk_port</span> <span class="o">=</span> <span class="p">(</span><span class="n">allocation</span> <span class="o">*</span> <span class="p">(</span><span class="n">covMatrix</span> <span class="o">*</span> <span class="n">allocation</span><span class="o">.</span><span class="n">transpose</span><span class="p">()))</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="c1"># Adding the results to the lists </span>
+    <span class="n">list_ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">return_port</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">list_risk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">risk_port</span><span class="p">)</span>
+
+<span class="n">data_simulations</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">list_ret</span><span class="p">,</span> <span class="n">list_risk</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+<span class="n">data_simulations</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Returns'</span><span class="p">,</span> <span class="s1">'Volatility'</span><span class="p">]</span>
+<span class="n">data_simulations</span><span class="o">.</span><span class="n">head</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><div class="nb-table-wrap"><table>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Returns</th>
+<th>Volatility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>0.242770</td>
+<td>0.194923</td>
+</tr>
+<tr>
+<th>1</th>
+<td>0.242532</td>
+<td>0.198997</td>
+</tr>
+<tr>
+<th>2</th>
+<td>0.268481</td>
+<td>0.242234</td>
+</tr>
+<tr>
+<th>3</th>
+<td>0.253254</td>
+<td>0.239326</td>
+</tr>
+<tr>
+<th>4</th>
+<td>0.260681</td>
+<td>0.236985</td>
+</tr>
+</tbody>
+</table></div></details>
+<div class="nb-code"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">rc</span><span class="o">=</span><span class="p">{</span><span class="s1">'figure.figsize'</span><span class="p">:(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">)})</span>
+
+<span class="c1"># Plotting the Markowitz efficient frontier</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_simulations</span><span class="p">[</span><span class="s1">'Volatility'</span><span class="p">],</span> <span class="n">data_simulations</span><span class="p">[</span><span class="s1">'Returns'</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Portfolios'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Markowitz efficient frontier"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Volatility"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Returns"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 15" data-asset="session-7/fig-15.png" loading="lazy"/></figure></details>
+<p>By employing Monte Carlo simulations, we can observe the existence of an "Efficient Frontier," which represents the optimal balance between maximized returns and minimized risks. The Markowitz approach enables us to determine the optimal allocation of the portfolio through quadratic optimization. (⚠️ It is important to note that this specific aspect falls outside the scope of this course.)</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Do not forget to install cvxopt</span>
+<span class="kn">from</span> <span class="nn">cvxopt</span> <span class="kn">import</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">solvers</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># Suppress the solver's verbose output</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+
+<span class="c1"># Creating the matrices of constraints and the return vector</span>
+<span class="n">vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Amat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asmatrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">vector</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">))),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">line_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asmatrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="n">line_vect</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.25</span>  <span class="c1"># Risk factor</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_stocks_prices</span><span class="p">)</span>  <span class="c1"># Number of observation</span>
+<span class="n">rolling_window</span> <span class="o">=</span> <span class="mi">35</span>
+<span class="n">start</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">indexes</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">rolling_window</span><span class="p">)</span>
+
+<span class="c1"># Dataframe to store the weights</span>
+<span class="n">data_weights</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">list_stock_cac</span><span class="p">)</span> 
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">:</span>
+    <span class="c1"># Moving rolling window of 1 year</span>
+    <span class="n">price_roll</span> <span class="o">=</span> <span class="n">selected_stocks_prices</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">256</span><span class="p">:</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">return_roll</span> <span class="o">=</span> <span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">256</span><span class="p">:</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Calculating the CAGR and volatility of each portfolio</span>
+    <span class="n">CAGR_1y</span> <span class="o">=</span> <span class="p">[</span><span class="n">compute_CAGR</span><span class="p">(</span><span class="n">price_roll</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">))]</span>
+    <span class="n">vol_1y</span> <span class="o">=</span> <span class="p">[</span><span class="n">compute_volatility</span><span class="p">(</span><span class="n">return_roll</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">))]</span>
+
+    <span class="c1"># Creating the matrices for the quadratic programming solver</span>
+    <span class="n">matrix_cagr_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asmatrix</span><span class="p">(</span><span class="n">CAGR_1y</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>  
+    <span class="n">matrix_vol_temp</span> <span class="o">=</span> <span class="n">return_roll</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> 
+    <span class="c1"># Quadratic programming</span>
+    <span class="n">qp_out</span> <span class="o">=</span> <span class="n">solvers</span><span class="o">.</span><span class="n">qp</span><span class="p">(</span><span class="n">matrix</span><span class="p">(</span><span class="n">matrix_vol_temp</span><span class="p">),</span> <span class="n">matrix</span><span class="p">(</span><span class="n">matrix_cagr_temp</span> <span class="o">*</span> <span class="n">gamma</span><span class="p">),</span>
+                        <span class="n">matrix</span><span class="p">(</span><span class="n">Amat</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">matrix</span><span class="p">(</span><span class="n">line_vect</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">msg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># Calculating the weights and normalizing</span>
+    <span class="n">total_weight</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">qp_out</span><span class="p">[</span><span class="s1">'x'</span><span class="p">])</span>
+    <span class="n">weights_val</span> <span class="o">=</span> <span class="p">[</span><span class="n">qp_out</span><span class="p">[</span><span class="s1">'x'</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">/</span> <span class="n">total_weight</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">))]</span>
+    <span class="c1"># Storing the calculated weights in a dataframe</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights_val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rolling_window</span><span class="p">):</span>
+            <span class="n">data_weights</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">data_weights</span><span class="p">)]</span> <span class="o">=</span> <span class="n">weights_val</span>
+
+<span class="c1"># Indexing the dataframe with the index of the prices</span>
+<span class="n">data_weights</span> <span class="o">=</span> <span class="n">data_weights</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_weights</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">start</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:,</span> <span class="p">:])),</span> <span class="p">:]</span>
+<span class="n">data_weights</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">start</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">index</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Let's plot the plot that describe how the portfolio should be allocate over time</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">data_weights</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">area</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Portfolio allocation"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre><matplotlib.legend.legend 0x254ea8353d0="" at=""></matplotlib.legend.legend></pre></details>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 16" data-asset="session-7/fig-16.png" loading="lazy"/></figure></details>
+<p>The preceding graph illustrates the weight distribution of each stock within the portfolio over time, generated through quadratic programming. We can compare the returns of this optimized portfolio against those of an equally weighted portfolio by calculating the cumulative returns of each, with a recalibration of weights occurring every 35 days.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Let's create the dataframe that contains the returns</span>
+<span class="n">zero_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_weights</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">)))</span>
+<span class="c1"># Return of the optimized portfolio</span>
+<span class="n">return_op_port</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">zero_data</span><span class="p">,</span><span class="n">columns</span> <span class="o">=</span> <span class="p">(</span><span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_weights</span><span class="p">)):</span>
+        <span class="c1"># Inserting the weights</span>
+        <span class="n">return_op_port</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">start</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">data_weights</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>
+<span class="c1"># Changing the index of the optimized portfolio</span>
+<span class="n">return_op_port</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data_weights</span><span class="o">.</span><span class="n">index</span>
+<span class="n">return_op_port</span><span class="p">[</span><span class="s1">'Return'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_stock_cac</span><span class="p">)):</span>
+    <span class="c1"># Calculating the returns </span>
+    <span class="n">return_op_port</span><span class="p">[</span><span class="s1">'Return'</span><span class="p">]</span> <span class="o">=</span> <span class="n">return_op_port</span><span class="p">[</span><span class="s1">'Return'</span><span class="p">]</span> <span class="o">+</span> <span class="n">return_op_port</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>
+<span class="c1"># Calculating the return of the portfolio</span>
+<span class="n">return_port</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">start</span><span class="o">-</span><span class="mi">1</span><span class="p">:,</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Cummulative return of the two portfolios</span>
+<span class="n">cummul_op_port</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">return_op_port</span><span class="p">[[</span><span class="s1">'Return'</span><span class="p">]])</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">cummul_port</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">selected_stocks_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">start</span><span class="o">-</span><span class="mi">1</span><span class="p">:,</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="c1"># Comparison with the CAC 40</span>
+<span class="n">cumul_cac40</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">cac_data_return</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">start</span><span class="o">-</span><span class="mi">1</span><span class="p">:,</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="c1"># Plotting the cummulative return of the optimized portfolio</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cummul_port</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Equally weighted portfolio"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cummul_op_port</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Markowitz weighted portfolio"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cumul_cac40</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"CAC 40"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Cummulative returns"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Date"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Cummulated return"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></pre></div>
+<details class="nb-output"><summary>Output</summary><figure class="nb-figure"><img alt="Figure 17" data-asset="session-7/fig-17.png" loading="lazy"/></figure></details>
+<p>From this analysis, it is evident that the selected stocks have consistently outperformed the CAC 40 index. Furthermore, the Markowitz optimized portfolio exhibits performance that is comparable to the equally weighted portfolio while demonstrating superior outcomes in specific instances.</p>
+<aside class="nb-exercise"><span class="nb-ex-tag">Assignment</span><h3>Assignment : Application of the Quantitative Methods</h3><p>Download data from Refinitiv Eikon, Bloomberg, Yahoo Finance, or any financial data provider for three or four stocks, allocating weights at your discretion (please refrain from performing a Markowitz optimization if you are unfamiliar with the concept). Construct a diversified portfolio that showcases strong performance. Utilizing the concepts covered in this course, along with relevant online resources or methodologies from other courses, conduct a backtest prior to forecasting future prices.</p></aside><h2 id="To-go-further---Option-Pricing-using-Monte-Carlo">To go further - Option Pricing using Monte Carlo</h2><p>The price of an option (here, we will only consider European Options) can be succinctly represented by the following formula: <code>Estimated price = Intrinsic Value + Time Value</code>, where :</p>
+<ul>
+<li>Intrinsic Value is defined as the difference between the current market price of the underlying asset and the strike price of the option.</li>
+<li>Time Value reflects the potential for the underlying asset’s price to increase or decrease, capturing the randomness of future price movements.</li>
+<li>There is no early exercise as we are considering European Options.</li>
+</ul>
+<p>To estimate the price of an option more accurately, we can utilize the Black-Scholes formula, which is expressed as: <code>ST = principal * exp((rate - 0.5 * σ²) * T + σ * sqrt(T) * X)</code> where :</p>
+<ul>
+<li>Principal refers to the current price of the underlying asset (also known as the spot price).</li>
+<li>Rate denotes the interest rate.</li>
+<li>σ represents the volatility or standard deviation of the asset price.</li>
+<li>T signifies the maturity of the option.</li>
+<li>X is a standard normally distributed random variable.</li>
+</ul>
+<p>Following this, we can calculate the option's payoff using the formula MAX(S - K, 0) for a CALL (and MAX(K - S, 0) for a PUT), where :</p>
+<ul>
+<li>K represents the strike price</li>
+<li>S the final price which can be decomposed as S0 + Variations</li>
+</ul>
+<p>The price of the option can then be expressed as: <code>exp(-rate * T) * payoff</code>. These estimations can be performed using Monte Carlo simulations to capture the stochastic nature of the underlying asset's price.</p>
+<div class="nb-code"><pre><span></span><span class="c1"># Definition of the Monte Carlo pricer</span>
+<span class="k">def</span> <span class="nf">black_scholes_MonteCarlo_call</span><span class="p">(</span><span class="n">spot</span><span class="p">,</span> <span class="n">strike</span><span class="p">,</span> <span class="n">volatility</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">maturity</span><span class="p">,</span> <span class="n">simulations</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">simulations</span><span class="p">)</span>  <span class="c1"># Generating a wide volume of random inputs</span>
+    <span class="c1"># Deterministic function</span>
+    <span class="n">ST</span> <span class="o">=</span> <span class="n">spot</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">rate</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">volatility</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">maturity</span> <span class="o">+</span> <span class="n">volatility</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">maturity</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span><span class="p">)</span>
+    <span class="c1"># Calculating the payoffs of the option</span>
+    <span class="n">payoffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">ST</span> <span class="o">-</span> <span class="n">strike</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">call_option_price</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">rate</span> <span class="o">*</span> <span class="n">maturity</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">payoffs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">call_option_price</span></pre></div>
+<div class="nb-code"><pre><span></span><span class="c1"># Application </span>
+<span class="n">S0</span> <span class="o">=</span> <span class="mi">100</span>        <span class="c1"># Initial value of the price</span>
+<span class="n">K</span> <span class="o">=</span> <span class="mi">110</span>         <span class="c1"># The strike</span>
+<span class="n">std</span> <span class="o">=</span> <span class="mf">0.2</span>       <span class="c1"># Volatility</span>
+<span class="n">r</span> <span class="o">=</span> <span class="mf">0.05</span>        <span class="c1"># Risk free rate</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">3</span>           <span class="c1"># Maturity</span>
+<span class="n">number_of_simulation</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="c1"># Application of the function</span>
+<span class="n">call_price</span> <span class="o">=</span> <span class="n">black_scholes_MonteCarlo_call</span><span class="p">(</span><span class="n">S0</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">number_of_simulation</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Call price : "</span><span class="p">,</span> <span class="n">call_price</span><span class="p">)</span></pre></div>
+<details class="nb-output"><summary>Output</summary><pre>Call price :  16.324689210822992</pre></details>
+<aside class="nb-exercise"><span class="nb-ex-tag">Blitz exercise</span><h3>Blitz Exercise : Price of a PUT &amp; a CALL (15 minutes)</h3><p>Using the aforementioned formulas and applications, create a program that allows the user to <strong>input parameters</strong> each time the program is executed. The program should enable the calculation of both the price of a call option and a put option based on the same parameters.</p></aside><h3 id="Next-session-:-Quizz"><em>Next session : Quizz</em></h3>
+` },
          { slug: "session-8", label: "Session 8", title: "Financial risk assessment", embedUrl: "" },
          { slug: "final-project", label: "Final Project", title: "Portfolio diversification, risk management, and strategy development", embedUrl: "", html: `
    <p>Create a comprehensive financial analysis project in a Jupyter Notebook that focuses on portfolio diversification, risk management, and strategy development. The project should solve a real-world financial problem, integrate multiple sources of data, and incorporate external factors like company news, market sentiment, and broader economic trends. You will be required to demonstrate the ability to build a diversified portfolio, assess its risk, and reflect on the impact of external factors on performance. Your Jupyter Notebook should include six sections, with flexibility in the methods and techniques you choose to apply. The project should require significant effort in data handling, analysis, and strategy development, and you should reflect on your choices, assumptions, and trade-offs.</p>
