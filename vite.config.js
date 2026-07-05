@@ -3,8 +3,7 @@ import react from "@vitejs/plugin-react";
 import { copyFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-// Deployed at https://eva-s-cheng.github.io/academic-portfolio/
-// If you attach a custom domain later, change base to "/" and add public/CNAME.
+// Deployed at https://eva-s-cheng.com/ (custom domain, GitHub Pages)
 export default defineConfig({
   base: "/",
   plugins: [
