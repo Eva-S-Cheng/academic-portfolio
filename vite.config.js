@@ -6,7 +6,7 @@ import { resolve } from "node:path";
 // Deployed at https://eva-s-cheng.github.io/academic-portfolio/
 // If you attach a custom domain later, change base to "/" and add public/CNAME.
 export default defineConfig({
-  base: "/academic-portfolio/",
+  base: "/",
   plugins: [
     react(),
     {
