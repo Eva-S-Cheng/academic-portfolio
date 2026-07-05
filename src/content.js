@@ -140,7 +140,7 @@
        description:
          "This website. A React application with publications synchronized from the ORCID public API, access-protected course material, and a light and dark design system, deployed on GitHub Pages.",
        tags: ["React", "ORCID API", "GitHub Pages"],
-       link: { label: "eva-s-cheng.github.io", url: "https://eva-s-cheng.github.io/academic-portfolio/" },
+       link: { label: "eva-s-cheng.github.io", url: "https://eva-s-cheng.com/" },
      },
      {
        name: "Research Paper Digest Agent",

@@ -55,7 +55,7 @@ export const FR = {
       description:
         "Ce site. Une application React avec des publications synchronis\u00e9es depuis l'API publique ORCID, des supports de cours prot\u00e9g\u00e9s par code d'acc\u00e8s, et un syst\u00e8me de design clair et sombre, d\u00e9ploy\u00e9e sur GitHub Pages.",
       tags: ["React", "API ORCID", "GitHub Pages"],
-      link: { label: "eva-s-cheng.github.io", url: "https://eva-s-cheng.github.io/academic-portfolio/" },
+      link: { label: "eva-s-cheng.github.io", url: "https://eva-s-cheng.com/" },
     },
     {
       name: "Research Paper Digest Agent",
