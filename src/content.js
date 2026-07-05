@@ -149,6 +149,12 @@
        tags: ["Automation", "Literature monitoring"],
      },
      {
+       name: "Kajin",
+       description:
+         "Web-scraping tool that collects and compiles the latest property sale listings from selected platforms, enabling real-time housing market monitoring.",
+       tags: ["Web scraping", "Real estate"],
+     },
+     {
        name: "News Digest",
        description:
          "An automated pipeline that collects daily news, produces general, category-level and article-level summaries with keywords and sources, and sends the compiled digest by scheduled email.",

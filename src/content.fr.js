@@ -64,6 +64,12 @@
         tags: ["Automatisation", "Veille scientifique"],
       },
       {
+        name: "Kajin",
+        description:
+          "Outil de web scraping qui collecte et compile les derni\u00e8res annonces de vente immobili\u00e8re depuis des plateformes s\u00e9lectionn\u00e9es, permettant un suivi du march\u00e9 immobilier en temps r\u00e9el.",
+        tags: ["Web scraping", "Immobilier"],
+      },
+      {
         name: "News Digest",
         description:
           "Un pipeline automatis\u00e9 qui collecte l'actualit\u00e9 quotidienne, produit des synth\u00e8ses g\u00e9n\u00e9rales, par cat\u00e9gorie et par article avec mots-cl\u00e9s et sources, et envoie le condens\u00e9 par email programm\u00e9.",
