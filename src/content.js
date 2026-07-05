@@ -278,7 +278,7 @@
        org: "Caisse d'Epargne Bretagne Pays de Loire",
        orgUrl: "https://www.caisse-epargne.fr",
        orgDomain: "caisse-epargne.fr",
-       logoUrl: "https://www.google.com/s2/favicons?domain=caisse-epargne.fr&sz=128",
+       logoUrl: "https://ce-prod.cloudimg.io/_images_/app/uploads/sites/3/2021/05/31183441/ce-100x100-1.png?func=bound&w=100&h=100&gravity=auto&optipress=2",
        period: "2025",
        details:
          "Within the ALM team of the Financial Management Department, I monitored liquidity and interest rate risks: periodic balance-sheet indicators, net interest margin analysis, pricing scales for the commercial bank, and scenario-based assessments of balance-sheet risks.",

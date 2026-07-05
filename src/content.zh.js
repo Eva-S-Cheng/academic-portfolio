@@ -187,7 +187,7 @@
         org: "Caisse d'Epargne Bretagne Pays de Loire",
         orgUrl: "https://www.caisse-epargne.fr",
         orgDomain: "caisse-epargne.fr",
-        logoUrl: "https://www.google.com/s2/favicons?domain=caisse-epargne.fr&sz=128",
+        logoUrl: "https://ce-prod.cloudimg.io/_images_/app/uploads/sites/3/2021/05/31183441/ce-100x100-1.png?func=bound&w=100&h=100&gravity=auto&optipress=2",
         period: "2025",
         details:
           "\u5728\u8ca1\u52d9\u7ba1\u7406\u90e8\u7684 ALM \u5718\u968a\uff0c\u6211\u8ca0\u8cac\u76e3\u63a7\u6d41\u52d5\u6027\u8207\u5229\u7387\u98a8\u96aa\uff1a\u7de8\u88fd\u5b9a\u671f\u8cc7\u7522\u8ca0\u50b5\u8868\u7ba1\u7406\u6307\u6a19\u3001\u5206\u6790\u6de8\u5229\u606f\u6536\u5165\u3001\u70ba\u5546\u696d\u9280\u884c\u5236\u5b9a\u5b9a\u50f9\u8868\uff0c\u4e26\u5c0d\u8cc7\u7522\u8ca0\u50b5\u8868\u98a8\u96aa\u9032\u884c\u60c5\u666f\u8a55\u4f30\u3002",
