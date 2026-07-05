@@ -210,5 +210,14 @@
         details:
           "Au sein d'une \u00e9quipe de conseil en conduite du changement, j'ai apport\u00e9 l'analyse de donn\u00e9es et le dashboarding aux projets internes et clients : tableaux de bord de gestion financi\u00e8re et RH, Big Data et BI appliqu\u00e9s \u00e0 la gestion financi\u00e8re et \u00e0 la mod\u00e9lisation \u00e9conomique, un tableau de bord de priorisation des projets RSE, et des ateliers de sensibilisation \u00e0 la data, \u00e0 la BI et \u00e0 l'IA, notamment pour la Nantes Digital Week.",
       },
+      {
+        role: "Professeure particuli\u00e8re en math\u00e9matiques, informatique, physique et chimie",
+        org: "Acadomia",
+        orgUrl: "https://www.acadomia.fr",
+        orgDomain: "acadomia.fr",
+        period: "2021 \u2013 2022",
+        details:
+          "Chez Acadomia, entreprise fran\u00e7aise de r\u00e9f\u00e9rence du soutien scolaire, j'ai exerc\u00e9 \u00e0 temps partiel comme professeure particuli\u00e8re en parall\u00e8le de mes \u00e9tudes et de mes engagements professionnels. J'ai accompagn\u00e9 des coll\u00e9giens et lyc\u00e9ens en math\u00e9matiques, physique et chimie pour renforcer leur compr\u00e9hension et leurs r\u00e9sultats, et enseign\u00e9 l'informatique \u00e0 un public vari\u00e9, des coll\u00e9giens aux \u00e9tudiants et adultes en formation.",
+      },
     ],
   };

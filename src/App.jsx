@@ -523,10 +523,27 @@ function Header({ theme, onToggleTheme }) {
           aria-expanded={menuOpen} aria-label="Menu">
           {menuOpen ? "✕" : "☰"}
         </button>
-        <button className="lang-toggle" onClick={() => setLang(lang === "en" ? "fr" : lang === "fr" ? "zh" : "en")}
-          aria-label="Change language · Changer de langue · \u66f4\u6539\u8a9e\u8a00">
-          {lang === "zh" ? "\u4e2d" : lang.toUpperCase()}
-        </button>
+        <div className="lang-drop">
+          <button className="lang-toggle" aria-haspopup="menu"
+            aria-label={"Change language \u00b7 Changer de langue \u00b7 \u66f4\u6539\u8a9e\u8a00"}>
+            {lang === "zh" ? "\u4e2d" : lang.toUpperCase()} <span className="lang-caret" aria-hidden="true">{"\u25be"}</span>
+          </button>
+          <div className="lang-menu" role="menu">
+            <div className="nav-menu-panel lang-menu-panel">
+              {[
+                { code: "en", label: "EN", name: "English" },
+                { code: "fr", label: "FR", name: "Fran\u00e7ais" },
+                { code: "zh", label: "\u4e2d", name: "\u7e41\u9ad4\u4e2d\u6587" },
+              ].map((o) => (
+                <button key={o.code} role="menuitem"
+                  className={`lang-item ${lang === o.code ? "active" : ""}`}
+                  onClick={() => setLang(o.code)}>
+                  <span className="lang-item-code">{o.label}</span> {o.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
         <button className="theme-toggle" onClick={onToggleTheme}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
           {theme === "dark" ? "☀" : "☾"}
@@ -1329,6 +1346,27 @@ a:hover { color: var(--green-deep); }
   transition: border-color 0.15s ease, color 0.15s ease;
 }
 .lang-toggle:hover { border-color: var(--green); color: var(--green-deep); }
+.lang-caret { font-size: 0.6rem; opacity: 0.6; }
+.lang-drop { position: relative; display: flex; align-items: center; }
+.lang-menu {
+  display: none; position: absolute; top: 100%; right: 0;
+  padding-top: 10px; z-index: 40;
+}
+.lang-drop:hover .lang-menu, .lang-drop:focus-within .lang-menu { display: block; }
+.lang-menu-panel { min-width: 172px; }
+.lang-item {
+  display: flex; align-items: baseline; gap: 10px; width: 100%; text-align: left;
+  border: none; background: none; cursor: pointer;
+  font-family: var(--font); font-size: 0.9rem; color: var(--ink);
+  padding: 9px 13px; border-radius: 9px;
+}
+.lang-item:hover { background: var(--wash); color: var(--green-deep); }
+.lang-item.active { color: var(--green-deep); font-weight: 600; }
+.lang-item-code {
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em;
+  color: var(--soft); min-width: 22px;
+}
+.lang-item.active .lang-item-code, .lang-item:hover .lang-item-code { color: var(--green-deep); }
 .menu-toggle {
   display: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
   width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 0.95rem;

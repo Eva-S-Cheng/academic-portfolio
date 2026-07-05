@@ -301,6 +301,15 @@
        details:
          "Within a change management consulting team, I brought data analysis and dashboarding to internal and client projects: financial and HR management dashboards, Big Data and BI applied to financial management and economic modeling, a dashboard for prioritizing CSR projects, and workshops on data, BI and AI, including for the Nantes Digital Week.",
      },
+     {
+       role: "Private Tutor in Mathematics, IT, Physics and Chemistry",
+       org: "Acadomia",
+       orgUrl: "https://www.acadomia.fr",
+       orgDomain: "acadomia.fr",
+       period: "2021 \u2013 2022",
+       details:
+         "At Acadomia, a leading French tutoring company, I worked part-time as a private tutor alongside my studies and professional commitments. I tutored secondary and high school students in Mathematics, Physics and Chemistry to strengthen their understanding and academic performance, and taught IT and computer science to a broader audience, from secondary school pupils to university students and adult learners.",
+     },
    ];
    
    /* ---------- Courses ----------
