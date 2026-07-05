@@ -6,6 +6,7 @@ import {
   TEACHING_EXPERIENCE, ACADEMIC_POSITIONS, PROFESSIONAL_EXPERIENCE, COURSES, COLLABORATORS, COPYRIGHT_NOTICE,
 } from "./content.js";
 import { FR } from "./content.fr.js";
+import { ZH } from "./content.zh.js";
 
 /* ---------- Language (EN default, FR optional; courses stay EN) ---------- */
 
@@ -90,6 +91,44 @@ const UI = {
     notFoundEyebrow: "Erreur 404", notFoundTitle: "Cette page n'existe pas", backHome: "Retour à l'accueil",
     footContact: "Contact", footProfiles: "Profils", footNavigate: "Navigation",
     colophon: ["Les publications sont synchronisées depuis ", "."],
+  },
+  zh: {
+    nav: { home: "\u4e3b\u9801", research: "\u7814\u7a76", teaching: "\u6559\u5b78", projects: "\u9805\u76ee", cv: "\u5c65\u6b77" },
+    heroExplore: "\u63a2\u7d22\u6211\u7684\u7814\u7a76", heroDownload: "\u4e0b\u8f09\u5c65\u6b77 \u2197",
+    aboutEyebrow: "\u95dc\u65bc", aboutTitle: ["\u91d1\u878d\u3001\u53ef\u6301\u7e8c\u767c\u5c55\u8207", "\u91cf\u5316\u65b9\u6cd5"],
+    interestsLabel: "\u7814\u7a76\u8208\u8da3", skillsLabel: "\u6280\u8853\u80fd\u529b", languagesLabel: "\u8a9e\u8a00",
+    exploreEyebrow: "\u63a2\u7d22", browse: "\u700f\u89bd \u2192",
+    cardResearchP: "\u5f9e ORCID \u540c\u6b65\u7684\u51fa\u7248\u7269\u3001\u5de5\u4f5c\u8ad6\u6587\u3001\u5b78\u4f4d\u8ad6\u6587\u53ca\u5171\u540c\u4f5c\u8005\u3002",
+    cardTeachingP: "\u6211\u7684\u6559\u5b78\u8077\u52d9\u8207\u8ab2\u7a0b\uff0c\u4e26\u70ba\u4fee\u8ab2\u5b78\u751f\u63d0\u4f9b\u7db2\u4e0a\u6559\u6750\u3002",
+    cardProjectsP: "\u570d\u7e5e\u6578\u64da\u3001\u97f3\u6a02\u8207\u81ea\u52d5\u5316\u7684\u500b\u4eba\u9805\u76ee\uff0c\u65bc\u7814\u7a76\u4ee5\u5916\u958b\u5c55\u3002",
+    cardCvP: "\u6559\u80b2\u80cc\u666f\u3001\u5b78\u8853\u8077\u52d9\u53ca\u5de5\u4f5c\u7d93\u9a57\u3002\u5b8c\u6574\u5c65\u6b77\u63d0\u4f9b\u82f1\u6587\u53ca\u6cd5\u6587\u7248\u672c\u3002",
+    researchTitle: ["\u7814\u7a76\u8207", "\u9805\u76ee"],
+    pubEyebrow: "\u5df2\u5f9e ORCID \u540c\u6b65 ", pubTitle: ["\u51fa\u7248\u7269\u8207", "\u5de5\u4f5c\u8ad6\u6587"],
+    reportsEyebrow: "\u4e0d\u4f5c\u767c\u8868", reportsTitle: ["\u5b78\u4f4d\u8ad6\u6587\u8207", "\u7814\u7a76\u5831\u544a"],
+    interestsTitle: ["\u7814\u7a76", "\u8208\u8da3"],
+    peopleEyebrow: "\u5408\u4f5c", peopleTitle: ["\u5171\u540c\u4f5c\u8005\u8207", "\u6307\u5c0e\u8001\u5e2b"],
+    discussBtn: "\u7814\u7a76\u4ea4\u6d41",
+    orcidError: ["\u7121\u6cd5\u8f09\u5165 ORCID \u8a18\u9304\uff0c\u4ecd\u53ef\u65bc ", " \u53ca ", " \u67e5\u95b1\u3002\u4ee5\u4e0b\u689d\u76ee\u4f86\u81ea\u672c\u7db2\u7ad9\u7684\u8a18\u9304\u3002"],
+    abstract: "\u6458\u8981", hideAbstract: "\u6536\u8d77\u6458\u8981", cite: "\u5f15\u7528", view: "\u67e5\u770b",
+    copyClipboard: "\u8907\u88fd\u5230\u526a\u8cbc\u7c3f", copied: "\u5df2\u8907\u88fd \u2713",
+    teachingTitle: "\u6559\u5b78", positionsEyebrow: "\u8077\u52d9",
+    coursesEyebrow: "\u8ab2\u7a0b", coursesTitle: ["\u8ab2\u7a0b", "\u6559\u6750"],
+    pagesOf: "\u9801\u6559\u6750", codeRequired: "\u9700\u8981\u5b58\u53d6\u78bc",
+    satisfaction: "\u5b78\u751f\u6eff\u610f\u5ea6", openCourse: "\u9032\u5165\u8ab2\u7a0b \u2192",
+    contactTeaching: "\u6559\u5b78\u76f8\u95dc\u806f\u7d61",
+    projectsTitle: ["\u500b\u4eba", "\u9805\u76ee"],
+    projectsSub: "\u65bc\u7814\u7a76\u4ee5\u5916\u958b\u5c55\u7684\u500b\u4eba\u9805\u76ee\uff0c\u570d\u7e5e\u6578\u64da\u3001\u97f3\u6a02\u8207\u81ea\u52d5\u5316\u3002",
+    cvTitle: ["Curriculum ", "Vitae"],
+    academicPositions: "\u5b78\u8853\u8077\u52d9", education: "\u6559\u80b2\u80cc\u666f", professionalExp: "\u5de5\u4f5c\u7d93\u9a57",
+    getInTouch: "\u8207\u6211\u806f\u7d61", details: "\u8a73\u60c5", hideDetails: "\u6536\u8d77\u8a73\u60c5",
+    courseContents: "\u8ab2\u7a0b\u76ee\u9304",
+    gateTitle: "\u6b64\u6559\u6750\u50c5\u4f9b\u4fee\u8ab2\u5b78\u751f\u4f7f\u7528\u3002",
+    gateSub: "\u8acb\u8f38\u5165\u8ab2\u5802\u4e0a\u63d0\u4f9b\u7684\u5b58\u53d6\u78bc\uff0c\u6b64\u88dd\u7f6e\u5c07\u8a18\u4f4f\u8a72\u78bc\u3002",
+    gatePlaceholder: "\u5b58\u53d6\u78bc", gateUnlock: "\u89e3\u9396", gateChecking: "\u9a57\u8b49\u4e2d\u2026",
+    gateError: "\u5b58\u53d6\u78bc\u4e0d\u6b63\u78ba\uff0c\u8acb\u91cd\u8a66\u3002", gateNoCode: "\u6c92\u6709\u5b58\u53d6\u78bc\uff1f", gateContact: "\u96fb\u90f5\u806f\u7d61\u6211",
+    notFoundEyebrow: "\u932f\u8aa4 404", notFoundTitle: "\u9801\u9762\u4e0d\u5b58\u5728", backHome: "\u8fd4\u56de\u4e3b\u9801",
+    footContact: "\u806f\u7d61", footProfiles: "\u500b\u4eba\u6a94\u6848", footNavigate: "\u5c0e\u89bd",
+    colophon: ["\u51fa\u7248\u7269\u540c\u6b65\u81ea ", "\u3002"],
   },
 };
 
@@ -484,9 +523,9 @@ function Header({ theme, onToggleTheme }) {
           aria-expanded={menuOpen} aria-label="Menu">
           {menuOpen ? "✕" : "☰"}
         </button>
-        <button className="lang-toggle" onClick={() => setLang(lang === "fr" ? "en" : "fr")}
-          aria-label={lang === "fr" ? "Switch to English" : "Passer en français"}>
-          {lang === "fr" ? "EN" : "FR"}
+        <button className="lang-toggle" onClick={() => setLang(lang === "en" ? "fr" : lang === "fr" ? "zh" : "en")}
+          aria-label="Change language · Changer de langue · \u66f4\u6539\u8a9e\u8a00">
+          {lang === "zh" ? "\u4e2d" : lang.toUpperCase()}
         </button>
         <button className="theme-toggle" onClick={onToggleTheme}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
@@ -1096,7 +1135,7 @@ export default function App() {
   const [lang, setLang] = useState(() => {
     try {
       const saved = localStorage.getItem("lang");
-      if (saved === "en" || saved === "fr") return saved;
+      if (saved === "en" || saved === "fr" || saved === "zh") return saved;
     } catch { /* storage unavailable */ }
     return "en";
   });
@@ -1107,7 +1146,7 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
-    document.documentElement.lang = lang;
+    document.documentElement.lang = lang === "zh" ? "zh-Hant-HK" : lang;
     try { localStorage.setItem("lang", lang); } catch { /* storage unavailable */ }
   }, [lang]);
 
@@ -1115,7 +1154,10 @@ export default function App() {
     lang,
     setLang,
     t: UI[lang],
-    pick: (k) => (lang === "fr" && FR[k] !== undefined ? FR[k] : EN_CONTENT[k]),
+    pick: (k) => {
+      const overlay = lang === "fr" ? FR : lang === "zh" ? ZH : null;
+      return overlay && overlay[k] !== undefined ? overlay[k] : EN_CONTENT[k];
+    },
   }), [lang]);
 
   return (
