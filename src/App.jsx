@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Component, createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, Route, Routes, useLocation, useParams } from "react-router-dom";
 import {
   ORCID_ID, LINKS, PROFILE_LINKS, AFFILIATION, HERO_LEDE, BIO, SKILLS, LANGUAGES,
@@ -414,20 +414,14 @@ function PubItem({ title, authors, venue, year, type, link, citation, abstract }
 }
 
 function OrgMark({ domain, name, logoUrl }) {
-  const [stage, setStage] = useState(0);
-  const sources = [
-    ...(logoUrl ? [logoUrl] : []),
-    ...(domain ? [
-      `https://logo.clearbit.com/${domain}`,
-      `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
-    ] : []),
-  ];
-  if (stage >= sources.length) {
+  const [failed, setFailed] = useState(false);
+  const src = logoUrl || (domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null);
+  if (!src || failed) {
     return <span className="org-mark org-mark-fallback" aria-hidden="true">{(name || "?")[0]}</span>;
   }
   return (
-    <img className="org-mark" src={sources[stage]} alt="" loading="lazy"
-      onError={() => setStage((s) => s + 1)} />
+    <img className="org-mark" src={src} alt="" loading="lazy"
+      onError={() => setFailed(true)} />
   );
 }
 
@@ -480,7 +474,9 @@ function Header({ theme, onToggleTheme }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  useEffect(() => setMenuOpen(false), [location.pathname]);
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   return (
     <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
@@ -602,7 +598,9 @@ function Footer() {
 
 function ScrollToTop() {
   const { pathname } = useLocation();
-  useEffect(() => window.scrollTo(0, 0), [pathname]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   return null;
 }
 
@@ -612,6 +610,35 @@ function PageHead({ title }) {
   }, [title]);
   return null;
 }
+
+class RouteErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { failed: false };
+  }
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    if (this.state.failed) {
+      return (
+        <section className="page-hero">
+          <div className="wrap">
+            <h1 className="page-title">This page could not be displayed</h1>
+            <div className="btn-row">
+              <button className="btn btn-solid" onClick={() => window.location.reload()}>Reload</button>
+            </div>
+          </div>
+        </section>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const GlobalStyles = memo(function GlobalStyles() {
+  return <style>{STYLES}</style>;
+});
 
 function Portrait() {
   const [failed, setFailed] = useState(false);
@@ -1179,20 +1206,22 @@ export default function App() {
 
   return (
     <LangContext.Provider value={langValue}>
-      <style>{STYLES}</style>
+      <GlobalStyles />
       <ScrollToTop />
       <Header theme={theme} onToggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))} />
       <main>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/research" element={<ResearchPage />} />
-          <Route path="/teaching" element={<TeachingPage />} />
-          <Route path="/teaching/:courseSlug" element={<CoursePage />} />
-          <Route path="/teaching/:courseSlug/:slug" element={<SessionPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/cv" element={<CVPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        <RouteErrorBoundary>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/research" element={<ResearchPage />} />
+            <Route path="/teaching" element={<TeachingPage />} />
+            <Route path="/teaching/:courseSlug" element={<CoursePage />} />
+            <Route path="/teaching/:courseSlug/:slug" element={<SessionPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/cv" element={<CVPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </RouteErrorBoundary>
       </main>
       <Footer />
     </LangContext.Provider>
