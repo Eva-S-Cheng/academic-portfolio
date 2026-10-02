@@ -29,7 +29,7 @@
    ];
    
    export const AFFILIATION =
-     "Doctoral student in Finance, ESCP Business School · Visiting Researcher, Audencia Business School";
+     "Doctoral student in Finance, ESCP Business School";
    
    export const HERO_LEDE =
      "I study how climate, nature and social risks affect corporate decisions and financial markets, how investors influence corporate sustainability practices, and how artificial intelligence can support the analysis of corporate disclosures.";
@@ -37,7 +37,7 @@
    export const BIO = [
      "My research lies at the intersection of finance, sustainability and quantitative methods. I examine how climate, nature and social risks affect corporate decisions and financial markets, how investors influence corporate sustainability practices, and how artificial intelligence can be applied to the analysis of corporate disclosures and sustainability reporting. My work draws on econometrics, asset and property pricing, and machine learning applied to finance.",
      "I came to research after several years in industry. Following an MSc in Data Management for Finance, from which I graduated valedictorian, I worked as a Financial Analyst in real estate development and as an Asset and Liability Manager in banking, building on earlier experience as a Data Analyst. This background informs the empirical questions I pursue.",
-     "I am currently a doctoral student in Finance at ESCP Business School and a Visiting Researcher at Audencia Business School. I have also taught Python and Quantitative Finance to postgraduate students as an adjunct lecturer.",
+     "I am currently a doctoral student in Finance at ESCP Business School. I was previously a Visiting Researcher at Audencia Business School. I have also taught Python and Quantitative Finance to postgraduate students as an adjunct lecturer.",
    ];
    
    export const SKILLS = ["Python", "R", "SQL", "Excel", "C++", "Power BI"];
@@ -276,7 +276,7 @@
        org: "Audencia Business School",
        orgUrl: "https://www.audencia.com",
        orgDomain: "audencia.com",
-       period: "2025 \u2013 Present",
+       period: "2025 \u2013 August 2026",
        details: null,
      },
      {

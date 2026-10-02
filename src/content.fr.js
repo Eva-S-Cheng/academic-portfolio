@@ -7,7 +7,7 @@
 
    export const FR = {
     AFFILIATION:
-      "Doctorante en finance, ESCP Business School \u00b7 Chercheuse invit\u00e9e, Audencia Business School",
+      "Doctorante en finance, ESCP Business School",
   
     HERO_LEDE:
       "J'\u00e9tudie la mani\u00e8re dont les risques climatiques, naturels et sociaux influencent les d\u00e9cisions des entreprises et les march\u00e9s financiers, comment les investisseurs orientent les pratiques de durabilit\u00e9 des entreprises, et comment l'IA peut soutenir l'analyse des publications d'entreprises.",
@@ -15,7 +15,7 @@
     BIO: [
       "Ma recherche se situe \u00e0 l'intersection de la finance, de la durabilit\u00e9 et des m\u00e9thodes quantitatives. J'examine comment les risques climatiques, naturels et sociaux influencent les d\u00e9cisions des entreprises et les march\u00e9s financiers, comment les investisseurs orientent les pratiques de durabilit\u00e9 des entreprises, et comment l'IA peut \u00eatre appliqu\u00e9e \u00e0 l'analyse des publications d'entreprises et du reporting de durabilit\u00e9. Mes travaux mobilisent l'\u00e9conom\u00e9trie, la valorisation d'actifs financiers et immobiliers, et le machine learning appliqu\u00e9 \u00e0 la finance.",
       "Je suis venue \u00e0 la recherche apr\u00e8s plusieurs ann\u00e9es en entreprise. Apr\u00e8s un MSc in Data Management for Finance, dont je suis sortie major de promotion, j'ai travaill\u00e9 comme analyste financi\u00e8re en promotion immobili\u00e8re puis comme gestionnaire actif-passif en banque, en m'appuyant sur une premi\u00e8re exp\u00e9rience de data analyst. Ce parcours nourrit les questions empiriques que j'\u00e9tudie.",
-      "Je suis actuellement doctorante en finance \u00e0 ESCP Business School et chercheuse invit\u00e9e \u00e0 Audencia Business School. J'ai \u00e9galement enseign\u00e9 Python et la finance quantitative \u00e0 des \u00e9tudiants de niveau master en tant qu'enseignante vacataire.",
+      "Je suis actuellement doctorante en finance \u00e0 ESCP Business School. J'ai auparavant \u00e9t\u00e9 chercheuse invit\u00e9e \u00e0 Audencia Business School. J'ai \u00e9galement enseign\u00e9 Python et la finance quantitative \u00e0 des \u00e9tudiants de niveau master en tant qu'enseignante vacataire.",
     ],
   
     RESEARCH_STATEMENT: [
@@ -185,7 +185,7 @@
         org: "Audencia Business School",
         orgUrl: "https://www.audencia.com",
         orgDomain: "audencia.com",
-        period: "2025 \u2013 aujourd'hui",
+        period: "2025 \u2013 ao\u00fbt 2026",
         details: null,
       },
       {
