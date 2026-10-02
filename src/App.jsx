@@ -1232,16 +1232,16 @@ export default function App() {
 
 const STYLES = `
 :root {
-  --bg: #f5f7f2;
+  --bg: #e8eee4;
   --surface: #ffffff;
   --ink: #172219;
   --soft: #58695e;
-  --line: #dde4d9;
+  --line: #c2cec3;
   --green: #1c7550;
   --green-deep: #135c3d;
-  --wash: #e6f0e8;
-  --shadow: 0 1px 2px rgba(23, 34, 25, 0.04), 0 8px 24px -12px rgba(23, 34, 25, 0.12);
-  --shadow-hover: 0 2px 4px rgba(23, 34, 25, 0.05), 0 14px 32px -14px rgba(23, 34, 25, 0.18);
+  --wash: #dce8de;
+  --shadow: 0 0 0 1px rgba(23, 34, 25, 0.04), 0 1px 2px rgba(23, 34, 25, 0.06), 0 10px 22px -12px rgba(23, 34, 25, 0.22);
+  --shadow-hover: 0 0 0 1px rgba(28, 117, 80, 0.12), 0 2px 6px rgba(23, 34, 25, 0.08), 0 16px 32px -12px rgba(23, 34, 25, 0.26);
   --font: "Fraunces", Georgia, serif;
 }
 
